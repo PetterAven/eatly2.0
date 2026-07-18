@@ -71,9 +71,10 @@ return [
     | authentication or password reset when the operations are successful
     | and the user is authenticated. You are free to change this value.
     |
+    | MODIFICADO: Cambiado de '/dashboard' a '/' para regresar a Eatly
     */
 
-    'home' => '/dashboard',
+    'home' => '/',
 
     /*
     |--------------------------------------------------------------------------

@@ -2,30 +2,26 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Location;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Location>
  */
 class LocationFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     protected $model = Location::class;
+
     public function definition(): array
     {
-         return [
-            'country'      => 'México',
+        return [
+            'country'      => 'España', // Mapeado en español
             'state'        => $this->faker->state(),
             'city'         => $this->faker->city(),
-            'address_line' => $this->faker->streetAddress(),
-            'postal_code'  => $this->faker->postcode(),
-            'lat'          => $this->faker->latitude(19.0, 21.0),
-            'lng'          => $this->faker->longitude(-100.0, -98.0),
+            'address_line' => $this->faker->streetAddress(), // <-- Corregido
+            'postal_code'  => $this->faker->numerify('#####'),
+            'lat'          => $this->faker->latitude(40.0, 41.0), // <-- Corregido
+            'lng'          => $this->faker->longitude(-4.0, -3.0), // <-- Corregido
         ];
     }
 }

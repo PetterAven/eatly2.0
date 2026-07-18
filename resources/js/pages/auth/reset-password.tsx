@@ -15,80 +15,91 @@ interface ResetPasswordProps {
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     return (
-        <AuthLayout
-            title="Reset password"
-            description="Please enter your new password below"
-        >
-            <Head title="Reset password" />
+        <div className="min-h-screen w-full bg-gradient-to-br from-purple-900 to-indigo-950 flex flex-col justify-center items-center px-4 py-8">
+            <div className="w-full sm:max-w-md bg-white border border-purple-800/20 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+                
+                {/* Detalle estético superior de la marca */}
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-700 via-amber-500 to-purple-700"></div>
 
-            <Form
-                {...update.form()}
-                transform={(data) => ({ ...data, token, email })}
-                resetOnSuccess={['password', 'password_confirmation']}
-            >
-                {({ processing, errors }) => (
-                    <div className="grid gap-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                name="email"
-                                autoComplete="email"
-                                value={email}
-                                className="mt-1 block w-full"
-                                readOnly
-                            />
-                            <InputError
-                                message={errors.email}
-                                className="mt-2"
-                            />
-                        </div>
+                <AuthLayout
+                    title="Actualizar Contraseña"
+                    description="Por favor, introduce tu nueva clave de seguridad abajo"
+                >
+                    <Head title="Restablecer Contraseña - Eatly UPP" />
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                name="password"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                autoFocus
-                                placeholder="Password"
-                            />
-                            <InputError message={errors.password} />
-                        </div>
+                    <Form
+                        {...update.form()}
+                        transform={(data) => ({ ...data, token, email })}
+                        resetOnSuccess={['password', 'password_confirmation']}
+                        className="mt-4"
+                    >
+                        {({ processing, errors }) => (
+                            <div className="grid gap-6">
+                                {/* Campo Correo Electrónico (Solo Lectura) */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
+                                        Correo Electrónico
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        autoComplete="email"
+                                        value={email}
+                                        className="rounded-xl border-gray-200 bg-slate-100 text-gray-500 cursor-not-allowed"
+                                        readOnly
+                                    />
+                                    <InputError message={errors.email} className="mt-2" />
+                                </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
-                            </Label>
-                            <Input
-                                id="password_confirmation"
-                                type="password"
-                                name="password_confirmation"
-                                autoComplete="new-password"
-                                className="mt-1 block w-full"
-                                placeholder="Confirm password"
-                            />
-                            <InputError
-                                message={errors.password_confirmation}
-                                className="mt-2"
-                            />
-                        </div>
+                                {/* Campo Nueva Contraseña */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
+                                        Nueva Contraseña
+                                    </Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        autoComplete="new-password"
+                                        autoFocus
+                                        placeholder="Mínimo 8 caracteres"
+                                        className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
+                                    />
+                                    <InputError message={errors.password} />
+                                </div>
 
-                        <Button
-                            type="submit"
-                            className="mt-4 w-full"
-                            disabled={processing}
-                            data-test="reset-password-button"
-                        >
-                            {processing && <Spinner />}
-                            Reset password
-                        </Button>
-                    </div>
-                )}
-            </Form>
-        </AuthLayout>
+                                {/* Campo Confirmar Contraseña */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password_confirmation" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
+                                        Confirmar Contraseña
+                                    </Label>
+                                    <Input
+                                        id="password_confirmation"
+                                        type="password"
+                                        name="password_confirmation"
+                                        autoComplete="new-password"
+                                        placeholder="Repite tu contraseña"
+                                        className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
+                                    />
+                                    <InputError message={errors.password_confirmation} className="mt-2" />
+                                </div>
+
+                                {/* Botón de envío */}
+                                <Button
+                                    type="submit"
+                                    className="mt-4 w-full h-11 bg-amber-500 hover:bg-amber-600 text-purple-950 font-black rounded-xl shadow-md transition-all duration-200 uppercase tracking-wider text-xs flex items-center justify-center gap-2"
+                                    disabled={processing}
+                                    data-test="reset-password-button"
+                                >
+                                    {processing && <Spinner className="text-purple-950 h-4 w-4" />}
+                                    Restablecer Contraseña
+                                </Button>
+                            </div>
+                        )}
+                    </Form>
+                </AuthLayout>
+            </div>
+        </div>
     );
 }

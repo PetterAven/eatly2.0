@@ -3,45 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
+use Inertia\Response;
 
 class HomeController extends Controller
 {
+    /**
+     * Muestra la página de inicio o redirige al dashboard si ya está logueado.
+     */
     public function welcome()
     {
-        // Traer sucursales activas con restaurant, location e imágenes
-        $branches = Branch::with(['restaurant', 'location', 'images'])
+        // SI BRAYAN YA INICIÓ SESIÓN, LO MANDAMOS AL DASHBOARD AUTOMÁTICAMENTE
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+
+        $branches = Branch::with(['restaurant', 'location', 'images', 'image'])
             ->where('is_active', true)
-            ->orderBy('created_at', 'desc')
-            ->take(12)
             ->get()
-            ->map(function (Branch $branch) {
-                $image = $branch->images->first();
+            ->map(function ($branch) {
+                $imageUrl = $branch->image?->url 
+                    ?? $branch->images->first()?->url 
+                    ?? 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500';
 
                 return [
-                    'id'              => $branch->id,
-                    'name'            => $branch->name,
-                    'restaurant_name' => $branch->restaurant?->name,
-                    'city'            => $branch->location?->city,
-                    'state'           => $branch->location?->state,
-                    'image_url'       => $image?->url,
-                    // tiempos estimados fake por ahora (15–30 min)
-                    'eta_min'         => rand(15, 20),
-                    'eta_max'         => rand(21, 30),
-                    // rating demo
-                    'rating'          => number_format(rand(42, 50) / 10, 1),
+                    'id' => $branch->id,
+                    'name' => $branch->name ?? 'Sucursal sin nombre',
+                    'restaurant_name' => $branch->restaurant?->name ?? 'Restaurante Genérico',
+                    'city' => $branch->location?->city ?? 'Ciudad Principal',
+                    'image' => $imageUrl,
+                    'rating' => 4.5,
+                    'delivery_time' => '20-30 min'
                 ];
             });
 
+        // CORREGIDO: 'Welcome' ahora va con W mayúscula exacta coincidiendo con React
         return Inertia::render('Welcome', [
-            'canLogin'       => Route::has('login'),
-            'canRegister'    => Features::enabled(Features::registration()),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion'     => PHP_VERSION,
-            'branches'       => $branches,
+            'branches' => $branches
         ]);
     }
 }

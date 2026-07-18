@@ -20,7 +20,9 @@ class LevelFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'        => $this->faker->unique()->randomElement([
+            // CORREGIDO: Quitamos el ->unique() para que si se crean más de 3 registros, 
+            // Faker pueda repetir 'admin', 'owner' o 'customer' sin romper la base de datos.
+            'name'        => $this->faker->randomElement([
                 'admin', 'owner', 'customer',
             ]),
             'description' => $this->faker->sentence(),

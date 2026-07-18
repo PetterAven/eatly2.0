@@ -18,12 +18,13 @@ class BranchFactory extends Factory
      * @return array<string, mixed>
      */
     protected $model = Branch::class;
+
     public function definition(): array
     {
         return [
             'restaurant_id'     => Restaurant::factory(),
             'location_id'       => Location::factory(),
-            'name'              => $this->faker->streetName(),
+            'name'              => 'Sucursal ' . $this->faker->randomElement(['Centro', 'Norte', 'Sur', 'Poniente', 'Altabrisa', 'Industrial', 'Roma']),
             'phone'             => $this->faker->numerify('55########'),
             'capacity_per_slot' => $this->faker->numberBetween(5, 25),
             'opening_hours'     => json_encode([
