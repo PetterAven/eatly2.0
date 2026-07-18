@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import CheckoutForm from './Checkout/CheckoutForm';
 
 interface Product {
@@ -23,6 +23,7 @@ export default function Dashboard({ auth }: { auth: any }) {
     const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
+    // Listado de productos del campus
     const products: Product[] = [
         { id: 1, name: 'Chilaquiles Tecolote con Pollo', price: 65, description: 'Totopos crujientes, salsa verde viva, crema, queso de aro y pollo deshebrado.', category: 'Comida', restaurant_name: 'Cafetería Central UPP', image: 'https://images.unsplash.com/photo-1640719028782-8230f1bdc42a?auto=format&fit=crop&w=400&q=80', local_id: 1 },
         { id: 2, name: 'Hamburguesa Monumental Potro', price: 85, description: '150g de res, queso cheddar, tocino ahumado y papas a la francesa.', category: 'Comida', restaurant_name: 'The Potro Burger', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80', local_id: 2 },
@@ -33,12 +34,14 @@ export default function Dashboard({ auth }: { auth: any }) {
         { id: 7, name: 'Gomiboing Escarchado Fresa', price: 35, description: 'Jugo Boing frío con hielos, escarchado con miguelito, chamoy y gomitas.', category: 'Bares', restaurant_name: 'El Sultán Snack Bar', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=400&q=80', local_id: 4 }
     ];
 
+    // Filtrado de productos basado en la categoría seleccionada
     const filteredProducts = selectedCategory === 'Todos' 
         ? products 
         : products.filter(p => p.category === selectedCategory);
 
     const uniqueRestaurants = Array.from(new Set(filteredProducts.map(p => p.restaurant_name)));
 
+    // Acciones del carrito
     const addToCart = (product: Product) => {
         setCart(prev => {
             const existing = prev.find(item => item.product.id === product.id);
@@ -67,16 +70,26 @@ export default function Dashboard({ auth }: { auth: any }) {
             <Head title="Eatly UPP - Menú del Campus" />
             <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
                 
+                {/* Header Superior con Botón de Mis Pedidos */}
                 <header className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
                     <span className="text-xl font-black tracking-tight">Eatly <span className="text-purple-600">Eats</span> 🐴</span>
                     <div className="flex items-center space-x-4">
                         <span className="text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full">⚡ Entregas en el Campus</span>
+                        <Link 
+                            href="/historial" 
+                            className="text-xs font-bold text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
+                        >
+                            📋 Mis Pedidos
+                        </Link>
                         <button onClick={() => router.post('/logout')} className="text-xs font-bold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition">Salir</button>
                     </div>
                 </header>
 
+                {}
                 <div className="flex-1 flex flex-col lg:flex-row">
                     <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
+                        
+                        {/* Selector de Categorías */}
                         <div className="flex space-x-3 mb-8 overflow-x-auto pb-2">
                             {[
                                 { id: 'Todos', label: '📱 Todo' },
@@ -96,6 +109,7 @@ export default function Dashboard({ auth }: { auth: any }) {
                             ))}
                         </div>
 
+                        {}
                         {uniqueRestaurants.map(restaurant => (
                             <div key={restaurant} className="mb-10">
                                 <h2 className="text-lg font-black text-gray-900 border-b border-gray-200 pb-2 mb-4 flex items-center gap-2">
@@ -123,6 +137,7 @@ export default function Dashboard({ auth }: { auth: any }) {
                         ))}
                     </main>
 
+                    {}
                     <aside className="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-6 flex flex-col justify-between sticky lg:top-[73px] h-[calc(100vh-73px)]">
                         <div className="overflow-y-auto flex-1">
                             <h2 className="text-base font-black uppercase tracking-wider text-gray-500 mb-4">Tu Pedido</h2>
@@ -164,6 +179,7 @@ export default function Dashboard({ auth }: { auth: any }) {
                     </aside>
                 </div>
 
+                {/* Modal del Formulario de Pago */}
                 {isCheckoutOpen && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
                         <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 relative border border-gray-100 max-h-[90vh] overflow-y-auto">

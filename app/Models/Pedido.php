@@ -9,14 +9,8 @@ class Pedido extends Model
 {
     use HasFactory;
 
-    /**
-     * Forzar la conexión con la tabla en inglés de tu migración.
-     */
     protected $table = 'orders';
 
-    /**
-     * Atributos asignables de forma masiva (Hacen match exacto con tu migración).
-     */
     protected $fillable = [
         'user_id',
         'branch_id',
@@ -29,21 +23,34 @@ class Pedido extends Model
         'subtotal',
         'discount',
         'total',
+        'driver_id',
     ];
 
-    /**
-     * Relación: El estudiante que compra el pedido (Apunta a user_id).
-     */
     public function cliente()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Relación: La sucursal/local de comida (Apunta a branch_id).
-     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    /**
+     * La tabla ratings real usa "pedido_id" como llave foránea (no "order_id").
+     */
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'pedido_id');
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_id');
     }
 }

@@ -29,16 +29,15 @@ interface FormState {
     repartidor_id: number | null;
     local_id: number;
     items: Array<{ item_id: number; cantidad: number; precio_unitario: number }>;
-    error?: string;
 }
 
 export default function CheckoutForm({ subtotalComida, localId, vendedorId = null, repartidorId = null, itemsCarrito }: CheckoutProps) {
-    // Extraemos de forma segura las props compartidas por el Middleware de Inertia
     const { auth, flash, errors: serverErrors } = usePage<any>().props;
 
     const [numeroTarjeta, setNumeroTarjeta] = useState('');
     const [expiracion, setExpiracion] = useState('');
     const [cvv, setCvv] = useState('');
+    const [descargado, setDescargado] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm<FormState>({
         cliente_id: auth.user ? auth.user.id : '',
@@ -75,13 +74,54 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Asegúrate de que esta URL coincida exactamente con tu archivo de rutas (web.php)
         post('/pedidos/simular-pago', {
             preserveScroll: true,
         });
     };
 
-    // EVALUACIÓN DE ÉXITO INTEGRADA CON EL FLASH REAL DE LARAVEL
+    const descargarTicketDigital = () => {
+        const lines = [
+            "=========================================",
+            "            EATLY EATS CAMPUS            ",
+            "         Universidad Politécnica         ",
+            "=========================================",
+            `Fecha: ${new Date().toLocaleDateString()}`,
+            `Código Pedido: ${flash?.orderCode || 'EAT-SIMULADO'}`,
+            `Cliente: ${auth?.user?.name || 'Usuario Campus'}`,
+            "-----------------------------------------",
+            "Detalle de Compra:",
+        ];
+
+        itemsCarrito.forEach(item => {
+            lines.push(`- ${item.quantity}x ${item.product.name.substring(0, 20)}... $${(item.product.price * item.quantity).toFixed(2)}`);
+        });
+
+        lines.push(
+            "-----------------------------------------",
+            `Subtotal Alimentos: $${subtotalComida.toFixed(2)} MXN`,
+            "Envío Campus:        $12.00 MXN",
+            `TOTAL COBRADO:      $${(subtotalComida + 12.00).toFixed(2)} MXN`,
+            "-----------------------------------------",
+            `Edificio: ${flash?.edificio || data.destino_edificio}`,
+            `Aula/Cubículo: ${flash?.aula || data.destino_aula}`,
+            `Método de Pago: ${flash?.metodoPago === 'tarjeta' ? 'TARJETA BANCARIA' : 'EFECTIVO CONTRA ENTREGA'}`,
+            "=========================================",
+            "     ¡Gracias por consumir local!       ",
+            "         Powered by Eatly UPP           ",
+            "========================================="
+        ); // <-- CORREGIDO: Se cambió el corchete de cierre "];" por un paréntesis ");"
+
+        const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Ticket-${flash?.orderCode || 'EAT'}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setDescargado(true);
+    };
+
     const pedidoExitoso = flash?.success === true;
     const metodoPagoFinal = flash?.metodoPago || data.metodo_pago;
     const esTarjeta = metodoPagoFinal === 'tarjeta';
@@ -90,14 +130,12 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
     if (pedidoExitoso) {
         return (
             <div className="text-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm space-y-5 animate-fadeIn">
-                {/* Iconografía Dinámica */}
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto text-3xl ${
                     esTarjeta ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
                 }`}>
                     {esTarjeta ? '💳' : '💵'}
                 </div>
                 
-                {/* Mensajes de Confirmación basados en la respuesta */}
                 <div>
                     <h3 className="text-lg font-black text-gray-900">
                         {esTarjeta ? '¡Pago Procesado con Éxito!' : '¡Pedido Confirmado!'}
@@ -109,7 +147,6 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                     </p>
                 </div>
 
-                {/* Resumen del Ticket Físico / Digital */}
                 <div className="p-4 bg-gray-50 rounded-xl space-y-2 text-left text-xs font-medium text-gray-600 border border-gray-100">
                     <div className="flex justify-between border-b border-gray-200 pb-2">
                         <span>Código de Pedido:</span>
@@ -133,21 +170,22 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                     </div>
                 </div>
 
-                {/* Botones de Acción Posterior */}
                 <div className="space-y-2 pt-2">
                     <button 
                         type="button" 
-                        onClick={() => alert('Generando archivo de ticket PDF... Próximamente integrado con dompdf.')}
-                        className="w-full py-2.5 bg-gray-950 hover:bg-gray-800 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition"
+                        onClick={descargarTicketDigital}
+                        className={`w-full py-2.5 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition ${
+                            descargado ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-950 hover:bg-gray-800'
+                        }`}
                     >
-                        {esTarjeta ? '📄 Descargar Voucher de Pago' : '📄 Descargar Nota de Entrega'}
+                        {descargado ? '✔️ Ticket Guardado' : '📄 Descargar Ticket de Compra'}
                     </button>
                     <button 
                         type="button" 
-                        onClick={() => window.location.href = '/dashboard'}
-                        className="w-full py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold rounded-xl text-xs uppercase tracking-wider transition"
+                        onClick={() => { window.location.href = '/historial'; }}
+                        className="w-full py-2.5 border border-purple-200 text-purple-600 hover:bg-purple-50 font-bold rounded-xl text-xs uppercase tracking-wider transition"
                     >
-                        Volver al menú de Eatly
+                        ⭐ Ver pedido y Calificar
                     </button>
                 </div>
             </div>
@@ -161,9 +199,19 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                 <p className="text-xs text-gray-400 mt-0.5">Configura tu entrega en las instalaciones del campus.</p>
             </div>
 
-            {(errors.error || serverErrors.error) && (
+            {Object.keys(errors).length > 0 && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-xl space-y-1">
+                    <p className="font-bold">⚠️ Corrige los siguientes errores:</p>
+                    <ul className="list-disc list-inside text-[11px] font-medium pl-1">
+                        {Object.entries(errors).map(([key, msg]) => (
+                            <li key={key}>{String(msg)}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            {serverErrors?.error && (
                 <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-xl">
-                    ⚠️ {errors.error || serverErrors.error}
+                    ⚠️ {serverErrors.error}
                 </div>
             )}
 
