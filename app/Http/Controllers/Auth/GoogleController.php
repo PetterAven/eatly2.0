@@ -12,7 +12,6 @@ class GoogleController extends Controller
 {
     public function redirect()
     {
-        // Forzamos a Google a mostrar siempre la ventana de selección de cuenta
         return Socialite::driver('google')
             ->with(['prompt' => 'select_account'])
             ->redirect();
@@ -21,30 +20,39 @@ class GoogleController extends Controller
     public function callback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')->stateless()->user();
             
-            // Buscamos si el correo de Google ya existe en la Base de Datos
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
-                // SOLUCIÓN PROFESIONAL: Si ya existe, lo logueamos directo con 'true' (Recordar Sesión)
+                $user->update([
+                    'google_id'         => $googleUser->getId(),
+                    'avatar'            => $googleUser->getAvatar(),
+                    'email_verified_at' => $user->email_verified_at ?? now(), // Asegura pase por middleware 'verified'
+                ]);
+
                 Auth::login($user, true);
-                return redirect()->route('dashboard');
+
+                return redirect()->intended('/dashboard');
             }
 
-            // Si es un usuario nuevo en el campus, lo creamos de manera limpia
             $newUser = User::create([
-                'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'password' => bcrypt(Str::random(16)), 
+                'name'              => $googleUser->getName(),
+                'email'             => $googleUser->getEmail(),
+                'google_id'         => $googleUser->getId(),
+                'avatar'            => $googleUser->getAvatar(),
+                'level_id'          => 1,
+                'password'          => bcrypt(Str::random(16)), 
                 'email_verified_at' => now(), 
             ]);
 
             Auth::login($newUser, true);
-            return redirect()->route('dashboard');
 
-        } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Ocurrió un inconveniente al conectar con Google.');
+            return redirect()->intended('/dashboard');
+
+        } catch (\Throwable $e) {
+            // En producción redirigimos al login con mensaje de error limpio en vez de dd()
+            return redirect()->route('welcome')->with('error', 'Ocurrió un error al intentar autenticar con Google. Intenta de nuevo.');
         }
     }
 }

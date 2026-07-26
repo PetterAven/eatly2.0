@@ -5,20 +5,30 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
-import { login } from '@/routes';
-import { store } from '@/routes/register';
-import { Form, Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
+import React from 'react';
 
 export default function Register() {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/register', {
+            onFinish: () => reset('password', 'password_confirmation'),
+        });
+    };
+
     return (
-        // Fondo degradado institucional coordinado con el Login
-        <div className="min-h-screen w-full bg-gradient-to-br from-purple-900 to-indigo-950 flex flex-col justify-center items-center px-4 py-8">
-            
-            {/* Tarjeta contenedora elegante */}
-            <div className="w-full sm:max-w-md bg-white border border-purple-800/20 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
-                
-                {/* Detalle estético superior */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-700 via-amber-500 to-purple-700"></div>
+        <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-purple-900 to-indigo-950 px-4 py-8">
+            {}
+            <div className="relative w-full overflow-hidden rounded-3xl border border-purple-800/20 bg-white p-6 shadow-2xl sm:max-w-md sm:p-8">
+                {}
+                <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-purple-700 via-amber-500 to-purple-700"></div>
 
                 <AuthLayout
                     title="CREAR CUENTA"
@@ -26,129 +36,180 @@ export default function Register() {
                 >
                     <Head title="Registrarse - Eatly UPP" />
 
-                    <Form
-                        {...store.form()}
-                        className="flex flex-col gap-5 mt-4"
+                    <form
+                        onSubmit={handleSubmit}
+                        className="mt-4 flex flex-col gap-5"
                     >
-                        {({ processing, errors }) => (
-                            <>
-                                <div className="grid gap-5">
-                                    {/* Nombre Completo */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="name" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
-                                            Nombre Completo
-                                        </Label>
-                                        <Input
-                                            id="name"
-                                            name="name"
-                                            required
-                                            autoFocus
-                                            tabIndex={1}
-                                            autoComplete="name"
-                                            placeholder="Ingresa tu nombre"
-                                            className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
-                                        />
-                                        <InputError message={errors.name} />
-                                    </div>
-
-                                    {/* Correo Electrónico */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="email" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
-                                            Correo Electrónico
-                                        </Label>
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            name="email"
-                                            required
-                                            tabIndex={2}
-                                            autoComplete="email"
-                                            placeholder="ejemplo@upp.edu.mx"
-                                            className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
-                                        />
-                                        <InputError message={errors.email} />
-                                    </div>
-
-                                    {/* Contraseña */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="password" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
-                                            Contraseña
-                                        </Label>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            name="password"
-                                            required
-                                            tabIndex={3}
-                                            autoComplete="new-password"
-                                            placeholder="Mínimo 8 caracteres"
-                                            className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
-                                        />
-                                        <InputError message={errors.password} />
-                                    </div>
-
-                                    {/* Confirmar Contraseña */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="password_confirmation" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
-                                            Confirmar Contraseña
-                                        </Label>
-                                        <Input
-                                            id="password_confirmation"
-                                            type="password"
-                                            name="password_confirmation"
-                                            required
-                                            tabIndex={4}
-                                            autoComplete="new-password"
-                                            placeholder="Repite tu contraseña"
-                                            className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
-                                        />
-                                        <InputError message={errors.password_confirmation} />
-                                    </div>
-
-                                    {/* Botón de Registro Tradicional Simplificado */}
-                                    <Button
-                                        type="submit"
-                                        className="mt-2 w-full h-11 bg-amber-500 hover:bg-amber-600 text-purple-950 font-black rounded-xl shadow-md transition-all duration-200 uppercase tracking-wider text-xs active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
-                                        tabIndex={5}
-                                        disabled={processing}
-                                    >
-                                        {processing ? <Spinner className="text-purple-950 h-4 w-4" /> : null}
-                                        Registrarse
-                                    </Button>
-                                </div>
-
-                                {/* Divisor visual */}
-                                <div className="relative flex py-1 items-center">
-                                    <div className="flex-grow border-t border-slate-200"></div>
-                                    <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-bold uppercase tracking-wider">O también</span>
-                                    <div className="flex-grow border-t border-slate-200"></div>
-                                </div>
-
-                                {/* Botón de Registro Directo con Google */}
-                                <a
-                                    href="/auth/google/redirect"
-                                    className="w-full h-11 inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl border border-slate-200 shadow-sm text-xs uppercase tracking-wider active:scale-[0.99] transition-all group"
+                        <div className="grid gap-5">
+                            {}
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="name"
+                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
                                 >
-                                    <svg className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-                                        <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.137 4.114-3.465 0-6.285-2.82-6.285-6.285 0-3.465 2.82-6.285 6.285-6.285 1.425 0 2.735.485 3.79 1.3l3.03-3.03C18.91 1.93 15.76 1 12.24 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.897 0 10.867-4.14 10.867-11.24 0-.56-.052-1.12-.152-1.655H12.24z"/>
-                                    </svg>
-                                    Registrarse con Google
-                                </a>
+                                    Nombre Completo
+                                </Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    value={data.name}
+                                    onChange={(e) =>
+                                        setData('name', e.target.value)
+                                    }
+                                    required
+                                    autoFocus
+                                    tabIndex={1}
+                                    autoComplete="name"
+                                    placeholder="Ingresa tu nombre"
+                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                />
+                                <InputError message={errors.name} />
+                            </div>
 
-                                {/* Retorno al Login */}
-                                <div className="text-center text-xs font-medium text-gray-500 pt-4 border-t border-slate-100">
-                                    ¿Ya tienes una cuenta?{' '}
-                                    <TextLink 
-                                        href={login()} 
-                                        tabIndex={6}
-                                        className="text-purple-700 font-bold hover:underline"
-                                    >
-                                        Inicia Sesión
-                                    </TextLink>
-                                </div>
-                            </>
-                        )}
-                    </Form>
+                            {}
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="email"
+                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
+                                >
+                                    Correo Electrónico
+                                </Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    onChange={(e) =>
+                                        setData('email', e.target.value)
+                                    }
+                                    required
+                                    tabIndex={2}
+                                    autoComplete="email"
+                                    placeholder="ejemplo@upp.edu.mx"
+                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                />
+                                <InputError message={errors.email} />
+                            </div>
+
+                            {}
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="password"
+                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
+                                >
+                                    Contraseña
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    value={data.password}
+                                    onChange={(e) =>
+                                        setData('password', e.target.value)
+                                    }
+                                    required
+                                    tabIndex={3}
+                                    autoComplete="new-password"
+                                    placeholder="Mínimo 8 caracteres"
+                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                />
+                                <InputError message={errors.password} />
+                            </div>
+
+                            {}
+                            <div className="grid gap-2">
+                                <Label
+                                    htmlFor="password_confirmation"
+                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
+                                >
+                                    Confirmar Contraseña
+                                </Label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    name="password_confirmation"
+                                    value={data.password_confirmation}
+                                    onChange={(e) =>
+                                        setData(
+                                            'password_confirmation',
+                                            e.target.value,
+                                        )
+                                    }
+                                    required
+                                    tabIndex={4}
+                                    autoComplete="new-password"
+                                    placeholder="Repite tu contraseña"
+                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                />
+                                <InputError
+                                    message={errors.password_confirmation}
+                                />
+                            </div>
+
+                            {}
+                            <Button
+                                type="submit"
+                                className="mt-2 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-amber-500 text-xs font-black tracking-wider text-purple-950 uppercase shadow-md transition-all duration-200 hover:bg-amber-600 active:scale-[0.99] disabled:opacity-50"
+                                tabIndex={5}
+                                disabled={processing}
+                            >
+                                {processing && (
+                                    <Spinner className="h-4 w-4 text-purple-950" />
+                                )}
+                                Registrarse
+                            </Button>
+                        </div>
+
+                        {}
+                        <div className="relative flex items-center py-1">
+                            <div className="flex-grow border-t border-slate-200"></div>
+                            <span className="mx-4 flex-shrink text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                                O también
+                            </span>
+                            <div className="flex-grow border-t border-slate-200"></div>
+                        </div>
+
+                        {}
+                        <a
+                            href="/auth/google/redirect"
+                            className="group inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold tracking-wider text-slate-700 uppercase shadow-sm transition-all hover:bg-slate-50 active:scale-[0.99]"
+                        >
+                            <svg
+                                className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    fill="#EA4335"
+                                    d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2C17.52 1.57 14.96 1 12 1 7.35 1 3.4 3.65 1.5 7.5l3.6 2.8C6.01 7.22 8.78 5.04 12 5.04z"
+                                />
+                                <path
+                                    fill="#4285F4"
+                                    d="M23.5 12.25c0-.82-.07-1.6-.2-2.25H12v4.5h6.48c-.28 1.48-1.12 2.73-2.38 3.58l3.68 2.85c2.14-1.98 3.72-4.9 3.72-8.68z"
+                                />
+                                <path
+                                    fill="#FBBC05"
+                                    d="M5.1 14.7c-.24-.72-.38-1.49-.38-2.3s.14-1.58.38-2.3L1.5 7.3C.54 9.22 0 11.35 0 13.6s.54 4.38 1.5 6.3l3.6-2.9z"
+                                />
+                                <path
+                                    fill="#34A853"
+                                    d="M12 23c3.24 0 5.97-1.08 7.96-2.92l-3.68-2.85c-1.02.68-2.33 1.1-4.28 1.1-3.22 0-6-2.18-6.97-5.26l-3.6 2.8C3.4 20.35 7.35 23 12 23z"
+                                />
+                            </svg>
+                            Registrarse con Google
+                        </a>
+
+                        {}
+                        <div className="border-t border-slate-100 pt-4 text-center text-xs font-medium text-gray-500">
+                            ¿Ya tienes una cuenta?{' '}
+                            <TextLink
+                                href="/login"
+                                tabIndex={6}
+                                className="font-bold text-purple-700 hover:underline"
+                            >
+                                Inicia Sesión
+                            </TextLink>
+                        </div>
+                    </form>
                 </AuthLayout>
             </div>
         </div>

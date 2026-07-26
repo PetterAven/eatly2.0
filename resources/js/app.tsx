@@ -3,21 +3,43 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Eatly';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => {
-        // Busca dinámicamente tus componentes dentro de la carpeta pages
-        const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
         
-        // Mapea correctamente si el componente está suelto o en un subdirectorio
-        const page = pages[`./pages/${name}.tsx`] || pages[`./pages/${name}/index.tsx`];
+        const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
+
+        
+        let page =
+            pages[`./pages/${name}.tsx`] || pages[`./pages/${name}/index.tsx`];
+
         
         if (!page) {
-            throw new Error(`No se pudo encontrar la página: ./pages/${name}.tsx en el directorio.`);
+            const normalizedTarget = name.toLowerCase().replace(/\/index$/, '');
+            const matchingKey = Object.keys(pages).find((key) => {
+                const normalizedKey = key
+                    .replace('./pages/', '')
+                    .replace(/\.tsx$/, '')
+                    .toLowerCase();
+                return (
+                    normalizedKey === normalizedTarget ||
+                    normalizedKey === `${normalizedTarget}/index`
+                );
+            });
+
+            if (matchingKey) {
+                page = pages[matchingKey];
+            }
         }
-        
+
+        if (!page) {
+            throw new Error(
+                `[Inertia] No se pudo encontrar la página: "${name}" en el directorio ./pages/`,
+            );
+        }
+
         return page;
     },
     setup({ el, App, props }) {

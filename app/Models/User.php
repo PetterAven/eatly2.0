@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,7 +9,6 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
@@ -19,12 +17,14 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'level_id',
-        'name',
-        'email',
-        'password',
-        'phone',
-    ];
+    'name',
+    'email',
+    'password',
+    'google_id',
+    'avatar',
+    'level_id',
+    'email_verified_at',
+];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -51,30 +51,27 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
-     public function level()
+
+    public function level()
     {
         return $this->belongsTo(Level::class);
     }
 
-    // restaurantes que posee (dueño)
     public function restaurants()
     {
         return $this->hasMany(Restaurant::class, 'owner_id');
     }
 
-    // órdenes que ha realizado (cliente)
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
-    // carritos abiertos / históricos
     public function carts()
     {
         return $this->hasMany(Cart::class);
     }
 
-    // pagos que ha hecho
     public function payments()
     {
         return $this->hasMany(Payment::class);
