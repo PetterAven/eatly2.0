@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Order;
+use App\Models\Item;
+use App\Models\Branch;
+use App\Models\Restaurant;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -11,45 +13,49 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Si no hay productos, creamos unos por defecto para que no se vea vacío
-        if (Product::count() === 0) {
-            Product::insert([
-                [
-                    'name' => 'Chilaquiles Con Pollo',
-                    'category' => 'Comidas',
-                    'price' => 55.00,
-                    'description' => 'Chilaquiles verdes o rojos con pollo deshebrado, crema y queso.',
-                    'image_url' => 'https://images.unsplash.com/photo-1640719028782-8230f1bdc42a?auto=format&fit=crop&w=400&q=80',
-                    'cafe_name' => 'Cafetería Central UPP',
-                    'is_available' => true
-                ],
-                [
-                    'name' => 'Molletes Sencillos',
-                    'category' => 'Desayunos',
-                    'price' => 35.00,
-                    'description' => 'Dos piezas con frijoles, queso derretido y pico de gallo.',
-                    'image_url' => 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=400&q=80',
-                    'cafe_name' => 'Cafetería Central UPP',
-                    'is_available' => true
-                ],
-                [
-                    'name' => 'Café Americano Frío',
-                    'category' => 'Bebidas',
-                    'price' => 25.00,
-                    'description' => 'Café cargado de grano con hielos, 16oz.',
-                    'image_url' => 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=400&q=80',
-                    'cafe_name' => 'Snack Bar El Potro',
-                    'is_available' => true
-                ]
-            ]);
+        $user = Auth::user();
+
+        if ($user->role === 'merchant') {
+            return redirect()->route('vendor.dashboard');
         }
 
+        if ($user->role === 'driver') {
+            return redirect()->route('delivery.dashboard');
+        }
+
+        $items = Item::with(['category.branch.restaurant', 'images'])->get();
+        
+        $products = $items->map(function ($item) {
+            $branch = $item->category?->branch;
+            $restaurant = $branch?->restaurant;
+            $imageUrl = $item->images->first()?->url 
+                ?? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80';
+
+            // Usar dinámicamente el nombre y descripción del restaurante configurado (ej. Moto Restaurante)
+            $restaurantName = $restaurant?->name ?? $branch?->name ?? Restaurant::first()?->name ?? Branch::first()?->name ?? 'Cafetería UPP';
+            $restaurantDescription = $restaurant?->description ?? $restaurant?->address ?? 'Concesionario Oficial UPP';
+
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'price' => (float) $item->price,
+                'description' => $item->description ?? '',
+                'category' => 'Comida',
+                'restaurant_name' => $restaurantName,
+                'restaurant_description' => $restaurantDescription,
+                'image' => $imageUrl,
+                'local_id' => $branch?->id ?? 1,
+            ];
+        });
+
         return Inertia::render('Dashboard', [
-            'products' => Product::where('is_available', true)->get(),
             'activeOrder' => Order::where('user_id', Auth::id())
                                  ->whereIn('status', ['pending', 'preparing', 'ready'])
                                  ->latest()
-                                 ->first()
+                                 ->first(),
+            'databaseProducts' => $products,
+            'restaurants' => Restaurant::with('branches')->get(),
+            'branches' => Branch::with(['restaurant', 'location', 'images'])->get(),
         ]);
     }
 }

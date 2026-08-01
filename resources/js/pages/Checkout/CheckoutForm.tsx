@@ -6,7 +6,7 @@ interface CartItemProps {
         id: number;
         name: string;
         price: number;
-        [key: string]: any;
+        [key: string]: unknown;
     };
     quantity: number;
 }
@@ -17,6 +17,7 @@ interface CheckoutProps {
     vendedorId?: number | null;
     repartidorId?: number | null;
     itemsCarrito: CartItemProps[];
+    initialDeliveryLocation?: string;
 }
 
 interface FormState {
@@ -31,8 +32,8 @@ interface FormState {
     items: Array<{ item_id: number; cantidad: number; precio_unitario: number }>;
 }
 
-export default function CheckoutForm({ subtotalComida, localId, vendedorId = null, repartidorId = null, itemsCarrito }: CheckoutProps) {
-    const { auth, flash, errors: serverErrors } = usePage<any>().props;
+export default function CheckoutForm({ subtotalComida, localId, vendedorId = null, repartidorId = null, itemsCarrito, initialDeliveryLocation = '' }: CheckoutProps) {
+    const { auth, flash, errors: serverErrors } = usePage<{ auth: { user?: { id: number; name: string; email: string } }; flash?: Record<string, unknown>; errors?: Record<string, string> }>().props;
 
     const [numeroTarjeta, setNumeroTarjeta] = useState('');
     const [expiracion, setExpiracion] = useState('');
@@ -42,8 +43,8 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
     const { data, setData, post, processing, errors } = useForm<FormState>({
         cliente_id: auth.user ? auth.user.id : '',
         subtotal_comida: subtotalComida || 0,
-        destino_edificio: '',
-        destino_aula: '',
+        destino_edificio: initialDeliveryLocation || 'Edificio 2',
+        destino_aula: initialDeliveryLocation || 'Aula 104',
         metodo_pago: 'efectivo', 
         vendedor_id: vendedorId,
         repartidor_id: repartidorId,
@@ -64,7 +65,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
             local_id: localId,
             items: itemsMapeados
         }));
-    }, [subtotalComida, localId, itemsCarrito]);
+    }, [subtotalComida, localId, itemsCarrito, setData]);
 
     const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const valorLimpio = e.target.value.replace(/\D/g, '');
@@ -102,14 +103,13 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
             "Envío Campus:        $12.00 MXN",
             `TOTAL COBRADO:      $${(subtotalComida + 12.00).toFixed(2)} MXN`,
             "-----------------------------------------",
-            `Edificio: ${flash?.edificio || data.destino_edificio}`,
-            `Aula/Cubículo: ${flash?.aula || data.destino_aula}`,
+            `Destino: ${initialDeliveryLocation || data.destino_edificio}`,
             `Método de Pago: ${flash?.metodoPago === 'tarjeta' ? 'TARJETA BANCARIA' : 'EFECTIVO CONTRA ENTREGA'}`,
             "=========================================",
             "     ¡Gracias por consumir local!       ",
             "         Powered by Eatly UPP           ",
             "========================================="
-        ); // <-- CORREGIDO: Se cambió el corchete de cierre "];" por un paréntesis ");"
+        );
 
         const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
@@ -161,7 +161,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                     <div className="flex justify-between">
                         <span>Destino de Entrega:</span>
                         <span className="font-bold text-gray-900">
-                            {flash?.edificio || data.destino_edificio}, {flash?.aula || data.destino_aula}
+                            {initialDeliveryLocation || `${data.destino_edificio}, ${data.destino_aula}`}
                         </span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-gray-200 font-bold text-gray-950">
@@ -215,34 +215,12 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                 </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="p-3.5 bg-orange-50 border border-orange-200/60 rounded-2xl flex items-center justify-between">
                 <div>
-                    <label className="block text-[11px] font-bold uppercase text-gray-400 mb-1">Edificio UPP</label>
-                    <select 
-                        value={data.destino_edificio}
-                        onChange={e => setData('destino_edificio', e.target.value)}
-                        className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-0 font-medium"
-                        required
-                    >
-                        <option value="">Selecciona...</option>
-                        <option value="Edificio G">Edificio G (Ingenierías)</option>
-                        <option value="Edificio UD">Edificio UD (Laboratorios)</option>
-                        <option value="Edificio H">Edificio H (Biblioteca)</option>
-                        <option value="Cafetería Principal">Cafetería Principal</option>
-                    </select>
+                    <span className="text-[10px] font-black uppercase text-orange-700 tracking-wider block">Destino Seleccionado</span>
+                    <p className="text-xs font-bold text-gray-900 mt-0.5">{initialDeliveryLocation || "Campus UPP - Edificio 2"}</p>
                 </div>
-
-                <div>
-                    <label className="block text-[11px] font-bold uppercase text-gray-400 mb-1">Aula / Cubículo</label>
-                    <input 
-                        type="text" 
-                        placeholder="Ej. Aula 105 o Planta Alta"
-                        value={data.destino_aula}
-                        onChange={e => setData('destino_aula', e.target.value)}
-                        className="w-full text-xs p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-0"
-                        required
-                    />
-                </div>
+                <span className="text-xl">📍</span>
             </div>
 
             <div>
@@ -252,7 +230,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                         type="button"
                         onClick={() => setData('metodo_pago', 'efectivo')}
                         className={`p-3 border rounded-xl flex flex-col items-center gap-1.5 font-bold transition text-xs ${
-                            data.metodo_pago === 'efectivo' ? 'border-purple-600 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                            data.metodo_pago === 'efectivo' ? 'border-[#FF5722] bg-orange-50 text-[#FF5722]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                         }`}
                     >
                         <span className="text-lg">💵</span> Cash / Efectivo
@@ -261,7 +239,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                         type="button"
                         onClick={() => setData('metodo_pago', 'tarjeta')}
                         className={`p-3 border rounded-xl flex flex-col items-center gap-1.5 font-bold transition text-xs ${
-                            data.metodo_pago === 'tarjeta' ? 'border-purple-600 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                            data.metodo_pago === 'tarjeta' ? 'border-[#FF5722] bg-orange-50 text-[#FF5722]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                         }`}
                     >
                         <span className="text-lg">💳</span> Tarjeta Bancaria
@@ -272,7 +250,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
             {data.metodo_pago === 'tarjeta' && (
                 <div className="p-4 bg-gray-900 text-white rounded-2xl space-y-3.5 shadow-inner border border-gray-800">
                     <div className="flex justify-between items-center border-b border-gray-800 pb-2">
-                        <span className="text-[10px] font-bold text-purple-400 tracking-widest uppercase">Eatly Sandbox Gateway</span>
+                        <span className="text-[10px] font-bold text-orange-400 tracking-widest uppercase">Eatly Sandbox Gateway</span>
                         <span className="text-[10px] font-bold text-gray-500 bg-gray-800 px-2 py-0.5 rounded">MODO PRUEBA</span>
                     </div>
 
@@ -283,7 +261,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                             placeholder="4242 4242 4242 4242"
                             value={numeroTarjeta}
                             onChange={handleCardNumberChange}
-                            className="w-full text-xs p-2 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono tracking-widest focus:border-purple-500 focus:ring-0"
+                            className="w-full text-xs p-2 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono tracking-widest focus:border-[#FF5722] focus:ring-0"
                             required
                         />
                     </div>
@@ -297,7 +275,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                                 maxLength={5}
                                 value={expiracion}
                                 onChange={e => setExpiracion(e.target.value)}
-                                className="w-full text-xs p-2 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono focus:border-purple-500 focus:ring-0 text-center"
+                                className="w-full text-xs p-2 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono focus:border-[#FF5722] focus:ring-0 text-center"
                                 required
                             />
                         </div>
@@ -309,7 +287,7 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                                 maxLength={3}
                                 value={cvv}
                                 onChange={e => setCvv(e.target.value)}
-                                className="w-full text-xs p-2 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono focus:border-purple-500 focus:ring-0 text-center"
+                                className="w-full text-xs p-2 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono focus:border-[#FF5722] focus:ring-0 text-center"
                                 required
                             />
                         </div>
@@ -328,14 +306,14 @@ export default function CheckoutForm({ subtotalComida, localId, vendedorId = nul
                 </div>
                 <div className="flex justify-between text-gray-900 font-black text-sm pt-2 border-t border-gray-200 mt-2">
                     <span>Total a procesar:</span>
-                    <span className="text-purple-600">${(data.subtotal_comida + 12.00).toFixed(2)} MXN</span>
+                    <span className="text-[#FF5722]">${(data.subtotal_comida + 12.00).toFixed(2)} MXN</span>
                 </div>
             </div>
 
             <button
                 type="submit"
                 disabled={processing}
-                className="w-full py-3 mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-md disabled:opacity-50"
+                className="w-full py-3.5 mt-4 bg-[#FF5722] hover:bg-[#F4511E] text-white font-black rounded-2xl text-xs uppercase tracking-wider transition shadow-lg shadow-orange-500/25 disabled:opacity-50 flex items-center justify-center gap-2"
             >
                 {processing ? 'Procesando Transacción...' : `Confirmar y pagar $${(data.subtotal_comida + 12.00).toFixed(2)}`}
             </button>

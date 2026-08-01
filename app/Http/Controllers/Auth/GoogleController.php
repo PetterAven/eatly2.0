@@ -12,8 +12,9 @@ class GoogleController extends Controller
 {
     public function redirect()
     {
+        // Forzamos a Google a mostrar siempre la ventana de selección de cuenta y consentimiento
         return Socialite::driver('google')
-            ->with(['prompt' => 'select_account'])
+            ->with(['prompt' => 'select_account consent'])
             ->redirect();
     }
 
@@ -22,18 +23,24 @@ class GoogleController extends Controller
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
             
+            // Limpiamos cualquier sesión previa para evitar mezclar cuentas al cambiar de usuario en Google
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+            // Buscamos si el correo de Google ya existe en la Base de Datos
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
                 $user->update([
                     'google_id'         => $googleUser->getId(),
                     'avatar'            => $googleUser->getAvatar(),
-                    'email_verified_at' => $user->email_verified_at ?? now(), // Asegura pase por middleware 'verified'
+                    'email_verified_at' => $user->email_verified_at ?? now(),
                 ]);
 
                 Auth::login($user, true);
-
-                return redirect()->intended('/dashboard');
+                request()->session()->regenerate();
+                return redirect()->route('dashboard');
             }
 
             $newUser = User::create([
@@ -47,8 +54,8 @@ class GoogleController extends Controller
             ]);
 
             Auth::login($newUser, true);
-
-            return redirect()->intended('/dashboard');
+            request()->session()->regenerate();
+            return redirect()->route('dashboard');
 
         } catch (\Throwable $e) {
             // En producción redirigimos al login con mensaje de error limpio en vez de dd()

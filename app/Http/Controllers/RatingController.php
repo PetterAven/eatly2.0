@@ -15,7 +15,7 @@ class RatingController extends Controller
     {
         // Corregido: Verificar seguridad con base en tu modelo "Pedido"
         abort_unless($pedido->user_id === auth()->id(), 403, 'No tienes permiso para calificar este pedido.');
-        abort_unless($pedido->status === 'delivered', 422, 'Solo puedes calificar pedidos que ya han sido entregados.');
+        abort_unless(in_array($pedido->status, ['delivered', 'completed']), 422, 'Solo puedes calificar pedidos que ya han sido entregados.');
 
         $validated = $request->validate([
             'branch_stars'   => 'required|integer|min:1|max:5',

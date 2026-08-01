@@ -1,77 +1,89 @@
 import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
-import { Head, useForm } from '@inertiajs/react';
-import React from 'react';
+import { Head, useForm, Link } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
+        role: 'client',
         password: '',
         password_confirmation: '',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [acceptTerms, setAcceptTerms] = useState(false);
+    const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+    const [acceptPromos, setAcceptPromos] = useState(false);
+
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/register', {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
+        setShowTermsModal(true);
     };
 
+    const handleConfirmRegistration = () => {
+        setShowTermsModal(false);
+        post('/register');
+    };
+
+    const canContinue = acceptTerms && acceptPrivacy;
+
     return (
-        <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-purple-900 to-indigo-950 px-4 py-8">
-            {}
-            <div className="relative w-full overflow-hidden rounded-3xl border border-purple-800/20 bg-white p-6 shadow-2xl sm:max-w-md sm:p-8">
-                {}
-                <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-purple-700 via-amber-500 to-purple-700"></div>
+        <div className="min-h-screen w-full bg-gradient-to-br from-purple-950 via-indigo-950 to-slate-950 flex flex-col justify-center items-center px-4 py-8 relative overflow-hidden">
+            {/* Animación de Parrilla / Fuego de Fondo */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(#f97316_1.5px,transparent_1.5px)] [background-size:24px_24px]"></div>
+            <div className="absolute -top-32 -left-32 w-96 h-96 bg-amber-500/30 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
+            <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-orange-600/30 rounded-full blur-3xl animate-pulse pointer-events-none delay-1000"></div>
+
+            <div className="w-full sm:max-w-md bg-white/95 backdrop-blur-xl border border-amber-500/30 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden z-10">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 via-orange-600 to-amber-500 animate-pulse"></div>
+
+                {/* Detalle visual de llamas y parrilla */}
+                <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-2xl animate-bounce">🔥</span>
+                    <span className="text-xs font-black tracking-widest text-amber-600 uppercase bg-amber-50 px-3 py-1 rounded-full border border-amber-200/60 shadow-inner">
+                        Asador & Antojos UPP
+                    </span>
+                    <span className="text-2xl animate-bounce delay-150">🍔</span>
+                </div>
 
                 <AuthLayout
                     title="CREAR CUENTA"
-                    description="Únete a Eatly UPP y administra tus pedidos de comida en el campus"
+                    description="Únete a Eatly UPP y vive la experiencia gastronómica del campus"
                 >
                     <Head title="Registrarse - Eatly UPP" />
 
-                    <form
-                        onSubmit={handleSubmit}
-                        className="mt-4 flex flex-col gap-5"
-                    >
+                    <form onSubmit={submit} className="flex flex-col gap-5 mt-4">
                         <div className="grid gap-5">
-                            {}
+                            {/* Nombre Completo */}
                             <div className="grid gap-2">
-                                <Label
-                                    htmlFor="name"
-                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
-                                >
+                                <Label htmlFor="name" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
                                     Nombre Completo
                                 </Label>
                                 <Input
                                     id="name"
+                                    type="text"
                                     name="name"
                                     value={data.name}
-                                    onChange={(e) =>
-                                        setData('name', e.target.value)
-                                    }
+                                    onChange={e => setData('name', e.target.value)}
                                     required
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="name"
                                     placeholder="Ingresa tu nombre"
-                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                    className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
                                 />
                                 <InputError message={errors.name} />
                             </div>
 
-                            {}
+                            {/* Correo Electrónico */}
                             <div className="grid gap-2">
-                                <Label
-                                    htmlFor="email"
-                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
-                                >
+                                <Label htmlFor="email" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
                                     Correo Electrónico
                                 </Label>
                                 <Input
@@ -79,24 +91,40 @@ export default function Register() {
                                     type="email"
                                     name="email"
                                     value={data.email}
-                                    onChange={(e) =>
-                                        setData('email', e.target.value)
-                                    }
+                                    onChange={e => setData('email', e.target.value)}
                                     required
                                     tabIndex={2}
                                     autoComplete="email"
                                     placeholder="ejemplo@upp.edu.mx"
-                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                    className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
-                            {}
+                            {/* Tipo de Usuario / Rol */}
                             <div className="grid gap-2">
-                                <Label
-                                    htmlFor="password"
-                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
+                                <Label htmlFor="role" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
+                                    Tipo de Cuenta
+                                </Label>
+                                <select
+                                    id="role"
+                                    name="role"
+                                    value={data.role}
+                                    onChange={e => setData('role', e.target.value)}
+                                    required
+                                    tabIndex={3}
+                                    className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600 h-10 px-3 text-sm text-slate-700"
                                 >
+                                    <option value="client">🍽️ Cliente (Estudiante / Comensal)</option>
+                                    <option value="driver">🛵 Repartidor (Campus)</option>
+                                    <option value="merchant">🏪 Tienda / Local (Cafetería / Comercio)</option>
+                                </select>
+                                <InputError message={errors.role} />
+                            </div>
+
+                            {/* Contraseña */}
+                            <div className="grid gap-2">
+                                <Label htmlFor="password" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
                                     Contraseña
                                 </Label>
                                 <Input
@@ -104,24 +132,19 @@ export default function Register() {
                                     type="password"
                                     name="password"
                                     value={data.password}
-                                    onChange={(e) =>
-                                        setData('password', e.target.value)
-                                    }
+                                    onChange={e => setData('password', e.target.value)}
                                     required
-                                    tabIndex={3}
+                                    tabIndex={4}
                                     autoComplete="new-password"
                                     placeholder="Mínimo 8 caracteres"
-                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                    className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            {}
+                            {/* Confirmar Contraseña */}
                             <div className="grid gap-2">
-                                <Label
-                                    htmlFor="password_confirmation"
-                                    className="text-xs font-bold tracking-wider text-purple-950 uppercase"
-                                >
+                                <Label htmlFor="password_confirmation" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
                                     Confirmar Contraseña
                                 </Label>
                                 <Input
@@ -129,89 +152,156 @@ export default function Register() {
                                     type="password"
                                     name="password_confirmation"
                                     value={data.password_confirmation}
-                                    onChange={(e) =>
-                                        setData(
-                                            'password_confirmation',
-                                            e.target.value,
-                                        )
-                                    }
+                                    onChange={e => setData('password_confirmation', e.target.value)}
                                     required
-                                    tabIndex={4}
+                                    tabIndex={5}
                                     autoComplete="new-password"
                                     placeholder="Repite tu contraseña"
-                                    className="rounded-xl border-gray-200 bg-slate-50 text-gray-900 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                    className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
                                 />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                                <InputError message={errors.password_confirmation} />
                             </div>
 
-                            {}
+                            {/* Botón de Registro */}
                             <Button
                                 type="submit"
-                                className="mt-2 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-amber-500 text-xs font-black tracking-wider text-purple-950 uppercase shadow-md transition-all duration-200 hover:bg-amber-600 active:scale-[0.99] disabled:opacity-50"
-                                tabIndex={5}
+                                className="mt-2 w-full h-11 bg-amber-500 hover:bg-amber-600 text-purple-950 font-black rounded-xl shadow-md transition-all duration-200 uppercase tracking-wider text-xs active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
+                                tabIndex={6}
                                 disabled={processing}
                             >
-                                {processing && (
-                                    <Spinner className="h-4 w-4 text-purple-950" />
-                                )}
+                                {processing ? <Spinner className="text-purple-950 h-4 w-4" /> : null}
                                 Registrarse
                             </Button>
                         </div>
 
-                        {}
-                        <div className="relative flex items-center py-1">
+                        {/* Divisor visual */}
+                        <div className="relative flex py-1 items-center">
                             <div className="flex-grow border-t border-slate-200"></div>
-                            <span className="mx-4 flex-shrink text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-                                O también
-                            </span>
+                            <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-bold uppercase tracking-wider">O también</span>
                             <div className="flex-grow border-t border-slate-200"></div>
                         </div>
 
-                        {}
+                        {/* Botón Google */}
                         <a
                             href="/auth/google/redirect"
-                            className="group inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold tracking-wider text-slate-700 uppercase shadow-sm transition-all hover:bg-slate-50 active:scale-[0.99]"
+                            className="w-full h-11 inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl border border-slate-200 shadow-sm text-xs uppercase tracking-wider active:scale-[0.99] transition-all group"
                         >
-                            <svg
-                                className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    fill="#EA4335"
-                                    d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2C17.52 1.57 14.96 1 12 1 7.35 1 3.4 3.65 1.5 7.5l3.6 2.8C6.01 7.22 8.78 5.04 12 5.04z"
-                                />
-                                <path
-                                    fill="#4285F4"
-                                    d="M23.5 12.25c0-.82-.07-1.6-.2-2.25H12v4.5h6.48c-.28 1.48-1.12 2.73-2.38 3.58l3.68 2.85c2.14-1.98 3.72-4.9 3.72-8.68z"
-                                />
-                                <path
-                                    fill="#FBBC05"
-                                    d="M5.1 14.7c-.24-.72-.38-1.49-.38-2.3s.14-1.58.38-2.3L1.5 7.3C.54 9.22 0 11.35 0 13.6s.54 4.38 1.5 6.3l3.6-2.9z"
-                                />
-                                <path
-                                    fill="#34A853"
-                                    d="M12 23c3.24 0 5.97-1.08 7.96-2.92l-3.68-2.85c-1.02.68-2.33 1.1-4.28 1.1-3.22 0-6-2.18-6.97-5.26l-3.6 2.8C3.4 20.35 7.35 23 12 23z"
-                                />
+                            <svg className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                                <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.137 4.114-3.465 0-6.285-2.82-6.285-6.285 0-3.465 2.82-6.285 6.285-6.285 1.425 0 2.735.485 3.79 1.3l3.03-3.03C18.91 1.93 15.76 1 12.24 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.897 0 10.867-4.14 10.867-11.24 0-.56-.052-1.12-.152-1.655H12.24z"/>
                             </svg>
                             Registrarse con Google
                         </a>
 
-                        {}
-                        <div className="border-t border-slate-100 pt-4 text-center text-xs font-medium text-gray-500">
+                        {/* Retorno al Login */}
+                        <div className="text-center text-xs font-medium text-gray-500 pt-4 border-t border-slate-100">
                             ¿Ya tienes una cuenta?{' '}
-                            <TextLink
-                                href="/login"
-                                tabIndex={6}
-                                className="font-bold text-purple-700 hover:underline"
+                            <Link 
+                                href="/login" 
+                                tabIndex={7}
+                                className="text-purple-700 font-bold hover:underline"
                             >
                                 Inicia Sesión
-                            </TextLink>
+                            </Link>
                         </div>
                     </form>
                 </AuthLayout>
             </div>
+
+            {/* MODAL DE TÉRMINOS Y CONDICIONES ESTILO RAPPI */}
+            {showTermsModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 sm:p-8 relative border border-gray-100 flex flex-col max-h-[90vh] overflow-y-auto animate-fade-in">
+                        
+                        {/* Botón de cerrar */}
+                        <button 
+                            onClick={() => setShowTermsModal(false)}
+                            className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center font-bold transition"
+                        >
+                            ✕
+                        </button>
+
+                        <div className="mb-6 pr-8">
+                            <span className="text-2xl block mb-2">📜</span>
+                            <h3 className="text-xl font-black text-gray-900 tracking-tight">Términos y condiciones</h3>
+                            <p className="text-xs text-gray-500 mt-1">Por favor lee y acepta nuestros términos para completar tu registro en Eatly Eats UPP.</p>
+                        </div>
+
+                        {/* Contenido de términos */}
+                        <div className="bg-gray-50 border border-gray-200/60 rounded-2xl p-4 text-xs text-gray-600 h-36 overflow-y-auto mb-6 space-y-2 leading-relaxed">
+                            <p className="font-bold text-gray-800">1. Aceptación de los Términos</p>
+                            <p>Al registrarte en Eatly Eats UPP, aceptas cumplir con las normativas internas del campus universitario y las políticas de entrega en instalaciones.</p>
+                            <p className="font-bold text-gray-800 mt-2">2. Privacidad de Datos</p>
+                            <p>Tus datos personales y académicos son utilizados exclusivamente para la gestión, procesamiento y entrega de tus pedidos dentro de la Universidad Politécnica de Pachuca.</p>
+                            <p className="font-bold text-gray-800 mt-2">3. Pedidos y Pagos</p>
+                            <p>Los pedidos realizados a través de la plataforma implican un compromiso de pago y recepción en el punto indicado en el campus.</p>
+                        </div>
+
+                        {/* 3 Casillas de verificación (checkboxes) */}
+                        <div className="space-y-4 mb-8">
+                            <label className="flex items-start gap-3 cursor-pointer select-none">
+                                <input 
+                                    type="checkbox" 
+                                    checked={acceptTerms}
+                                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                                    className="mt-0.5 w-4 h-4 rounded text-[#FF5722] focus:ring-[#FF5722] border-gray-300"
+                                />
+                                <span className="text-xs font-bold text-gray-800">
+                                    Acepto los Términos y condiciones <span className="text-[#FF5722] font-black">* (Obligatorio)</span>
+                                </span>
+                            </label>
+
+                            <label className="flex items-start gap-3 cursor-pointer select-none">
+                                <input 
+                                    type="checkbox" 
+                                    checked={acceptPrivacy}
+                                    onChange={(e) => setAcceptPrivacy(e.target.checked)}
+                                    className="mt-0.5 w-4 h-4 rounded text-[#FF5722] focus:ring-[#FF5722] border-gray-300"
+                                />
+                                <span className="text-xs font-bold text-gray-800">
+                                    Acepto la Política de privacidad <span className="text-[#FF5722] font-black">* (Obligatorio)</span>
+                                </span>
+                            </label>
+
+                            <label className="flex items-start gap-3 cursor-pointer select-none">
+                                <input 
+                                    type="checkbox" 
+                                    checked={acceptPromos}
+                                    onChange={(e) => setAcceptPromos(e.target.checked)}
+                                    className="mt-0.5 w-4 h-4 rounded text-[#FF5722] focus:ring-[#FF5722] border-gray-300"
+                                />
+                                <span className="text-xs font-medium text-gray-600">
+                                    Quiero recibir promociones y novedades de Eatly Eats <span className="text-gray-400 font-normal">(Opcional)</span>
+                                </span>
+                            </label>
+                        </div>
+
+                        {/* Botón Continuar */}
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowTermsModal(false)}
+                                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs uppercase tracking-wider transition"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                disabled={!canContinue || processing}
+                                onClick={handleConfirmRegistration}
+                                className={`flex-1 py-3 text-white font-black rounded-xl text-xs uppercase tracking-wider shadow-lg transition flex items-center justify-center gap-2 ${
+                                    canContinue 
+                                        ? 'bg-[#FF5722] hover:bg-[#F4511E] shadow-orange-500/25 active:scale-95' 
+                                        : 'bg-gray-300 cursor-not-allowed opacity-50'
+                                }`}
+                            >
+                                {processing ? <Spinner className="text-white h-4 w-4" /> : null}
+                                Continuar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

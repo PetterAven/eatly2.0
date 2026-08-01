@@ -15,6 +15,15 @@ class Restaurant extends Model
         'description',
         'phone',
         'email',
+        'address',
+        'latitude',
+        'longitude',
+        'schedule',
+        'image',
+    ];
+
+    protected $casts = [
+        'schedule' => 'array',
     ];
 
     public function owner()

@@ -73,16 +73,9 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <div className="mb-1.5 flex items-center justify-between">
-                                <label className="block text-xs font-bold tracking-wider text-gray-700 uppercase">
-                                    Contraseña
-                                </label>
-                                <a
-                                    href="#"
-                                    className="text-xs font-semibold text-purple-600 hover:underline"
-                                >
-                                    ¿La olvidaste?
-                                </a>
+                            <div className="flex justify-between items-center mb-1.5">
+                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Contraseña</label>
+                                 <Link href="/forgot-password" className="text-xs font-semibold text-purple-600 hover:underline">¿La olvidaste?</Link>
                             </div>
                             <input
                                 type="password"

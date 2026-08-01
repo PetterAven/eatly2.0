@@ -42,7 +42,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                         onClick={cleanup}
                     >
                         <Settings className="mr-2" />
-                        Settings
+                        Mi Perfil / Ajustes
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>

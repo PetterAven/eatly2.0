@@ -45,13 +45,13 @@ class PedidoController extends Controller
                     'branch_id'      => $request->local_id,
                     'cart_id'        => null,
                     'code'           => $codigoGenerado,
-                    'status'         => 'delivered',
-                    'mode'           => 'pickup',
+                    'status'         => 'pending',
+                    'mode'           => 'delivery',
                     'payment_status' => $request->metodo_pago === 'tarjeta' ? 'paid' : 'unpaid',
                     'subtotal'       => $subtotal,
                     'discount'       => 0.00,
                     'total'          => $totalPagado,
-                    'driver_id'      => $repartidorId,
+                    'driver_id'      => null,
                 ]);
 
                 foreach ($request->items as $item) {

@@ -74,7 +74,7 @@ return [
     | MODIFICADO: Cambiado de '/dashboard' a '/' para regresar a Eatly
     */
 
-    'home' => '/',
+    'home' => '/dashboard',
 
     /*
     |--------------------------------------------------------------------------

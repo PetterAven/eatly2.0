@@ -26,6 +26,13 @@ class Pedido extends Model
         'driver_id',
     ];
 
+    protected $casts = [
+        'scheduled_at' => 'datetime',
+        'subtotal' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'total' => 'decimal:2',
+    ];
+
     public function cliente()
     {
         return $this->belongsTo(User::class, 'user_id');

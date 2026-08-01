@@ -21,6 +21,7 @@ class Order extends Model
         'subtotal',
         'discount',
         'total',
+        'driver_id',
     ];
 
     protected $casts = [
@@ -53,5 +54,10 @@ class Order extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_id');
     }
 }
