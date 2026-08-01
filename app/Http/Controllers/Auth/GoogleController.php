@@ -20,15 +20,25 @@ class GoogleController extends Controller
 
     public function callback()
     {
+        return $this->handleGoogleCallback();
+    }
+
+    public function handleGoogleCallback()
+    {
         try {
+            // Intentamos obtener el usuario de Google (con stateless para evitar problemas de session state mismatch)
             $googleUser = Socialite::driver('google')->stateless()->user();
             
-            // Limpiamos cualquier sesión previa para evitar mezclar cuentas al cambiar de usuario en Google
+            if (!$googleUser || !$googleUser->getEmail()) {
+                return redirect()->route('login')->with('error', 'No se pudo obtener la información de tu cuenta de Google.');
+            }
+
+            // Limpiamos cualquier sesión previa para evitar mezclar cuentas
             Auth::logout();
             request()->session()->invalidate();
             request()->session()->regenerateToken();
 
-            // Buscamos si el correo de Google ya existe en la Base de Datos
+            // Buscamos si el correo ya existe en la Base de Datos
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
@@ -37,29 +47,27 @@ class GoogleController extends Controller
                     'avatar'            => $googleUser->getAvatar(),
                     'email_verified_at' => $user->email_verified_at ?? now(),
                 ]);
-
-                Auth::login($user, true);
-                request()->session()->regenerate();
-                return redirect()->route('dashboard');
+            } else {
+                $user = User::create([
+                    'name'              => $googleUser->getName() ?? 'Usuario Google',
+                    'email'             => $googleUser->getEmail(),
+                    'google_id'         => $googleUser->getId(),
+                    'avatar'            => $googleUser->getAvatar(),
+                    'role'              => 'client',
+                    'level_id'          => 1,
+                    'password'          => bcrypt(Str::random(16)), 
+                    'email_verified_at' => now(), 
+                ]);
             }
 
-            $newUser = User::create([
-                'name'              => $googleUser->getName(),
-                'email'             => $googleUser->getEmail(),
-                'google_id'         => $googleUser->getId(),
-                'avatar'            => $googleUser->getAvatar(),
-                'level_id'          => 1,
-                'password'          => bcrypt(Str::random(16)), 
-                'email_verified_at' => now(), 
-            ]);
-
-            Auth::login($newUser, true);
+            Auth::login($user, true);
             request()->session()->regenerate();
+
             return redirect()->route('dashboard');
 
         } catch (\Throwable $e) {
-            // En producción redirigimos al login con mensaje de error limpio en vez de dd()
-            return redirect()->route('welcome')->with('error', 'Ocurrió un error al intentar autenticar con Google. Intenta de nuevo.');
+            // En caso de error, redirigimos al login con mensaje flash explicativo
+            return redirect()->route('login')->with('error', 'Ocurrió un error al autenticar con Google: ' . $e->getMessage());
         }
     }
 }

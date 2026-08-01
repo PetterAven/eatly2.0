@@ -1,7 +1,6 @@
-import AppLayout from '@/layouts/app-layout';
 import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import { Bike, Package, CheckCircle, Clock, MapPin, Navigation } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Bike, Package, CheckCircle, Clock, MapPin, Navigation, LogOut } from 'lucide-react';
 
 interface OrderItem {
     id: number;
@@ -30,12 +29,18 @@ interface Rating {
 }
 
 interface Props {
+    auth?: {
+        user?: {
+            name: string;
+            email: string;
+        };
+    };
     availableOrders: Order[];
     myDeliveries: Order[];
     myRatings: Rating[];
 }
 
-export default function DeliveryDashboard({ availableOrders, myDeliveries, myRatings }: Props) {
+export default function DeliveryDashboard({ auth, availableOrders, myDeliveries, myRatings }: Props) {
     const [loadingOrderId, setLoadingOrderId] = useState<number | null>(null);
 
     const takeOrder = (orderId: number) => {
@@ -54,19 +59,55 @@ export default function DeliveryDashboard({ availableOrders, myDeliveries, myRat
         });
     };
 
+    const handleLogout = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.post('/logout');
+    };
+
     return (
-        <AppLayout breadcrumbs={[{ title: 'Panel de Repartidor', href: '/delivery/dashboard' }]}>
+        <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
             <Head title="Panel de Repartidor - Eatly UPP" />
 
-            <div className="py-6 px-4 max-w-7xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-wider mb-1">
-                            <Bike className="h-4 w-4" /> Repartidor Autorizado UPP
-                        </div>
-                        <h1 className="text-2xl font-black text-slate-900">Panel de Entregas en Campus</h1>
-                        <p className="text-sm text-slate-500">Toma pedidos listos en las cafeterías y entrégalos a la comunidad universitaria.</p>
+            {/* Top Navbar Clean */}
+            <header className="bg-white border-b border-gray-100 px-6 py-3.5 flex justify-between items-center sticky top-0 z-40 shadow-sm">
+                <div className="flex items-center space-x-4">
+                    <Link href="/delivery/dashboard" className="flex items-center gap-2">
+                        <span className="text-2xl font-black tracking-tight text-gray-900">Eatly <span className="text-[#FF5722]">Eats</span> 🐴</span>
+                    </Link>
+                    <span className="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                        <Bike className="w-3.5 h-3.5" /> Panel de Repartidor
+                    </span>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                    <span className="text-xs font-bold text-gray-700 hidden sm:inline">
+                        👤 {auth?.user?.name || 'Repartidor'}
+                    </span>
+                    <button
+                        onClick={handleLogout}
+                        className="text-xs font-bold text-red-600 hover:bg-red-50 px-3.5 py-2 rounded-2xl transition duration-200 flex items-center gap-1"
+                    >
+                        <LogOut className="w-3.5 h-3.5" /> Salir
+                    </button>
+                </div>
+            </header>
+
+            <main className="flex-1 max-w-7xl mx-auto px-6 py-8 w-full space-y-8">
+                {/* Header Banner */}
+                <div className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
+                    <div className="absolute right-0 bottom-0 opacity-15 transform translate-x-8 translate-y-8 pointer-events-none">
+                        <span className="text-9xl">🛵</span>
+                    </div>
+                    <div className="relative z-10 max-w-xl">
+                        <span className="bg-white/25 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3 inline-block">
+                            🚀 Logística Campus UPP
+                        </span>
+                        <h1 className="text-3xl lg:text-4xl font-black tracking-tight mb-2">
+                            Entregas en Campus UPP
+                        </h1>
+                        <p className="text-xs lg:text-sm text-amber-100 font-medium">
+                            Toma pedidos listos en las cafeterías y llévalos puntualmente a la comunidad universitaria.
+                        </p>
                     </div>
                 </div>
 
@@ -77,13 +118,13 @@ export default function DeliveryDashboard({ availableOrders, myDeliveries, myRat
                     </h2>
 
                     {myDeliveries.length === 0 ? (
-                        <div className="bg-white p-8 rounded-2xl text-center border border-slate-200 text-slate-400 text-sm font-medium">
+                        <div className="bg-white p-8 rounded-2xl text-center border border-slate-200 text-slate-400 text-sm font-medium shadow-sm">
                             No tienes entregas activas en este momento. ¡Toma un pedido disponible abajo!
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {myDeliveries.map((order) => (
-                                <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-purple-200 p-5 flex flex-col justify-between">
+                                <div key={order.id} className="bg-white rounded-3xl shadow-sm border border-purple-200 p-6 flex flex-col justify-between">
                                     <div>
                                         <div className="flex justify-between items-start mb-3">
                                             <span className="font-bold text-purple-900 text-base">Pedido #{order.code || order.id}</span>
@@ -112,7 +153,7 @@ export default function DeliveryDashboard({ availableOrders, myDeliveries, myRat
                                              <button
                                                  onClick={() => updateStatus(order.id, 'completed')}
                                                  disabled={loadingOrderId === order.id}
-                                                 className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs uppercase rounded-xl shadow transition flex items-center gap-2 disabled:opacity-50"
+                                                 className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs uppercase rounded-xl shadow transition flex items-center gap-2 disabled:opacity-50"
                                              >
                                                  {loadingOrderId === order.id && (
                                                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -134,13 +175,13 @@ export default function DeliveryDashboard({ availableOrders, myDeliveries, myRat
                     </h2>
 
                     {availableOrders.length === 0 ? (
-                        <div className="bg-white p-8 rounded-2xl text-center border border-slate-200 text-slate-400 text-sm font-medium">
+                        <div className="bg-white p-8 rounded-2xl text-center border border-slate-200 text-slate-400 text-sm font-medium shadow-sm">
                             No hay pedidos disponibles para entrega en este momento.
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {availableOrders.map((order) => (
-                                <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+                                <div key={order.id} className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
                                     <div>
                                         <div className="flex justify-between items-start mb-3">
                                             <span className="font-bold text-slate-900 text-base">Pedido #{order.code || order.id}</span>
@@ -168,7 +209,7 @@ export default function DeliveryDashboard({ availableOrders, myDeliveries, myRat
                                          <button
                                              onClick={() => takeOrder(order.id)}
                                              disabled={loadingOrderId === order.id}
-                                             className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-purple-950 font-black text-xs uppercase rounded-xl shadow transition flex items-center gap-2 disabled:opacity-50"
+                                             className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-purple-950 font-black text-xs uppercase rounded-xl shadow transition flex items-center gap-2 disabled:opacity-50"
                                          >
                                              {loadingOrderId === order.id && (
                                                  <div className="w-3.5 h-3.5 border-2 border-purple-950 border-t-transparent rounded-full animate-spin" />
@@ -189,13 +230,13 @@ export default function DeliveryDashboard({ availableOrders, myDeliveries, myRat
                     </h2>
 
                     {myRatings.length === 0 ? (
-                        <div className="bg-white p-8 rounded-2xl text-center border border-slate-200 text-slate-400 text-sm font-medium">
+                        <div className="bg-white p-8 rounded-2xl text-center border border-slate-200 text-slate-400 text-sm font-medium shadow-sm">
                             Aún no tienes calificaciones de los comensales. ¡Completa más entregas con amabilidad y rapidez!
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {myRatings.map((rating) => (
-                                <div key={rating.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+                                <div key={rating.id} className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
                                     <div>
                                         <div className="flex justify-between items-start mb-2">
                                             <span className="font-bold text-slate-900 text-sm">{rating.user?.name || 'Comensal UPP'}</span>
@@ -216,7 +257,11 @@ export default function DeliveryDashboard({ availableOrders, myDeliveries, myRat
                         </div>
                     )}
                 </div>
-            </div>
-        </AppLayout>
+            </main>
+
+            <footer className="bg-gray-900 text-gray-400 py-8 text-center text-xs border-t border-gray-800 mt-12">
+                <p>&copy; {new Date().getFullYear()} Eatly Eats UPP - Panel de Repartidores.</p>
+            </footer>
+        </div>
     );
 }
