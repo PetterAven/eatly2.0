@@ -31,11 +31,14 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install Node Dependencies
-        run: npm ci
-
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Generate Routes (Wayfinder)
+        run: php artisan wayfinder:generate
+
+      - name: Install Node Dependencies
+        run: npm ci
 
       - name: Build Assets
         run: npm run build
