@@ -1,14 +1,9 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { LogOut, Menu, Settings, X } from 'lucide-react';
 import { useState, type PropsWithChildren } from 'react';
-import { SharedData } from '@/types';
 
 export default function EatlySettingsLayout({ children }: PropsWithChildren) {
-    const { auth } = usePage<SharedData>().props;
     const [menuOpen, setMenuOpen] = useState(false);
-
-    const userName = auth?.user?.name || 'Comensal';
-    const userInitial = userName.charAt(0).toUpperCase();
 
     const handleLogout = (e: React.FormEvent) => {
         e.preventDefault();
@@ -80,16 +75,6 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
                         className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                     >
                         🍽️ Menú / Catálogo
-                    </Link>
-
-                    <Link
-                        href="/profile"
-                        className="group flex items-center gap-2"
-                        title="Mi Cuenta"
-                    >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-orange-100 bg-white font-bold text-orange-600 shadow-md transition group-hover:scale-105">
-                            {userInitial}
-                        </div>
                     </Link>
 
                     <Link
