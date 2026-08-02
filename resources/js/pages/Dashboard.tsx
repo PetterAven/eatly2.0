@@ -13,6 +13,7 @@ interface Product {
     restaurant_description?: string;
     image: string;
     local_id?: number;
+    [key: string]: unknown;
 }
 
 interface CartItem {
@@ -112,7 +113,7 @@ export default function Dashboard({
     }, []);
 
     // Saludo dinámico según la hora del día y el nombre del usuario
-    const getDynamicGreeting = (name: string) => {
+    const getDynamicGreeting = (name?: string) => {
         const hour = new Date().getHours();
         const userName = name || 'Comensal';
         if (hour >= 6 && hour < 12) {

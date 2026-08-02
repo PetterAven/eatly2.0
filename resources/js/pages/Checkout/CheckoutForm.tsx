@@ -181,7 +181,7 @@ export default function CheckoutForm({
                     <div className="flex justify-between border-b border-gray-200 pb-2">
                         <span>Código de Pedido:</span>
                         <span className="font-bold tracking-wider text-gray-900">
-                            {codigoPedido}
+                            {String(codigoPedido)}
                         </span>
                     </div>
                     <div className="flex justify-between border-b border-gray-200 pb-2">

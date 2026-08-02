@@ -31,8 +31,9 @@ export default function DeleteUser() {
         reset,
         errors,
         clearErrors,
-    } = useForm({
+    } = useForm<{ password: string; error?: string }>({
         password: '',
+        error: '',
     });
 
     const deleteUser = (e: React.FormEvent) => {
