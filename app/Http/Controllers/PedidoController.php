@@ -12,8 +12,12 @@ class PedidoController extends Controller
 {
     public function procesarPagoSimulado(Request $request)
     {
+        $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login')->withErrors(['error' => 'Por favor inicia sesión para continuar.']);
+        }
+
         $request->validate([
-            'cliente_id' => 'required|exists:users,id',
             'subtotal_comida' => 'required|numeric|min:0',
             'destino_edificio' => 'required|string',
             'destino_aula' => 'required|string',
@@ -28,20 +32,20 @@ class PedidoController extends Controller
         ]);
 
         try {
-            $resultado = DB::transaction(function () use ($request) {
+            $resultado = DB::transaction(function () use ($request, $user) {
                 $subtotal = $request->subtotal_comida;
                 $tarifaEnvioBase = 12.00;
 
                 $repartidorId = $request->repartidor_id;
                 if (! $repartidorId) {
-                    $repartidorId = User::where('id', '!=', $request->cliente_id)->first()?->id;
+                    $repartidorId = User::where('id', '!=', $user->id)->first()?->id;
                 }
 
                 $totalPagado = $subtotal + $tarifaEnvioBase;
                 $codigoGenerado = 'EAT-'.strtoupper(Str::random(8));
 
                 $pedido = Pedido::create([
-                    'user_id' => $request->cliente_id,
+                    'user_id' => $user->id,
                     'branch_id' => $request->local_id,
                     'cart_id' => null,
                     'code' => $codigoGenerado,
