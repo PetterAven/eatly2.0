@@ -1,8 +1,7 @@
 import RatingModal from '@/components/RatingModal';
 import StarRating from '@/components/StarRating';
-import AppLayout from '@/layouts/app-layout';
-import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, Calendar, CheckCircle2, Clock } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeft, Calendar, CheckCircle2, Clock, LogOut, Settings } from 'lucide-react';
 import { useState } from 'react';
 
 interface RatingSummary {
@@ -26,6 +25,12 @@ interface HistoryProps {
         data: OrderRow[];
         links: { url: string | null; label: string; active: boolean }[];
     };
+    auth?: {
+        user?: {
+            name: string;
+            email: string;
+        };
+    };
     [key: string]: unknown;
 }
 
@@ -39,7 +44,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function History() {
-    const { orders } = usePage<HistoryProps>().props;
+    const { orders, auth } = usePage<HistoryProps>().props;
     const [ratingOrder, setRatingOrder] = useState<OrderRow | null>(null);
 
     const ordersData = orders?.data ?? [];
@@ -76,145 +81,168 @@ export default function History() {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Mis Pedidos', href: '/historial' }]}>
+        <>
             <Head title="Historial de Pedidos - Eatly UPP" />
-            <div className="mx-auto max-w-2xl px-4 py-8 pb-24">
-                {/* Botón de navegación interna de regreso al menú (Dashboard) */}
-                <div className="mb-6">
-                    <Link
-                        href="/dashboard"
-                        className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black tracking-wider text-gray-700 uppercase shadow-sm transition hover:bg-gray-50 hover:text-purple-600"
-                    >
-                        <ArrowLeft className="h-4 w-4 text-purple-600" />
-                        Volver al Menú
-                    </Link>
-                </div>
+            <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-900">
+                {/* Navbar unificado con la identidad de marca */}
+                <header className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-3.5 shadow-sm">
+                    <div className="flex items-center space-x-4">
+                        <Link href="/dashboard" className="flex items-center gap-2">
+                            <span className="text-2xl font-black tracking-tight text-gray-900">
+                                Eatly <span className="text-[#FF5722]">Eats</span> 🐴
+                            </span>
+                        </Link>
+                    </div>
 
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-2xl font-black tracking-tight text-gray-900">
-                        Mis Pedidos 🐴
-                    </h1>
-                    <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-400">
-                        Historial de compras
-                    </span>
-                </div>
-
-                <div className="space-y-4">
-                    {ordersData.map((order) => (
-                        <div
-                            key={order.id}
-                            className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm transition duration-200 hover:shadow-md"
+                    <div className="flex items-center space-x-3">
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                         >
-                            <div className="flex items-start justify-between border-b border-gray-100 pb-3">
-                                <div>
-                                    <p className="text-sm font-extrabold text-gray-900 md:text-base">
-                                        {order.branch?.name ??
-                                            'Comercio del Campus'}
-                                    </p>
-                                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-gray-400">
-                                        <span className="rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-black text-purple-600">
-                                            {order.code}
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <Calendar className="h-3.5 w-3.5 text-gray-400" />
-                                            {formatFecha(order.created_at)}
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <Clock className="h-3.5 w-3.5 text-gray-400" />
-                                            {formatHora(order.created_at)}
-                                        </span>
-                                    </div>
-                                </div>
+                            🍽️ Menú / Catálogo
+                        </Link>
 
-                                <span
-                                    className={`rounded-full px-3 py-1 text-[10px] font-black tracking-wider uppercase ${
-                                        order.status === 'delivered'
-                                            ? 'bg-green-100 text-green-700'
-                                            : order.status === 'cancelled'
-                                              ? 'bg-red-100 text-red-700'
-                                              : 'bg-amber-100 text-amber-700'
-                                    }`}
-                                >
-                                    {statusLabels[order.status] ?? order.status}
-                                </span>
+                        <Link
+                            href="/profile"
+                            className="group flex items-center gap-2"
+                            title="Mi Cuenta"
+                        >
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-orange-100 bg-white font-bold text-orange-600 shadow-md transition group-hover:scale-105">
+                                {auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : 'U'}
                             </div>
+                        </Link>
 
-                            <div className="mt-4 flex items-center justify-between">
-                                <div>
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase">
-                                        Total pagado
+                        <Link
+                            href="/settings/profile"
+                            className="flex items-center gap-1 rounded-2xl bg-gray-100 px-3.5 py-2 text-xs font-bold text-gray-700 transition duration-200 hover:bg-gray-200"
+                            title="Ajustes"
+                        >
+                            <Settings className="h-4 w-4 text-[#FF5722]" /> Ajustes
+                        </Link>
+
+                        <button
+                            onClick={() => router.post('/logout')}
+                            className="flex items-center gap-1 rounded-2xl px-3 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-50"
+                        >
+                            <LogOut className="h-3.5 w-3.5" /> Salir
+                        </button>
+                    </div>
+                </header>
+
+                <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 pb-24">
+                    {/* Banner de Sección con identidad de marca */}
+                    <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-orange-500 to-red-600 p-6 text-white shadow-xl">
+                        <div className="relative z-10">
+                            <span className="mb-2 inline-block rounded-full bg-white/25 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase backdrop-blur-md">
+                                📋 Historial de Compras
+                            </span>
+                            <h1 className="text-2xl font-black tracking-tight lg:text-3xl">
+                                Mis Pedidos 🐴
+                            </h1>
+                            <p className="mt-1 text-xs text-orange-100">
+                                Revisa el estado de tus pedidos anteriores y califica tu experiencia.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mb-6">
+                        <Link
+                            href="/dashboard"
+                            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black tracking-wider text-gray-700 uppercase shadow-sm transition hover:bg-gray-50 hover:text-[#FF5722]"
+                        >
+                            <ArrowLeft className="h-4 w-4 text-[#FF5722]" />
+                            Volver al Menú Principal
+                        </Link>
+                    </div>
+
+                    <div className="space-y-4">
+                        {ordersData.map((order) => (
+                            <div key={order.id} className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm transition duration-200 hover:shadow-md">
+                                <div className="flex items-start justify-between border-b border-gray-100 pb-3">
+                                    <div>
+                                        <p className="text-sm font-extrabold text-gray-900 md:text-base">{order.branch?.name ?? 'Comercio del Campus'}</p>
+                                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-gray-400">
+                                            <span className="rounded-md bg-orange-50 px-2 py-0.5 text-[10px] font-black text-[#FF5722]">
+                                                {order.code}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                                                {formatFecha(order.created_at)}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <Clock className="h-3.5 w-3.5 text-gray-400" />
+                                                {formatHora(order.created_at)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <span className={`rounded-full px-3 py-1 text-[10px] font-black tracking-wider uppercase ${
+                                        order.status === 'delivered' 
+                                            ? 'bg-green-100 text-green-700' 
+                                            : order.status === 'cancelled' 
+                                            ? 'bg-red-100 text-red-700' 
+                                            : 'bg-amber-100 text-amber-700'
+                                    }`}>
+                                        {statusLabels[order.status] ?? order.status}
                                     </span>
-                                    <p className="text-lg font-black text-gray-900">
-                                        ${Number(order.total).toFixed(2)} MXN
-                                    </p>
                                 </div>
 
-                                {['delivered', 'completed'].includes(
-                                    order.status,
-                                ) &&
-                                    !hasBranchRating(order) && (
+                                <div className="mt-4 flex items-center justify-between">
+                                    <div>
+                                        <span className="block text-[10px] font-bold text-gray-400 uppercase">Total pagado</span>
+                                        <p className="text-lg font-black text-gray-900">${Number(order.total).toFixed(2)} MXN</p>
+                                    </div>
+
+                                    {['delivered', 'completed'].includes(order.status) && !hasBranchRating(order) && (
                                         <button
-                                            onClick={() =>
-                                                setRatingOrder(order)
-                                            }
-                                            className="rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-black tracking-wider text-white uppercase shadow-sm transition hover:bg-purple-700 hover:shadow-purple-100"
+                                            onClick={() => setRatingOrder(order)}
+                                            className="rounded-xl bg-[#FF5722] px-4 py-2.5 text-xs font-black tracking-wider text-white uppercase shadow-sm transition hover:bg-[#F4511E]"
                                         >
                                             ⭐ Calificar Pedido
                                         </button>
                                     )}
 
-                                {hasBranchRating(order) && (
-                                    <div className="flex flex-col items-end gap-1">
-                                        <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 uppercase">
-                                            <CheckCircle2 className="h-3.5 w-3.5" />{' '}
-                                            Pedido Calificado ⭐
-                                        </span>
-                                        <StarRating
-                                            value={
-                                                order.ratings?.find((r) =>
-                                                    r.rateable_type.endsWith(
-                                                        'Branch',
-                                                    ),
-                                                )?.stars ?? 0
-                                            }
-                                            readOnly
-                                            size={16}
-                                        />
-                                    </div>
-                                )}
+                                    {hasBranchRating(order) && (
+                                        <div className="flex flex-col items-end gap-1">
+                                            <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 uppercase">
+                                                <CheckCircle2 className="h-3.5 w-3.5" /> Pedido Calificado ⭐
+                                            </span>
+                                            <StarRating
+                                                value={order.ratings?.find((r) => r.rateable_type.endsWith('Branch'))?.stars ?? 0}
+                                                readOnly
+                                                size={16}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
 
-                    {ordersData.length === 0 && (
-                        <div className="border-gray-150 rounded-2xl border bg-white px-4 py-16 text-center">
-                            <span className="mb-2 block text-4xl">🍽️</span>
-                            <p className="text-sm font-bold text-gray-900">
-                                Aún no tienes pedidos registrados
-                            </p>
-                            <p className="mt-1 text-xs text-gray-400">
-                                Realiza tu primera compra desde el menú del
-                                campus.
-                            </p>
-                            <Link
-                                href="/dashboard"
-                                className="mt-4 inline-block rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white hover:bg-purple-700"
-                            >
-                                Ver Menú
-                            </Link>
-                        </div>
+                        {ordersData.length === 0 && (
+                            <div className="rounded-2xl border border-gray-150 bg-white px-4 py-16 text-center">
+                                <span className="mb-2 block text-4xl">🍽️</span>
+                                <p className="text-sm font-bold text-gray-900">Aún no tienes pedidos registrados</p>
+                                <p className="mt-1 text-xs text-gray-400">Realiza tu primera compra desde el menú del campus.</p>
+                                <Link 
+                                    href="/dashboard"
+                                    className="mt-4 inline-block rounded-xl bg-[#FF5722] px-4 py-2 text-xs font-bold text-white hover:bg-[#F4511E]"
+                                >
+                                    Ver Menú
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+
+                    {ratingOrder && (
+                        <RatingModal
+                            orderId={ratingOrder.id}
+                            branchName={ratingOrder.branch?.name ?? 'este comercio'}
+                            hasDriver={!!ratingOrder.driver_id}
+                            onClose={() => setRatingOrder(null)}
+                        />
                     )}
-                </div>
-
-                {ratingOrder && (
-                    <RatingModal
-                        orderId={ratingOrder.id}
-                        branchName={ratingOrder.branch?.name ?? 'este comercio'}
-                        hasDriver={!!ratingOrder.driver_id}
-                        onClose={() => setRatingOrder(null)}
-                    />
-                )}
+                </main>
             </div>
-        </AppLayout>
+        </>
     );
 }

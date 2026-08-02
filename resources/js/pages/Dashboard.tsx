@@ -366,6 +366,14 @@ export default function Dashboard({
                             </div>
                         </Link>
 
+                        <Link
+                            href="/settings/profile"
+                            className="flex items-center gap-1 rounded-2xl bg-gray-100 px-3.5 py-2.5 text-xs font-bold text-gray-700 transition duration-200 hover:bg-gray-200"
+                            title="Ajustes"
+                        >
+                            ⚙️ Ajustes
+                        </Link>
+
                         {/* Botón de Carrito con Contador */}
                         <button
                             onClick={() => {
