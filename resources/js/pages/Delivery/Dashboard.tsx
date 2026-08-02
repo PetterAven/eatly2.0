@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Bike, LogOut, Navigation, Package } from 'lucide-react';
+import { Bike, LogOut, Navigation, Package, Settings } from 'lucide-react';
 import { useState } from 'react';
 
 interface OrderItem {
@@ -99,6 +99,12 @@ export default function DeliveryDashboard({
                 </div>
 
                 <div className="flex items-center space-x-4">
+                    <Link
+                        href="/settings/profile"
+                        className="flex items-center gap-1 rounded-2xl bg-gray-100 px-3.5 py-2 text-xs font-bold text-gray-700 transition duration-200 hover:bg-gray-200"
+                    >
+                        <Settings className="h-3.5 w-3.5 text-[#FF5722]" /> Ajustes
+                    </Link>
                     <span className="hidden text-xs font-bold text-gray-700 sm:inline">
                         👤 {auth?.user?.name || 'Repartidor'}
                     </span>

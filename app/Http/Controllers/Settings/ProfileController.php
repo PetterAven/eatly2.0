@@ -45,11 +45,38 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
+
+        if (empty($user->google_id)) {
+            $request->validate([
+                'password' => ['required', 'current_password'],
+            ]);
+        }
+
+        $hasActiveOrders = false;
+        $activeStatuses = ['delivered', 'completed', 'cancelled'];
+
+        if ($user->role === 'client' || empty($user->role)) {
+            $hasActiveOrders = \App\Models\Order::where('user_id', $user->id)
+                ->whereNotIn('status', $activeStatuses)
+                ->exists();
+        } elseif ($user->role === 'merchant') {
+            $hasActiveOrders = \App\Models\Order::whereHas('branch', function ($q) use ($user) {
+                $q->whereHas('restaurant', function ($r) use ($user) {
+                    $r->where('owner_id', $user->id);
+                });
+            })->whereNotIn('status', $activeStatuses)->exists();
+        } elseif ($user->role === 'driver') {
+            $hasActiveOrders = \App\Models\Order::where('driver_id', $user->id)
+                ->whereNotIn('status', $activeStatuses)
+                ->exists();
+        }
+
+        if ($hasActiveOrders) {
+            return back()->withErrors([
+                'error' => 'No puedes eliminar tu cuenta mientras tengas pedidos activos. Espera a que se completen o cancelen.',
+            ]);
+        }
 
         Auth::logout();
 

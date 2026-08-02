@@ -76,7 +76,7 @@ class ProfileUpdateTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $this->assertSoftDeleted($user);
     }
 
     public function test_correct_password_must_be_provided_to_delete_account()
@@ -95,5 +95,32 @@ class ProfileUpdateTest extends TestCase
             ->assertRedirect(route('profile.edit'));
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_user_with_active_orders_cannot_delete_account()
+    {
+        $user = User::factory()->create();
+        $branch = \App\Models\Branch::factory()->create();
+
+        \App\Models\Order::create([
+            'user_id' => $user->id,
+            'branch_id' => $branch->id,
+            'code' => 'EAT-TEST',
+            'status' => 'pending',
+            'mode' => 'delivery',
+            'payment_status' => 'paid',
+            'subtotal' => 100,
+            'discount' => 0,
+            'total' => 112,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->delete(route('profile.destroy'), [
+                'password' => 'password',
+            ]);
+
+        $response->assertSessionHasErrors('error');
+        $this->assertAuthenticatedAs($user);
     }
 }

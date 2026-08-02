@@ -65,23 +65,33 @@ export default function Sidebar({
                 {/* CONTENIDO SCROLLABLE */}
                 <div className="flex-1 space-y-6 overflow-y-auto p-5">
                     {/* PERFIL USUARIO: Avatar con inicial + "Hola, {auth.user.name}" */}
-                    <Link
-                        href="/profile"
-                        onClick={onClose}
-                        className="group flex items-center gap-3.5 rounded-2xl border border-orange-100 bg-orange-50/60 p-3 transition hover:bg-orange-100/80"
-                    >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF5722] text-base font-black text-white shadow-md transition group-hover:scale-105">
-                            {userInitial}
-                        </div>
-                        <div className="overflow-hidden">
-                            <p className="text-[10px] font-extrabold tracking-wider text-orange-600 uppercase">
-                                Mi Cuenta
-                            </p>
-                            <h4 className="truncate text-sm font-black text-gray-900">
-                                Hola, {userName}
-                            </h4>
-                        </div>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/profile"
+                            onClick={onClose}
+                            className="group flex flex-1 items-center gap-3.5 rounded-2xl border border-orange-100 bg-orange-50/60 p-3 transition hover:bg-orange-100/80"
+                        >
+                            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF5722] text-base font-black text-white shadow-md transition group-hover:scale-105">
+                                {userInitial}
+                            </div>
+                            <div className="overflow-hidden">
+                                <p className="text-[10px] font-extrabold tracking-wider text-orange-600 uppercase">
+                                    Mi Cuenta
+                                </p>
+                                <h4 className="truncate text-sm font-black text-gray-900">
+                                    Hola, {userName}
+                                 </h4>
+                            </div>
+                        </Link>
+                        <Link
+                            href="/settings/profile"
+                            onClick={onClose}
+                            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-white text-lg shadow-sm transition hover:bg-gray-50 hover:text-[#FF5722]"
+                            title="Ajustes"
+                        >
+                            ⚙️
+                        </Link>
+                    </div>
 
                     {/* CARD DESTACADA: Botón azul "⚽ Descubre nuestras promociones del Campus" */}
                     <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-4 text-white shadow-lg">
