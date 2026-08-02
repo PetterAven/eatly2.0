@@ -12,12 +12,12 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('order_id')
-                  ->constrained('orders')
-                  ->cascadeOnDelete();
+                ->constrained('orders')
+                ->cascadeOnDelete();
 
             $table->foreignId('item_id')
-                  ->constrained('items')
-                  ->cascadeOnDelete();
+                ->constrained('items')
+                ->cascadeOnDelete();
 
             $table->integer('quantity')->default(1);
             $table->decimal('unit_price', 10, 2);

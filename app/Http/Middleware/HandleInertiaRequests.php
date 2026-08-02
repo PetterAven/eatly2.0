@@ -50,12 +50,12 @@ class HandleInertiaRequests extends Middleware
             // Armamos el objeto "flash" leyendo las llaves sueltas que guardamos
             // en la sesión con back()->with(['success' => ..., 'message' => ..., ...])
             'flash' => [
-                'success'    => fn () => $request->session()->get('success'),
-                'message'    => fn () => $request->session()->get('message'),
-                'orderCode'  => fn () => $request->session()->get('orderCode'),
+                'success' => fn () => $request->session()->get('success'),
+                'message' => fn () => $request->session()->get('message'),
+                'orderCode' => fn () => $request->session()->get('orderCode'),
                 'metodoPago' => fn () => $request->session()->get('metodoPago'),
-                'edificio'   => fn () => $request->session()->get('edificio'),
-                'aula'       => fn () => $request->session()->get('aula'),
+                'edificio' => fn () => $request->session()->get('edificio'),
+                'aula' => fn () => $request->session()->get('aula'),
             ],
         ];
     }

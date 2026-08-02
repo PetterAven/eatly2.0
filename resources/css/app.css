@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 /* CORREGIDO: Le decimos a Tailwind v4 que escanee todos tus componentes de React */
 @source '../js/**/*.tsx';

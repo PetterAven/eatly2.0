@@ -28,8 +28,8 @@ class GoogleController extends Controller
         try {
             // Intentamos obtener el usuario de Google (con stateless para evitar problemas de session state mismatch)
             $googleUser = Socialite::driver('google')->stateless()->user();
-            
-            if (!$googleUser || !$googleUser->getEmail()) {
+
+            if (! $googleUser || ! $googleUser->getEmail()) {
                 return redirect()->route('login')->with('error', 'No se pudo obtener la información de tu cuenta de Google.');
             }
 
@@ -43,20 +43,20 @@ class GoogleController extends Controller
 
             if ($user) {
                 $user->update([
-                    'google_id'         => $googleUser->getId(),
-                    'avatar'            => $googleUser->getAvatar(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
                     'email_verified_at' => $user->email_verified_at ?? now(),
                 ]);
             } else {
                 $user = User::create([
-                    'name'              => $googleUser->getName() ?? 'Usuario Google',
-                    'email'             => $googleUser->getEmail(),
-                    'google_id'         => $googleUser->getId(),
-                    'avatar'            => $googleUser->getAvatar(),
-                    'role'              => 'client',
-                    'level_id'          => 1,
-                    'password'          => bcrypt(Str::random(16)), 
-                    'email_verified_at' => now(), 
+                    'name' => $googleUser->getName() ?? 'Usuario Google',
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'role' => 'client',
+                    'level_id' => 1,
+                    'password' => bcrypt(Str::random(16)),
+                    'email_verified_at' => now(),
                 ]);
             }
 
@@ -67,7 +67,7 @@ class GoogleController extends Controller
 
         } catch (\Throwable $e) {
             // En caso de error, redirigimos al login con mensaje flash explicativo
-            return redirect()->route('login')->with('error', 'Ocurrió un error al autenticar con Google: ' . $e->getMessage());
+            return redirect()->route('login')->with('error', 'Ocurrió un error al autenticar con Google: '.$e->getMessage());
         }
     }
 }

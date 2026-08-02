@@ -12,12 +12,12 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('cart_id')
-                  ->constrained('carts')
-                  ->cascadeOnDelete();
+                ->constrained('carts')
+                ->cascadeOnDelete();
 
             $table->foreignId('item_id')
-                  ->constrained('items')
-                  ->cascadeOnDelete();
+                ->constrained('items')
+                ->cascadeOnDelete();
 
             $table->integer('quantity')->default(1);
             $table->decimal('unit_price', 10, 2);

@@ -43,5 +43,5 @@ export interface User {
 }
 
 declare global {
-    function route(name?: string, params?: any, absolute?: boolean): string;
+    function route(name?: string, params?: unknown, absolute?: boolean): string;
 }

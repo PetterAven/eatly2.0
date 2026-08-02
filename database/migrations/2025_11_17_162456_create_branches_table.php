@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('restaurant_id')
-                  ->constrained('restaurants')
-                  ->cascadeOnDelete();
+                ->constrained('restaurants')
+                ->cascadeOnDelete();
 
             $table->foreignId('location_id')
-                  ->nullable()
-                  ->constrained('locations')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('locations')
+                ->nullOnDelete();
 
             $table->string('name');
             $table->string('phone')->nullable();

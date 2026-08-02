@@ -29,7 +29,7 @@ class DeliveryController extends Controller
                 ->where('driver_id', $userId)
                 ->latest()
                 ->get(),
-            'myRatings' => $myRatings
+            'myRatings' => $myRatings,
         ]);
     }
 
@@ -41,7 +41,7 @@ class DeliveryController extends Controller
 
         $order->update([
             'driver_id' => Auth::id(),
-            'status' => 'delivering'
+            'status' => 'delivering',
         ]);
 
         return redirect()->back()->with('success', 'Has tomado el pedido para entrega.');
@@ -50,7 +50,7 @@ class DeliveryController extends Controller
     public function updateOrderStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|string|in:ready,delivering,completed'
+            'status' => 'required|string|in:ready,delivering,completed',
         ]);
 
         $order->update(['status' => $validated['status']]);

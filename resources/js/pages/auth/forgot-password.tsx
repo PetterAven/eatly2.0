@@ -13,11 +13,10 @@ import AuthLayout from '@/layouts/auth-layout';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
-        <div className="min-h-screen w-full bg-gradient-to-br from-purple-900 to-indigo-950 flex flex-col justify-center items-center px-4 py-8">
-            <div className="w-full sm:max-w-md bg-white border border-purple-800/20 shadow-2xl rounded-3xl p-6 sm:p-8 relative overflow-hidden">
-                
+        <div className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-purple-900 to-indigo-950 px-4 py-8">
+            <div className="relative w-full overflow-hidden rounded-3xl border border-purple-800/20 bg-white p-6 shadow-2xl sm:max-w-md sm:p-8">
                 {/* Detalle estético superior de la marca */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-700 via-amber-500 to-purple-700"></div>
+                <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-purple-700 via-amber-500 to-purple-700"></div>
 
                 <AuthLayout
                     title="¿Olvidaste tu contraseña?"
@@ -26,17 +25,20 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     <Head title="Recuperar Contraseña - Eatly UPP" />
 
                     {status && (
-                        <div className="mb-4 text-center text-sm font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
+                        <div className="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-center text-sm font-semibold text-emerald-600">
                             {status}
                         </div>
                     )}
 
-                    <div className="space-y-6 mt-4">
+                    <div className="mt-4 space-y-6">
                         <Form {...email.form()}>
                             {({ processing, errors }) => (
                                 <>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="email" className="text-xs font-bold text-purple-950 uppercase tracking-wider">
+                                        <Label
+                                            htmlFor="email"
+                                            className="text-xs font-bold tracking-wider text-purple-950 uppercase"
+                                        >
                                             Correo Electrónico
                                         </Label>
                                         <Input
@@ -46,14 +48,14 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                             autoComplete="off"
                                             autoFocus
                                             placeholder="tu.correo@upp.edu.mx"
-                                            className="rounded-xl border-gray-200 bg-slate-50 focus-visible:ring-purple-600/20 focus-visible:border-purple-600"
+                                            className="rounded-xl border-gray-200 bg-slate-50 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
                                         />
                                         <InputError message={errors.email} />
                                     </div>
 
                                     <div className="mt-2 flex items-center justify-start">
                                         <Button
-                                            className="w-full h-11 bg-amber-500 hover:bg-amber-600 text-purple-950 font-black rounded-xl shadow-md transition-all duration-200 uppercase tracking-wider text-xs flex items-center justify-center gap-2"
+                                            className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-amber-500 text-xs font-black tracking-wider text-purple-950 uppercase shadow-md transition-all duration-200 hover:bg-amber-600"
                                             disabled={processing}
                                             data-test="email-password-reset-link-button"
                                         >
@@ -67,9 +69,12 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             )}
                         </Form>
 
-                        <div className="text-center text-xs font-medium text-gray-500 pt-4 border-t border-slate-100">
+                        <div className="border-t border-slate-100 pt-4 text-center text-xs font-medium text-gray-500">
                             <span>O bien, regresar al </span>
-                            <TextLink href={login()} className="text-purple-700 font-bold hover:underline">
+                            <TextLink
+                                href={login()}
+                                className="font-bold text-purple-700 hover:underline"
+                            >
                                 inicio de sesión
                             </TextLink>
                         </div>

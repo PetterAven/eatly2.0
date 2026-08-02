@@ -12,17 +12,17 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
 
             $table->foreignId('branch_id')
-                  ->constrained('branches')
-                  ->cascadeOnDelete();
+                ->constrained('branches')
+                ->cascadeOnDelete();
 
             $table->foreignId('cart_id')
-                  ->nullable()
-                  ->constrained('carts')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('carts')
+                ->nullOnDelete();
 
             $table->string('code')->unique();
 
@@ -46,4 +46,3 @@ return new class extends Migration
         Schema::dropIfExists('orders');
     }
 };
-

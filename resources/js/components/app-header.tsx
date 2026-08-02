@@ -32,7 +32,17 @@ import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Clock, Store, Bike, Settings } from 'lucide-react';
+import {
+    Bike,
+    BookOpen,
+    Clock,
+    Folder,
+    LayoutGrid,
+    Menu,
+    Search,
+    Settings,
+    Store,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -62,23 +72,37 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const user = auth?.user;
     const role = user?.role || 'client';
 
-    const mainNavItems: NavItem[] = role === 'merchant'
-        ? [
-            { title: 'Panel de Tienda', href: '/vendor/dashboard', icon: Store },
-            { title: 'Mi Perfil', href: '/profile', icon: Settings },
-          ]
-        : role === 'driver'
-        ? [
-            { title: 'Panel de Repartidor', href: '/delivery/dashboard', icon: Bike },
-            { title: 'Mi Perfil', href: '/profile', icon: Settings },
-          ]
-        : [
-            { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
-            { title: 'Mis Pedidos', href: '/historial', icon: Clock },
-            { title: 'Mi Perfil', href: '/profile', icon: Settings },
-          ];
+    const mainNavItems: NavItem[] =
+        role === 'merchant'
+            ? [
+                  {
+                      title: 'Panel de Tienda',
+                      href: '/vendor/dashboard',
+                      icon: Store,
+                  },
+                  { title: 'Mi Perfil', href: '/profile', icon: Settings },
+              ]
+            : role === 'driver'
+              ? [
+                    {
+                        title: 'Panel de Repartidor',
+                        href: '/delivery/dashboard',
+                        icon: Bike,
+                    },
+                    { title: 'Mi Perfil', href: '/profile', icon: Settings },
+                ]
+              : [
+                    { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+                    { title: 'Mis Pedidos', href: '/historial', icon: Clock },
+                    { title: 'Mi Perfil', href: '/profile', icon: Settings },
+                ];
 
-    const homeUrl = role === 'merchant' ? '/vendor/dashboard' : role === 'driver' ? '/delivery/dashboard' : dashboard();
+    const homeUrl =
+        role === 'merchant'
+            ? '/vendor/dashboard'
+            : role === 'driver'
+              ? '/delivery/dashboard'
+              : dashboard();
     const getInitials = useInitials();
     return (
         <>

@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
  */
@@ -20,16 +21,16 @@ class OrderItemFactory extends Factory
 
     public function definition(): array
     {
-        $item      = Item::factory()->create();
-        $quantity  = $this->faker->numberBetween(1, 4);
+        $item = Item::factory()->create();
+        $quantity = $this->faker->numberBetween(1, 4);
         $unitPrice = $item->price;
 
         return [
-            'order_id'   => Order::factory(),
-            'item_id'    => $item->id,
-            'quantity'   => $quantity,
+            'order_id' => Order::factory(),
+            'item_id' => $item->id,
+            'quantity' => $quantity,
             'unit_price' => $unitPrice,
-            'notes'      => $this->faker->optional()->sentence(6),
+            'notes' => $this->faker->optional()->sentence(6),
         ];
     }
 }

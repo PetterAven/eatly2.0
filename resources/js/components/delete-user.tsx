@@ -19,7 +19,15 @@ export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const [isOpen, setIsOpen] = useState(false);
 
-    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm({
+    const {
+        data,
+        setData,
+        delete: destroy,
+        processing,
+        reset,
+        errors,
+        clearErrors,
+    } = useForm({
         password: '',
     });
 
@@ -74,10 +82,7 @@ export default function DeleteUser() {
 
                         <form onSubmit={deleteUser} className="space-y-6">
                             <div className="grid gap-2">
-                                <Label
-                                    htmlFor="password"
-                                    className="sr-only"
-                                >
+                                <Label htmlFor="password" className="sr-only">
                                     Password
                                 </Label>
 
@@ -87,7 +92,9 @@ export default function DeleteUser() {
                                     name="password"
                                     ref={passwordInput}
                                     value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('password', e.target.value)
+                                    }
                                     placeholder="Password"
                                     autoComplete="current-password"
                                 />

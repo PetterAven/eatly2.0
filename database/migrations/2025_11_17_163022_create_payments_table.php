@@ -12,12 +12,12 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('order_id')
-                  ->constrained('orders')
-                  ->cascadeOnDelete();
+                ->constrained('orders')
+                ->cascadeOnDelete();
 
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
 
             $table->string('provider')->default('cash'); // stripe, mercado_pago, cash...
             $table->string('provider_reference')->nullable();
@@ -39,4 +39,3 @@ return new class extends Migration
         Schema::dropIfExists('payments');
     }
 };
-

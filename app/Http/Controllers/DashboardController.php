@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\Item;
 use App\Models\Branch;
+use App\Models\Item;
+use App\Models\Order;
 use App\Models\Restaurant;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -24,11 +24,11 @@ class DashboardController extends Controller
         }
 
         $items = Item::with(['category.branch.restaurant', 'images'])->get();
-        
+
         $products = $items->map(function ($item) {
             $branch = $item->category?->branch;
             $restaurant = $branch?->restaurant;
-            $imageUrl = $item->images->first()?->url 
+            $imageUrl = $item->images->first()?->url
                 ?? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80';
 
             // Usar dinámicamente el nombre y descripción del restaurante configurado (ej. Moto Restaurante)
@@ -50,9 +50,9 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'activeOrder' => Order::where('user_id', Auth::id())
-                                 ->whereIn('status', ['pending', 'preparing', 'ready'])
-                                 ->latest()
-                                 ->first(),
+                ->whereIn('status', ['pending', 'preparing', 'ready'])
+                ->latest()
+                ->first(),
             'databaseProducts' => $products,
             'restaurants' => Restaurant::with('branches')->get(),
             'branches' => Branch::with(['restaurant', 'location', 'images'])->get(),

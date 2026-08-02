@@ -27,10 +27,11 @@ export default function Profile({
 }) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, patch, processing, errors, recentlySuccessful } = useForm({
-        name: auth.user.name,
-        email: auth.user.email,
-    });
+    const { data, setData, patch, processing, errors, recentlySuccessful } =
+        useForm({
+            name: auth.user.name,
+            email: auth.user.email,
+        });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,7 +59,9 @@ export default function Profile({
                                 id="name"
                                 className="mt-1 block w-full"
                                 value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
+                                onChange={(e) =>
+                                    setData('name', e.target.value)
+                                }
                                 required
                                 autoComplete="name"
                                 placeholder="Full name"
@@ -78,7 +81,9 @@ export default function Profile({
                                 type="email"
                                 className="mt-1 block w-full"
                                 value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
+                                onChange={(e) =>
+                                    setData('email', e.target.value)
+                                }
                                 required
                                 autoComplete="username"
                                 placeholder="Email address"
@@ -101,13 +106,15 @@ export default function Profile({
                                             as="button"
                                             className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                         >
-                                            Click here to resend the verification email.
+                                            Click here to resend the
+                                            verification email.
                                         </Link>
                                     </p>
 
                                     {status === 'verification-link-sent' && (
                                         <div className="mt-2 text-sm font-medium text-green-600">
-                                            A new verification link has been sent to your email address.
+                                            A new verification link has been
+                                            sent to your email address.
                                         </div>
                                     )}
                                 </div>

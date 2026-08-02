@@ -21,11 +21,11 @@ class RestaurantFactory extends Factory
     public function definition(): array
     {
         return [
-            'owner_id'    => User::factory(), // owner del restaurante
-            'name'        => $this->faker->company() . ' ' . $this->faker->randomElement(['Restaurante', 'Bistro', 'Café', 'Gastronomía']),
+            'owner_id' => User::factory(), // owner del restaurante
+            'name' => $this->faker->company().' '.$this->faker->randomElement(['Restaurante', 'Bistro', 'Café', 'Gastronomía']),
             'description' => $this->faker->sentence(12),
-            'phone'       => $this->faker->numerify('55########'),
-            'email'       => $this->faker->unique()->companyEmail(),
+            'phone' => $this->faker->numerify('55########'),
+            'email' => $this->faker->unique()->companyEmail(),
         ];
     }
 }

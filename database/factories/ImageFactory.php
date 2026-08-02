@@ -16,14 +16,15 @@ class ImageFactory extends Factory
      * @return array<string, mixed>
      */
     protected $model = Image::class;
+
     public function definition(): array
     {
         return [
             'imageable_type' => null, // lo asignamos desde el seeder
-            'imageable_id'   => null,
-            'url'            => $this->faker->imageUrl(800, 600, 'food', true),
-            'alt'            => $this->faker->sentence(3),
-            'position'       => 0,
+            'imageable_id' => null,
+            'url' => $this->faker->imageUrl(800, 600, 'food', true),
+            'alt' => $this->faker->sentence(3),
+            'position' => 0,
         ];
     }
 }

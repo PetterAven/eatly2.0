@@ -1,13 +1,23 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import React from 'react';
 
+interface PageProps {
+    flash?: {
+        error?: string;
+        success?: string;
+    };
+    [key: string]: unknown;
+}
+
 export default function Login() {
-    
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
         remember: true,
     });
+
+    const { props } = usePage<PageProps>();
+    const flashError = props.flash?.error;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,7 +25,6 @@ export default function Login() {
     };
 
     const handleGoogleLogin = () => {
-        
         window.location.href = '/auth/google/redirect';
     };
 
@@ -49,6 +58,12 @@ export default function Login() {
                         </p>
                     </div>
 
+                    {flashError && (
+                        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                            {flashError}
+                        </div>
+                    )}
+
                     {}
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
@@ -73,9 +88,16 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <div className="flex justify-between items-center mb-1.5">
-                                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">Contraseña</label>
-                                 <Link href="/forgot-password" className="text-xs font-semibold text-purple-600 hover:underline">¿La olvidaste?</Link>
+                            <div className="mb-1.5 flex items-center justify-between">
+                                <label className="block text-xs font-bold tracking-wider text-gray-700 uppercase">
+                                    Contraseña
+                                </label>
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-xs font-semibold text-purple-600 hover:underline"
+                                >
+                                    ¿La olvidaste?
+                                </Link>
                             </div>
                             <input
                                 type="password"

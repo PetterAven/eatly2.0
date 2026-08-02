@@ -8,14 +8,11 @@ const appName = import.meta.env.VITE_APP_NAME || 'Eatly';
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => {
-        
         const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
 
-        
         let page =
             pages[`./pages/${name}.tsx`] || pages[`./pages/${name}/index.tsx`];
 
-        
         if (!page) {
             const normalizedTarget = name.toLowerCase().replace(/\/index$/, '');
             const matchingKey = Object.keys(pages).find((key) => {

@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\VendorController;
 use App\Http\Controllers\DeliveryController;
-use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderHistoryController;
+use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\VendorController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,9 +72,10 @@ Route::post('/logout', function () {
     Auth::logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
+
     return redirect('/');
 })->name('logout');
 
-if (file_exists(__DIR__ . '/settings.php')) {
-    require __DIR__ . '/settings.php';
+if (file_exists(__DIR__.'/settings.php')) {
+    require __DIR__.'/settings.php';
 }

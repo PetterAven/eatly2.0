@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
+import React, { useState } from 'react';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -13,7 +13,12 @@ interface SidebarProps {
     onSelectCategory?: (category: string) => void;
 }
 
-export default function Sidebar({ isOpen, onClose, auth, onSelectCategory }: SidebarProps) {
+export default function Sidebar({
+    isOpen,
+    onClose,
+    auth,
+    onSelectCategory,
+}: SidebarProps) {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     if (!isOpen) return null;
@@ -29,22 +34,28 @@ export default function Sidebar({ isOpen, onClose, auth, onSelectCategory }: Sid
     return (
         <div className="fixed inset-0 z-50 overflow-hidden">
             {/* Fondo oscuro traslúcido de superposición (backdrop/overlay) que al hacer clic afuera cierre el menú */}
-            <div 
+            <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
 
             {/* Barra lateral desplegable (Sidebar / Drawer) estilo Rappi */}
-            <div className="absolute inset-y-0 left-0 w-80 bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out z-10">
-                
+            <div className="absolute inset-y-0 left-0 z-10 flex w-80 transform flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out">
                 {/* 1. HEADER: Logo de Eatly Eats + Botón de cerrar ✖️ arriba a la derecha */}
-                <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
-                    <Link href="/dashboard" className="flex items-center gap-2" onClick={onClose}>
-                        <span className="text-xl font-black tracking-tight text-gray-900">Eatly <span className="text-[#FF5722]">Eats</span> 🐴</span>
-                    </Link>
-                    <button 
+                <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-5">
+                    <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2"
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center font-bold transition shadow-sm"
+                    >
+                        <span className="text-xl font-black tracking-tight text-gray-900">
+                            Eatly <span className="text-[#FF5722]">Eats</span>{' '}
+                            🐴
+                        </span>
+                    </Link>
+                    <button
+                        onClick={onClose}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-700 shadow-sm transition hover:bg-gray-200"
                         aria-label="Cerrar menú"
                     >
                         ✖️
@@ -52,38 +63,45 @@ export default function Sidebar({ isOpen, onClose, auth, onSelectCategory }: Sid
                 </div>
 
                 {/* CONTENIDO SCROLLABLE */}
-                <div className="flex-1 overflow-y-auto p-5 space-y-6">
-
+                <div className="flex-1 space-y-6 overflow-y-auto p-5">
                     {/* PERFIL USUARIO: Avatar con inicial + "Hola, {auth.user.name}" */}
-                    <Link 
-                        href="/profile" 
+                    <Link
+                        href="/profile"
                         onClick={onClose}
-                        className="flex items-center gap-3.5 p-3 rounded-2xl bg-orange-50/60 hover:bg-orange-100/80 border border-orange-100 transition group"
+                        className="group flex items-center gap-3.5 rounded-2xl border border-orange-100 bg-orange-50/60 p-3 transition hover:bg-orange-100/80"
                     >
-                        <div className="bg-[#FF5722] text-white rounded-full w-11 h-11 flex items-center justify-center font-black text-base shadow-md group-hover:scale-105 transition">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF5722] text-base font-black text-white shadow-md transition group-hover:scale-105">
                             {userInitial}
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-[10px] font-extrabold text-orange-600 uppercase tracking-wider">Mi Cuenta</p>
-                            <h4 className="font-black text-sm text-gray-900 truncate">Hola, {userName}</h4>
+                            <p className="text-[10px] font-extrabold tracking-wider text-orange-600 uppercase">
+                                Mi Cuenta
+                            </p>
+                            <h4 className="truncate text-sm font-black text-gray-900">
+                                Hola, {userName}
+                            </h4>
                         </div>
                     </Link>
 
                     {/* CARD DESTACADA: Botón azul "⚽ Descubre nuestras promociones del Campus" */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden flex flex-col justify-between">
-                        <div className="absolute right-2 bottom-2 text-4xl opacity-20">⚽</div>
+                    <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-4 text-white shadow-lg">
+                        <div className="absolute right-2 bottom-2 text-4xl opacity-20">
+                            ⚽
+                        </div>
                         <div className="relative z-10 mb-3">
-                            <span className="bg-white/20 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full mb-2 inline-block">
+                            <span className="mb-2 inline-block rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-black text-white uppercase">
                                 Promoción UPP
                             </span>
-                            <h4 className="font-black text-xs leading-snug">⚽ Descubre nuestras promociones del Campus</h4>
+                            <h4 className="text-xs leading-snug font-black">
+                                ⚽ Descubre nuestras promociones del Campus
+                            </h4>
                         </div>
-                        <button 
+                        <button
                             onClick={() => {
                                 if (onSelectCategory) onSelectCategory('Todos');
                                 onClose();
                             }}
-                            className="relative z-10 w-full py-2 bg-white text-blue-700 hover:bg-blue-50 font-black rounded-xl text-[11px] uppercase tracking-wider transition shadow-sm text-center"
+                            className="relative z-10 w-full rounded-xl bg-white py-2 text-center text-[11px] font-black tracking-wider text-blue-700 uppercase shadow-sm transition hover:bg-blue-50"
                         >
                             Ver Promociones
                         </button>
@@ -93,141 +111,214 @@ export default function Sidebar({ isOpen, onClose, auth, onSelectCategory }: Sid
 
                     {/* • SECCIONES */}
                     <div className="space-y-1">
-                        <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2">Secciones del Campus</p>
-                        
-                        <button 
-                            onClick={() => { if (onSelectCategory) onSelectCategory('Comida'); onClose(); }}
-                            className="w-full text-left flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                        <p className="mb-2 text-[10px] font-extrabold tracking-wider text-gray-400 uppercase">
+                            Secciones del Campus
+                        </p>
+
+                        <button
+                            onClick={() => {
+                                if (onSelectCategory)
+                                    onSelectCategory('Comida');
+                                onClose();
+                            }}
+                            className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">🍽️ Cafeterías / Restaurantes</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                🍽️ Cafeterías / Restaurantes
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </button>
 
-                        <button 
-                            onClick={() => { if (onSelectCategory) onSelectCategory('Snacks'); onClose(); }}
-                            className="w-full text-left flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                        <button
+                            onClick={() => {
+                                if (onSelectCategory)
+                                    onSelectCategory('Snacks');
+                                onClose();
+                            }}
+                            className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">🍿 Snacks & Botanas</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                🍿 Snacks & Botanas
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </button>
 
-                        <button 
-                            onClick={() => { if (onSelectCategory) onSelectCategory('Bares'); onClose(); }}
-                            className="w-full text-left flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                        <button
+                            onClick={() => {
+                                if (onSelectCategory) onSelectCategory('Bares');
+                                onClose();
+                            }}
+                            className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">🥤 Bebidas</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                🥤 Bebidas
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </button>
 
-                        <button 
-                            onClick={() => { if (onSelectCategory) onSelectCategory('Comida'); onClose(); }}
-                            className="w-full text-left flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                        <button
+                            onClick={() => {
+                                if (onSelectCategory)
+                                    onSelectCategory('Comida');
+                                onClose();
+                            }}
+                            className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">⚡ Pedidos Express</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                ⚡ Pedidos Express
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </button>
                     </div>
 
                     {/* • PROMOCIONES Y CRÉDITOS */}
                     <div className="space-y-1">
-                        <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2">Créditos & Monedero</p>
-                        <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100 text-xs">
-                            <span className="font-bold text-gray-700 flex items-center gap-2">💰 Créditos Eatly</span>
-                            <span className="font-black text-[#FF5722]">$ 0.00 MXN</span>
+                        <p className="mb-2 text-[10px] font-extrabold tracking-wider text-gray-400 uppercase">
+                            Créditos & Monedero
+                        </p>
+                        <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3 text-xs">
+                            <span className="flex items-center gap-2 font-bold text-gray-700">
+                                💰 Créditos Eatly
+                            </span>
+                            <span className="font-black text-[#FF5722]">
+                                $ 0.00 MXN
+                            </span>
                         </div>
                     </div>
 
                     {/* • TU PERFIL */}
                     <div className="space-y-1">
-                        <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2">Tu Perfil</p>
+                        <p className="mb-2 text-[10px] font-extrabold tracking-wider text-gray-400 uppercase">
+                            Tu Perfil
+                        </p>
 
-                        <Link 
-                            href="/profile" 
+                        <Link
+                            href="/profile"
                             onClick={onClose}
-                            className="flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                            className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">⚙️ Información de mi cuenta</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                ⚙️ Información de mi cuenta
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </Link>
 
-                        <button 
+                        <button
                             onClick={() => setShowPaymentModal(true)}
-                            className="w-full text-left flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                            className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">💳 Métodos de pago</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                💳 Métodos de pago
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </button>
 
-                        <Link 
-                            href="/historial" 
+                        <Link
+                            href="/historial"
                             onClick={onClose}
-                            className="flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                            className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">📦 Últimas órdenes</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                📦 Últimas órdenes
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </Link>
                     </div>
 
                     {/* • OTROS */}
-                    <div className="space-y-1 pt-2 border-t border-gray-100">
-                        <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-2">Aliados UPP</p>
+                    <div className="space-y-1 border-t border-gray-100 pt-2">
+                        <p className="mb-2 text-[10px] font-extrabold tracking-wider text-gray-400 uppercase">
+                            Aliados UPP
+                        </p>
 
-                        <Link 
-                            href="/vendor/register" 
+                        <Link
+                            href="/vendor/register"
                             onClick={onClose}
-                            className="flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                            className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">🏪 Registra tu cafetería</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                🏪 Registra tu cafetería
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </Link>
 
-                        <Link 
-                            href="/register" 
+                        <Link
+                            href="/register"
                             onClick={onClose}
-                            className="flex items-center justify-between p-3 rounded-2xl hover:bg-orange-50 text-xs font-bold text-gray-800 transition group"
+                            className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
-                            <span className="flex items-center gap-2">🛵 Quiero ser Repartidor UPP</span>
-                            <span className="text-gray-400 group-hover:text-[#FF5722]">&gt;</span>
+                            <span className="flex items-center gap-2">
+                                🛵 Quiero ser Repartidor UPP
+                            </span>
+                            <span className="text-gray-400 group-hover:text-[#FF5722]">
+                                &gt;
+                            </span>
                         </Link>
 
                         <form onSubmit={handleLogout} className="pt-2">
-                            <button 
+                            <button
                                 type="submit"
-                                className="w-full text-left flex items-center justify-between p-3 rounded-2xl hover:bg-red-50 text-xs font-bold text-red-600 transition group"
+                                className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-red-600 transition hover:bg-red-50"
                             >
-                                <span className="flex items-center gap-2">🚪 Cerrar sesión</span>
-                                <span className="text-red-400 group-hover:text-red-600">&gt;</span>
+                                <span className="flex items-center gap-2">
+                                    🚪 Cerrar sesión
+                                </span>
+                                <span className="text-red-400 group-hover:text-red-600">
+                                    &gt;
+                                </span>
                             </button>
                         </form>
                     </div>
-
                 </div>
             </div>
 
             {/* Modal de Métodos de Pago */}
             {showPaymentModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 relative border border-gray-100">
-                        <button 
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                    <div className="relative w-full max-w-sm rounded-3xl border border-gray-100 bg-white p-6 shadow-2xl">
+                        <button
                             onClick={() => setShowPaymentModal(false)}
-                            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center font-bold"
+                            className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-700 hover:bg-gray-200"
                         >
                             ✕
                         </button>
-                        
-                        <div className="text-center space-y-4 pt-2">
-                            <span className="text-4xl block">💳</span>
-                            <h3 className="font-black text-base text-gray-900">Métodos de Pago Registrados</h3>
-                            <p className="text-xs text-gray-500">Actualmente tienes configurado efectivo contra entrega y pasarela de prueba Eatly Sandbox.</p>
-                            
-                            <div className="p-3 bg-gray-50 rounded-2xl border border-gray-100 text-left text-xs font-bold text-gray-800 flex items-center justify-between">
+
+                        <div className="space-y-4 pt-2 text-center">
+                            <span className="block text-4xl">💳</span>
+                            <h3 className="text-base font-black text-gray-900">
+                                Métodos de Pago Registrados
+                            </h3>
+                            <p className="text-xs text-gray-500">
+                                Actualmente tienes configurado efectivo contra
+                                entrega y pasarela de prueba Eatly Sandbox.
+                            </p>
+
+                            <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3 text-left text-xs font-bold text-gray-800">
                                 <span>💵 Efectivo en Campus UPP</span>
-                                <span className="text-emerald-600 text-[10px]">Predeterminado</span>
+                                <span className="text-[10px] text-emerald-600">
+                                    Predeterminado
+                                </span>
                             </div>
 
-                            <button 
+                            <button
                                 onClick={() => setShowPaymentModal(false)}
-                                className="w-full py-3 bg-[#FF5722] text-white font-black rounded-xl text-xs uppercase tracking-wider"
+                                className="w-full rounded-xl bg-[#FF5722] py-3 text-xs font-black tracking-wider text-white uppercase"
                             >
                                 Entendido
                             </button>

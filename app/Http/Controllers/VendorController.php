@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Item;
 use App\Models\Order;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -62,7 +62,7 @@ class VendorController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('items', 'public');
-            $item->images()->create(['url' => '/storage/' . $path]);
+            $item->images()->create(['url' => '/storage/'.$path]);
         }
 
         return redirect()->back()->with('success', 'Platillo creado exitosamente.');
@@ -84,7 +84,7 @@ class VendorController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('items', 'public');
             $product->images()->delete();
-            $product->images()->create(['url' => '/storage/' . $path]);
+            $product->images()->create(['url' => '/storage/'.$path]);
         }
 
         return redirect()->back()->with('success', 'Platillo actualizado exitosamente.');
@@ -93,13 +93,14 @@ class VendorController extends Controller
     public function destroyProduct(Item $product)
     {
         $product->delete();
+
         return redirect()->back()->with('success', 'Platillo eliminado.');
     }
 
     public function updateOrderStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|string|in:pending,preparing,ready,delivering,completed,delivered,cancelled'
+            'status' => 'required|string|in:pending,preparing,ready,delivering,completed,delivered,cancelled',
         ]);
 
         $order->update(['status' => $validated['status']]);
@@ -113,7 +114,7 @@ class VendorController extends Controller
         $restaurant = \App\Models\Restaurant::firstOrCreate(
             ['owner_id' => $user->id],
             [
-                'name' => $user->name . ' Restaurante',
+                'name' => $user->name.' Restaurante',
                 'description' => 'Deliciosa comida en el campus de la UPP.',
                 'address' => 'Edificio de Servicios Estudiantiles, UPP',
                 'latitude' => 19.8145,
@@ -152,7 +153,7 @@ class VendorController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('restaurants', 'public');
-            $dataToUpdate['image'] = '/storage/' . $path;
+            $dataToUpdate['image'] = '/storage/'.$path;
         }
 
         $restaurant->update($dataToUpdate);
@@ -191,7 +192,7 @@ class VendorController extends Controller
         ]);
 
         $user = \App\Models\User::create([
-            'name' => $validated['restaurant_name'] . ' (Admin)',
+            'name' => $validated['restaurant_name'].' (Admin)',
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
             'role' => 'merchant',
@@ -201,7 +202,7 @@ class VendorController extends Controller
         $restaurant = \App\Models\Restaurant::create([
             'owner_id' => $user->id,
             'name' => $validated['restaurant_name'],
-            'description' => 'Especialidad en ' . $validated['food_type'] . ' - Campus UPP.',
+            'description' => 'Especialidad en '.$validated['food_type'].' - Campus UPP.',
             'phone' => $validated['phone'],
             'email' => $validated['email'],
             'address' => $validated['location'],
@@ -222,7 +223,7 @@ class VendorController extends Controller
         $branch = \App\Models\Branch::create([
             'restaurant_id' => $restaurant->id,
             'location_id' => $location->id,
-            'name' => $validated['restaurant_name'] . ' - ' . $validated['location'],
+            'name' => $validated['restaurant_name'].' - '.$validated['location'],
             'phone' => $validated['phone'],
             'is_active' => true,
         ]);

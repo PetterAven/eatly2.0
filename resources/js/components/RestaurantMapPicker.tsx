@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 
 interface MapPickerProps {
     latitude: number;
     longitude: number;
-    address: string;
+    address?: string;
     onChange: (lat: number, lng: number, address: string) => void;
 }
 
@@ -18,7 +18,15 @@ const customIcon = L.divIcon({
     iconAnchor: [14, 14],
 });
 
-function LocationMarker({ position, setPosition, onChange }: { position: [number, number], setPosition: (pos: [number, number]) => void, onChange: (lat: number, lng: number, address: string) => void }) {
+function LocationMarker({
+    position,
+    setPosition,
+    onChange,
+}: {
+    position: [number, number];
+    setPosition: (pos: [number, number]) => void;
+    onChange: (lat: number, lng: number, address: string) => void;
+}) {
     useMapEvents({
         click(e) {
             const newPos: [number, number] = [e.latlng.lat, e.latlng.lng];
@@ -28,8 +36,8 @@ function LocationMarker({ position, setPosition, onChange }: { position: [number
     });
 
     return position === null ? null : (
-        <Marker 
-            position={position} 
+        <Marker
+            position={position}
             icon={customIcon}
             draggable={true}
             eventHandlers={{
@@ -39,25 +47,38 @@ function LocationMarker({ position, setPosition, onChange }: { position: [number
                     const newPos: [number, number] = [coord.lat, coord.lng];
                     setPosition(newPos);
                     fetchAddress(newPos[0], newPos[1], onChange);
-                }
+                },
             }}
         />
     );
 }
 
-async function fetchAddress(lat: number, lng: number, onChange: (lat: number, lng: number, address: string) => void) {
+async function fetchAddress(
+    lat: number,
+    lng: number,
+    onChange: (lat: number, lng: number, address: string) => void,
+) {
     try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+        );
         const data = await response.json();
         const addressText = data.display_name || `${lat}, ${lng}`;
         onChange(lat, lng, addressText);
-    } catch (e) {
+    } catch {
         onChange(lat, lng, `${lat}, ${lng}`);
     }
 }
 
-export default function RestaurantMapPicker({ latitude, longitude, address, onChange }: MapPickerProps) {
-    const [position, setPosition] = useState<[number, number]>([latitude || 19.8145, longitude || -98.7389]);
+export default function RestaurantMapPicker({
+    latitude,
+    longitude,
+    onChange,
+}: MapPickerProps) {
+    const [position, setPosition] = useState<[number, number]>([
+        latitude || 19.8145,
+        longitude || -98.7389,
+    ]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
 
@@ -72,7 +93,9 @@ export default function RestaurantMapPicker({ latitude, longitude, address, onCh
         if (!searchQuery.trim()) return;
         setSearching(true);
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
+            );
             const results = await res.json();
             if (results && results.length > 0) {
                 const lat = parseFloat(results[0].lat);
@@ -97,32 +120,39 @@ export default function RestaurantMapPicker({ latitude, longitude, address, onCh
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar dirección o lugar (ej. UPP, Pachuca)..."
-                    className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+                    className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
                 />
                 <button
                     type="submit"
                     disabled={searching}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase rounded-xl transition"
+                    className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white uppercase transition hover:bg-slate-800"
                 >
                     {searching ? 'Buscando...' : 'Buscar'}
                 </button>
             </form>
 
-            <div className="h-[300px] w-full rounded-2xl overflow-hidden border border-slate-200 shadow-inner z-0 relative">
-                <MapContainer 
-                    center={position} 
-                    zoom={15} 
-                    scrollWheelZoom={false} 
+            <div className="relative z-0 h-[300px] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-inner">
+                <MapContainer
+                    center={position}
+                    zoom={15}
+                    scrollWheelZoom={false}
                     style={{ height: '100%', width: '100%' }}
                 >
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <LocationMarker position={position} setPosition={setPosition} onChange={onChange} />
+                    <LocationMarker
+                        position={position}
+                        setPosition={setPosition}
+                        onChange={onChange}
+                    />
                 </MapContainer>
             </div>
-            <p className="text-[11px] text-slate-400">💡 Haz clic en el mapa o arrastra el pin naranja para ubicar con exactitud tu local.</p>
+            <p className="text-[11px] text-slate-400">
+                💡 Haz clic en el mapa o arrastra el pin naranja para ubicar con
+                exactitud tu local.
+            </p>
         </div>
     );
 }

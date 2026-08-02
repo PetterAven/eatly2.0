@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\Level;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -16,6 +16,7 @@ class UserFactory extends Factory
      * The current password being used by the factory.
      */
     protected $model = User::class;
+
     protected static ?string $password;
 
     /**
@@ -27,11 +28,11 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'level_id'           => Level::factory(), // crea un level si no existe
+            'level_id' => Level::factory(), // crea un level si no existe
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= 'password',
-            'phone'              => $this->faker->numerify('55########'),
+            'phone' => $this->faker->numerify('55########'),
             'remember_token' => Str::random(10),
             'two_factor_secret' => Str::random(10),
             'two_factor_recovery_codes' => Str::random(10),

@@ -15,13 +15,13 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'country'      => 'España', // Mapeado en español
-            'state'        => $this->faker->state(),
-            'city'         => $this->faker->city(),
+            'country' => 'España', // Mapeado en español
+            'state' => $this->faker->state(),
+            'city' => $this->faker->city(),
             'address_line' => $this->faker->streetAddress(), // <-- Corregido
-            'postal_code'  => $this->faker->numerify('#####'),
-            'lat'          => $this->faker->latitude(40.0, 41.0), // <-- Corregido
-            'lng'          => $this->faker->longitude(-4.0, -3.0), // <-- Corregido
+            'postal_code' => $this->faker->numerify('#####'),
+            'lat' => $this->faker->latitude(40.0, 41.0), // <-- Corregido
+            'lng' => $this->faker->longitude(-4.0, -3.0), // <-- Corregido
         ];
     }
 }

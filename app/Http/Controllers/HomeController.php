@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class HomeController extends Controller
 {
@@ -22,8 +21,8 @@ class HomeController extends Controller
             ->where('is_active', true)
             ->get()
             ->map(function ($branch) {
-                $imageUrl = $branch->image?->url 
-                    ?? $branch->images->first()?->url 
+                $imageUrl = $branch->image?->url
+                    ?? $branch->images->first()?->url
                     ?? 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500';
 
                 return [
@@ -33,13 +32,13 @@ class HomeController extends Controller
                     'city' => $branch->location?->city ?? 'Ciudad Principal',
                     'image' => $imageUrl,
                     'rating' => 4.5,
-                    'delivery_time' => '20-30 min'
+                    'delivery_time' => '20-30 min',
                 ];
             });
 
         // CORREGIDO: 'Welcome' ahora va con W mayúscula exacta coincidiendo con React
         return Inertia::render('Welcome', [
-            'branches' => $branches
+            'branches' => $branches,
         ]);
     }
 }

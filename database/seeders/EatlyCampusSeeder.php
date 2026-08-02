@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use App\Models\User;
 
 class EatlyCampusSeeder extends Seeder
 {
@@ -13,7 +13,7 @@ class EatlyCampusSeeder extends Seeder
     {
         // 1. Obtener o crear un usuario dueño/administrador para asociar al restaurante
         $owner = User::first();
-        if (!$owner) {
+        if (! $owner) {
             $ownerId = DB::table('users')->insertGetId([
                 'name' => 'Administrador Campus UPP',
                 'email' => 'admin@upp.edu.mx',
@@ -28,13 +28,13 @@ class EatlyCampusSeeder extends Seeder
         // 2. Crear una ubicación de respaldo en la tabla locations de forma dinámica
         try {
             $locationExiste = DB::table('locations')->where('id', 1)->exists();
-            if (!$locationExiste) {
+            if (! $locationExiste) {
                 $locationData = ['id' => 1, 'created_at' => now(), 'updated_at' => now()];
-                
+
                 if (Schema::hasColumn('locations', 'name')) {
                     $locationData['name'] = 'Campus UPP';
                 }
-                
+
                 DB::table('locations')->insert($locationData);
             }
         } catch (\Exception $e) {
@@ -43,12 +43,12 @@ class EatlyCampusSeeder extends Seeder
 
         // 3. Crear el restaurante principal en la tabla restaurants si no existe
         $restaurantExiste = DB::table('restaurants')->where('id', 1)->exists();
-        if (!$restaurantExiste) {
+        if (! $restaurantExiste) {
             $restaurantData = [
                 'id' => 1,
                 'owner_id' => $ownerId,
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
 
             if (Schema::hasColumn('restaurants', 'name')) {
@@ -80,7 +80,7 @@ class EatlyCampusSeeder extends Seeder
             $branchData = [
                 'restaurant_id' => 1,
                 'location_id' => 1,
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
 
             if (Schema::hasColumn('branches', 'name')) {
@@ -114,14 +114,14 @@ class EatlyCampusSeeder extends Seeder
 
         foreach ($categories as $cat) {
             $catData = ['updated_at' => now()];
-            
+
             if (Schema::hasColumn('categories', 'name')) {
                 $catData['name'] = $cat['name'];
             }
             if (Schema::hasColumn('categories', 'branch_id')) {
                 $catData['branch_id'] = $cat['branch_id'];
             }
-            
+
             DB::table('categories')->updateOrInsert(
                 ['id' => $cat['id']],
                 array_merge($catData, ['created_at' => now()])
@@ -141,7 +141,7 @@ class EatlyCampusSeeder extends Seeder
 
         foreach ($platillos as $platillo) {
             $itemData = [
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
 
             if (Schema::hasColumn('items', 'name')) {
