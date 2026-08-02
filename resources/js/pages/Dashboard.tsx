@@ -354,19 +354,6 @@ export default function Dashboard({
                             📋 Mis Pedidos
                         </Link>
 
-                        {/* Avatar de usuario que redirige a /profile */}
-                        <Link
-                            href="/profile"
-                            className="group flex items-center gap-2"
-                            title="Mi Cuenta"
-                        >
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-orange-100 bg-white font-bold text-orange-600 shadow-md transition group-hover:scale-105">
-                                {auth?.user?.name
-                                    ? auth.user.name.charAt(0).toUpperCase()
-                                    : 'U'}
-                            </div>
-                        </Link>
-
                         <Link
                             href="/settings/profile"
                             className="flex items-center gap-1 rounded-2xl bg-gray-100 px-3.5 py-2.5 text-xs font-bold text-gray-700 transition duration-200 hover:bg-gray-200"

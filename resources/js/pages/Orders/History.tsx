@@ -44,7 +44,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function History() {
-    const { orders, auth } = usePage<HistoryProps>().props;
+    const { orders } = usePage<HistoryProps>().props;
     const [ratingOrder, setRatingOrder] = useState<OrderRow | null>(null);
 
     const ordersData = orders?.data ?? [];
@@ -100,16 +100,6 @@ export default function History() {
                             className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                         >
                             🍽️ Menú / Catálogo
-                        </Link>
-
-                        <Link
-                            href="/profile"
-                            className="group flex items-center gap-2"
-                            title="Mi Cuenta"
-                        >
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-orange-100 bg-white font-bold text-orange-600 shadow-md transition group-hover:scale-105">
-                                {auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : 'U'}
-                            </div>
                         </Link>
 
                         <Link
