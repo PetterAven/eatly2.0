@@ -55,6 +55,43 @@ class User extends Authenticatable
         ];
     }
 
+    public function getRoleAttribute($value)
+    {
+        if ($value === 'vendor' || $value === 'restaurante') {
+            return 'merchant';
+        }
+        return $value ?? 'client';
+    }
+
+    public function redirectRouteName(): string
+    {
+        return match ($this->role) {
+            'vendor' => 'vendor.dashboard',
+            'delivery' => 'delivery.dashboard',
+            default => 'dashboard',
+        };
+    }
+
+    public function isMerchant(): bool
+    {
+        return $this->level_id == 2 || in_array($this->role, ['merchant', 'vendor', 'restaurante']);
+    }
+
+    public function isDriver(): bool
+    {
+        return $this->level_id == 3 || $this->role === 'driver';
+    }
+
+    public function isClient(): bool
+    {
+        return $this->level_id == 1 || $this->role === 'client';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->level_id == 4 || $this->role === 'admin';
+    }
+
     public function level()
     {
         return $this->belongsTo(Level::class);
