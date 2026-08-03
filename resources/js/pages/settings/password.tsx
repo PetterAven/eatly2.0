@@ -34,7 +34,7 @@ export default function Password() {
     const updatePassword = (e: React.FormEvent) => {
         e.preventDefault();
 
-        put(route('user-password.update'), {
+        put('/settings/password', {
             preserveScroll: true,
             onSuccess: () => reset(),
             onError: (errors) => {
@@ -132,6 +132,7 @@ export default function Password() {
 
                         <div className="flex items-center gap-4">
                             <Button
+                                type="submit"
                                 disabled={processing}
                                 className="rounded-xl bg-[#FF5722] hover:bg-[#F4511E] text-white text-xs font-black uppercase tracking-wider px-6 py-2.5 shadow-md transition"
                                 data-test="update-password-button"

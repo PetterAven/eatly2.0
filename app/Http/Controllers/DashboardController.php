@@ -15,12 +15,9 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role === 'merchant') {
-            return redirect()->route('vendor.dashboard');
-        }
-
-        if ($user->role === 'driver') {
-            return redirect()->route('delivery.dashboard');
+        $redirectRoute = $user->redirectRouteName();
+        if ($redirectRoute !== 'dashboard') {
+            return redirect()->route($redirectRoute);
         }
 
         $items = Item::with(['category.branch.restaurant', 'images'])->get();
@@ -35,12 +32,19 @@ class DashboardController extends Controller
             $restaurantName = $restaurant?->name ?? $branch?->name ?? Restaurant::first()?->name ?? Branch::first()?->name ?? 'Cafetería UPP';
             $restaurantDescription = $restaurant?->description ?? $restaurant?->address ?? 'Concesionario Oficial UPP';
 
+            $catName = $item->category?->name ?? 'Comida';
+            $mappedCategory = match($catName) {
+                'Snacks' => 'Snacks',
+                'Bebidas', 'Postres', 'Combos', 'Bares' => 'Bares',
+                default => 'Comida',
+            };
+
             return [
                 'id' => $item->id,
                 'name' => $item->name,
                 'price' => (float) $item->price,
                 'description' => $item->description ?? '',
-                'category' => 'Comida',
+                'category' => $mappedCategory,
                 'restaurant_name' => $restaurantName,
                 'restaurant_description' => $restaurantDescription,
                 'image' => $imageUrl,

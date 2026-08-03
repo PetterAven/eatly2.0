@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Bike, LogOut, Navigation, Package, Settings } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface OrderItem {
     id: number;
@@ -47,6 +47,13 @@ export default function DeliveryDashboard({
     myRatings,
 }: Props) {
     const [loadingOrderId, setLoadingOrderId] = useState<number | null>(null);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({ only: ['availableOrders', 'myDeliveries'] });
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     const takeOrder = (orderId: number) => {
         setLoadingOrderId(orderId);

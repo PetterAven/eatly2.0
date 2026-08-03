@@ -40,7 +40,7 @@ export default function DeleteUser() {
         e.preventDefault();
         if (confirmText !== 'ELIMINAR') return;
 
-        destroy(route('profile.destroy'), {
+        destroy('/settings/profile', {
             preserveScroll: true,
             onSuccess: () => {
                 setIsOpen(false);

@@ -23,12 +23,12 @@ export default function Profile({
     const { data, setData, patch, processing, errors, recentlySuccessful } =
         useForm({
             name: auth.user.name,
-            email: auth.user.email,
+            email: isGoogleUser ? '' : auth.user.email,
         });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        patch(route('profile.update'), {
+        patch('/settings/profile', {
             preserveScroll: true,
         });
     };
@@ -72,11 +72,11 @@ export default function Profile({
                             id="email"
                             type="email"
                             className={`mt-1 block w-full rounded-xl border-gray-200 text-xs ${isGoogleUser ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
-                            value={data.email}
+                            value={isGoogleUser ? auth.user.email : data.email}
                             onChange={(e) =>
                                 setData('email', e.target.value)
                             }
-                            required
+                            required={!isGoogleUser}
                             disabled={isGoogleUser}
                             autoComplete="username"
                             placeholder="Correo electrónico"
@@ -99,7 +99,7 @@ export default function Profile({
                                 <p className="-mt-4 text-xs text-muted-foreground">
                                     Tu dirección de correo no está verificada.{' '}
                                     <Link
-                                        href={route('verification.send')}
+                                        href="/email/verification-notification"
                                         method="post"
                                         as="button"
                                         className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
@@ -118,8 +118,9 @@ export default function Profile({
 
                     <div className="flex items-center gap-4">
                         <Button
+                            type="submit"
                             disabled={processing}
-                            className="rounded-xl bg-[#FF5722] hover:bg-[#F4511E] text-white text-xs font-black uppercase tracking-wider px-6 py-2.5 shadow-md transition"
+                            className="rounded-xl bg-[#FF5722] hover:bg-[#F4511E] text-white text-xs font-black tracking-wider px-6 py-2.5 shadow-md transition"
                             data-test="update-profile-button"
                         >
                             Guardar Cambios

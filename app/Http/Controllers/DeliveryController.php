@@ -21,7 +21,7 @@ class DeliveryController extends Controller
 
         return Inertia::render('Delivery/Dashboard', [
             'availableOrders' => Order::with(['user', 'branch', 'items.item'])
-                ->whereIn('status', ['ready', 'preparing'])
+                ->whereIn('status', ['pending', 'preparing', 'ready'])
                 ->whereNull('driver_id')
                 ->latest()
                 ->get(),
