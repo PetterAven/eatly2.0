@@ -97,6 +97,7 @@ class GoogleController extends Controller
                 'exception' => $e,
                 'trace' => $e->getTraceAsString(),
             ]);
+
             // En caso de error, redirigimos al login con mensaje flash explicativo
             return redirect()->route('login')->with('error', 'Ocurrió un error al autenticar con Google: '.$e->getMessage());
         }

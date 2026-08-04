@@ -32,7 +32,7 @@ class DashboardController extends Controller
             $restaurantDescription = $restaurant?->description ?? $restaurant?->address ?? 'Concesionario Oficial UPP';
 
             $catName = $item->category?->name ?? 'Comida';
-            $mappedCategory = match($catName) {
+            $mappedCategory = match ($catName) {
                 'Snacks' => 'Snacks',
                 'Bebidas', 'Postres', 'Combos', 'Bares' => 'Bares',
                 default => 'Comida',

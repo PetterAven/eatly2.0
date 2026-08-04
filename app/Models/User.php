@@ -69,6 +69,7 @@ class User extends Authenticatable
         if ($value === 'vendor' || $value === 'restaurante') {
             return 'merchant';
         }
+
         return $value ?? 'client';
     }
 

@@ -23,7 +23,7 @@ class HomeController extends Controller
                 $imageUrl = $branch->image?->url
                     ?? $branch->images->first()?->url
                     ?? $branch->restaurant?->image
-                    ?? match($branch->id) {
+                    ?? match ($branch->id) {
                         1 => 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
                         2 => 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80',
                         3 => 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=600&q=80',
