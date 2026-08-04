@@ -20,6 +20,21 @@ export default function Profile({
     const { auth } = usePage<SharedData>().props;
     const isGoogleUser = Boolean((auth.user as Record<string, unknown>)?.google_id);
 
+    const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
+    const profileTypeLabel = 
+        userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante' 
+            ? '🏪 Perfil de Restaurante / Local' 
+            : userRole === 'driver' 
+                ? '🛵 Perfil de Repartidor' 
+                : '🎓 Perfil de Estudiante / Comensal';
+
+    const badgeColor = 
+        userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante' 
+            ? 'bg-orange-100 text-orange-800 border-orange-200' 
+            : userRole === 'driver' 
+                ? 'bg-amber-100 text-amber-800 border-amber-200' 
+                : 'bg-purple-100 text-purple-800 border-purple-200';
+
     const { data, setData, patch, processing, errors, recentlySuccessful } =
         useForm({
             name: auth.user.name,
@@ -38,6 +53,10 @@ export default function Profile({
             <Head title="Ajustes del perfil - Eatly UPP" />
 
             <div className="space-y-6">
+                <div className={`inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-xs font-black tracking-wider uppercase shadow-sm ${badgeColor}`}>
+                    {profileTypeLabel}
+                </div>
+
                 <HeadingSmall
                     title="Información del perfil"
                     description="Actualiza tu nombre y dirección de correo electrónico"
