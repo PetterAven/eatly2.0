@@ -9,7 +9,7 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
     const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
 
     const homeUrl = userRole === 'merchant' ? '/vendor/dashboard' : userRole === 'driver' ? '/delivery/dashboard' : '/dashboard';
-    const homeLabel = userRole === 'merchant' ? '🏪 Panel Concesionario' : userRole === 'driver' ? '🚀 Panel Repartidor' : '🍽️ Menú / Catálogo';
+    const homeLabel = userRole === 'merchant' ? '🏪 Panel Concesionario' : userRole === 'driver' ? '🛵 Mis Entregas' : '🍽️ Menú / Catálogo';
 
     const handleLogout = (e: React.FormEvent) => {
         e.preventDefault();
