@@ -33,8 +33,11 @@ COPY . /var/www/html
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Generate Wayfinder routes
+RUN php artisan wayfinder:generate
+
 # Install Node dependencies and build assets
-RUN rm -f package-lock.json && npm install && npm run build
+RUN npm ci && npm run build
 
 # Set permissions
 RUN chmod -R 777 storage bootstrap/cache
