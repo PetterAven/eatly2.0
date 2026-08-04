@@ -34,7 +34,7 @@ COPY . /var/www/html
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Install Node dependencies and build assets
-RUN npm ci && npm run build
+RUN rm -f package-lock.json && npm install && npm run build
 
 # Set permissions
 RUN chmod -R 777 storage bootstrap/cache
