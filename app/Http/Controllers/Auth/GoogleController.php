@@ -49,11 +49,22 @@ class GoogleController extends Controller
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
-                $user->update([
+                $requestedRole = request()->input('state');
+                $roleMap = [
+                    'client' => 1,
+                    'merchant' => 2,
+                    'driver' => 3,
+                ];
+                $updateData = [
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
                     'email_verified_at' => $user->email_verified_at ?? now(),
-                ]);
+                ];
+                if ($requestedRole && array_key_exists($requestedRole, $roleMap)) {
+                    $updateData['role'] = $requestedRole;
+                    $updateData['level_id'] = $roleMap[$requestedRole];
+                }
+                $user->update($updateData);
             } else {
                 $requestedRole = request()->input('state', 'client');
                 $roleMap = [

@@ -57,6 +57,15 @@ class User extends Authenticatable
 
     public function getRoleAttribute($value)
     {
+        if ($this->level_id) {
+            return match ((int) $this->level_id) {
+                2 => 'merchant',
+                3 => 'driver',
+                4 => 'admin',
+                default => 'client',
+            };
+        }
+
         if ($value === 'vendor' || $value === 'restaurante') {
             return 'merchant';
         }
