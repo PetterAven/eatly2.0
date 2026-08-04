@@ -19,11 +19,25 @@ class VendorController extends Controller
             ->latest()
             ->get();
 
-        if (Category::count() === 0) {
-            $branchId = \App\Models\Branch::first()?->id ?? 1;
-            Category::create(['name' => 'Comida', 'branch_id' => $branchId]);
-            Category::create(['name' => 'Snacks', 'branch_id' => $branchId]);
-            Category::create(['name' => 'Bebidas', 'branch_id' => $branchId]);
+        $branch = \App\Models\Branch::first();
+        if (! $branch) {
+            $restaurant = \App\Models\Restaurant::first() ?? \App\Models\Restaurant::create([
+                'owner_id' => auth()->id() ?? 1,
+                'name' => 'Mi Restaurante UPP',
+            ]);
+            $branch = \App\Models\Branch::create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'Sucursal Principal',
+                'is_active' => true,
+            ]);
+        }
+        $branchId = $branch->id;
+
+        $defaultCategories = ['Comida', 'Bebidas', 'Postres', 'Snacks', 'Combos'];
+        foreach ($defaultCategories as $catName) {
+            Category::firstOrCreate(
+                ['name' => $catName, 'branch_id' => $branchId]
+            );
         }
 
         return Inertia::render('Vendor/Dashboard', [
@@ -36,9 +50,25 @@ class VendorController extends Controller
 
     public function storeProduct(Request $request)
     {
-        if (Category::count() === 0) {
-            $branchId = \App\Models\Branch::first()?->id ?? 1;
-            Category::create(['name' => 'Comida', 'branch_id' => $branchId]);
+        $branch = \App\Models\Branch::first();
+        if (! $branch) {
+            $restaurant = \App\Models\Restaurant::first() ?? \App\Models\Restaurant::create([
+                'owner_id' => auth()->id() ?? 1,
+                'name' => 'Mi Restaurante UPP',
+            ]);
+            $branch = \App\Models\Branch::create([
+                'restaurant_id' => $restaurant->id,
+                'name' => 'Sucursal Principal',
+                'is_active' => true,
+            ]);
+        }
+        $branchId = $branch->id;
+
+        $defaultCategories = ['Comida', 'Bebidas', 'Postres', 'Snacks', 'Combos'];
+        foreach ($defaultCategories as $catName) {
+            Category::firstOrCreate(
+                ['name' => $catName, 'branch_id' => $branchId]
+            );
         }
 
         $validated = $request->validate([
@@ -47,10 +77,12 @@ class VendorController extends Controller
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'is_available' => 'boolean',
+            'sale_unit' => 'required|string|in:pieza,orden,otro',
+            'unit_label' => 'nullable|string|max:50',
             'image' => 'nullable|image|max:5120',
         ]);
 
-        $categoryId = $validated['category_id'] ?? Category::first()?->id ?? Category::create(['name' => 'General', 'branch_id' => \App\Models\Branch::first()?->id ?? 1])->id;
+        $categoryId = $validated['category_id'] ?? Category::first()?->id ?? Category::create(['name' => 'General', 'branch_id' => $branchId])->id;
 
         $item = Item::create([
             'name' => $validated['name'],
@@ -58,6 +90,8 @@ class VendorController extends Controller
             'price' => $validated['price'],
             'description' => $validated['description'] ?? '',
             'is_available' => $request->has('is_available') ? $request->is_available : true,
+            'sale_unit' => $validated['sale_unit'] ?? 'orden',
+            'unit_label' => $validated['unit_label'] ?? null,
         ]);
 
         if ($request->hasFile('image')) {
@@ -76,10 +110,20 @@ class VendorController extends Controller
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'is_available' => 'boolean',
+            'sale_unit' => 'required|string|in:pieza,orden,otro',
+            'unit_label' => 'nullable|string|max:50',
             'image' => 'nullable|image|max:5120',
         ]);
 
-        $product->update($validated);
+        $product->update([
+            'name' => $validated['name'],
+            'category_id' => $validated['category_id'] ?? $product->category_id,
+            'price' => $validated['price'],
+            'description' => $validated['description'] ?? '',
+            'is_available' => $request->has('is_available') ? $request->is_available : $product->is_available,
+            'sale_unit' => $validated['sale_unit'] ?? 'orden',
+            'unit_label' => $validated['unit_label'] ?? null,
+        ]);
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('items', 'public');

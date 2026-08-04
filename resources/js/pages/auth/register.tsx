@@ -1,11 +1,20 @@
 import InputError from '@/components/input-error';
+import GoogleIcon from '@/components/google-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+
+interface PageProps {
+    flash?: {
+        error?: string;
+        success?: string;
+    };
+    [key: string]: unknown;
+}
 
 export default function Register() {
     const { data, setData, post, processing, errors } = useForm({
@@ -15,6 +24,9 @@ export default function Register() {
         password: '',
         password_confirmation: '',
     });
+
+    const { props } = usePage<PageProps>();
+    const flashError = props.flash?.error;
 
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [acceptTerms, setAcceptTerms] = useState(false);
@@ -59,6 +71,12 @@ export default function Register() {
                     description="Únete a Eatly UPP y vive la experiencia gastronómica del campus"
                 >
                     <Head title="Registrarse - Eatly UPP" />
+
+                    {flashError && (
+                        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                            {flashError}
+                        </div>
+                    )}
 
                     <form
                         onSubmit={submit}
@@ -231,15 +249,7 @@ export default function Register() {
                             href="/auth/google/redirect"
                             className="group inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold tracking-wider text-slate-700 uppercase shadow-sm transition-all hover:bg-slate-50 active:scale-[0.99]"
                         >
-                            <svg
-                                className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    fill="#EA4335"
-                                    d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.137 4.114-3.465 0-6.285-2.82-6.285-6.285 0-3.465 2.82-6.285 6.285-6.285 1.425 0 2.735.485 3.79 1.3l3.03-3.03C18.91 1.93 15.76 1 12.24 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.897 0 10.867-4.14 10.867-11.24 0-.56-.052-1.12-.152-1.655H12.24z"
-                                />
-                            </svg>
+                            <GoogleIcon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
                             Registrarse con Google
                         </a>
 

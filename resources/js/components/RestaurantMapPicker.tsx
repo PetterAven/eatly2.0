@@ -92,9 +92,39 @@ export default function RestaurantMapPicker({
         e.preventDefault();
         if (!searchQuery.trim()) return;
         setSearching(true);
+        const query = searchQuery.trim().toLowerCase();
+
+        // Campus UPP predefined locations/fallback
+        const campusLocations: Record<string, { lat: number; lng: number; name: string }> = {
+            'upp': { lat: 19.8145, lng: -98.7389, name: 'Universidad Politécnica de Pachuca (Campus Principal)' },
+            'edificio': { lat: 19.8148, lng: -98.7392, name: 'Campus UPP - Edificio Académico' },
+            'cafeteria': { lat: 19.8142, lng: -98.7385, name: 'Campus UPP - Zona de Cafeterías y Concesionarios' },
+            'biblioteca': { lat: 19.8150, lng: -98.7395, name: 'Campus UPP - Biblioteca Central' },
+            'canchas': { lat: 19.8138, lng: -98.7380, name: 'Campus UPP - Canchas Deportivas' },
+            'rectoria': { lat: 19.8152, lng: -98.7382, name: 'Campus UPP - Edificio de Rectoría y Administrativo' },
+            'servicios': { lat: 19.8143, lng: -98.7388, name: 'Campus UPP - Edificio de Servicios Estudiantiles' },
+            'pachuca': { lat: 20.1237, lng: -98.7364, name: 'Pachuca de Soto, Hidalgo' },
+        };
+
+        // Check if query matches any campus keyword
+        for (const [key, loc] of Object.entries(campusLocations)) {
+            if (query.includes(key)) {
+                const newPos: [number, number] = [loc.lat, loc.lng];
+                setPosition(newPos);
+                onChange(loc.lat, loc.lng, loc.name);
+                setSearching(false);
+                return;
+            }
+        }
+
         try {
             const res = await fetch(
                 `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
+                {
+                    headers: {
+                        'User-Agent': 'EatlyEatsUPP/1.0 (eatly@upp.edu.mx)',
+                    },
+                }
             );
             const results = await res.json();
             if (results && results.length > 0) {
@@ -103,9 +133,23 @@ export default function RestaurantMapPicker({
                 const newPos: [number, number] = [lat, lon];
                 setPosition(newPos);
                 onChange(lat, lon, results[0].display_name);
+            } else {
+                // Fallback to UPP campus center if not found externally
+                const defaultLat = 19.8145;
+                const defaultLng = -98.7389;
+                const defaultAddr = `Campus UPP - Ubicación: ${searchQuery}`;
+                setPosition([defaultLat, defaultLng]);
+                onChange(defaultLat, defaultLng, defaultAddr);
+                alert(`No se encontró "${searchQuery}" en mapas externos, pero se ha asignado al Campus UPP. Puedes ajustar el pin o la dirección manualmente.`);
             }
         } catch (err) {
             console.error('Error buscando dirección:', err);
+            const defaultLat = 19.8145;
+            const defaultLng = -98.7389;
+            const defaultAddr = `Campus UPP - Ubicación: ${searchQuery}`;
+            setPosition([defaultLat, defaultLng]);
+            onChange(defaultLat, defaultLng, defaultAddr);
+            alert('No se pudo conectar con el servicio de mapas externos. Se ha asignado la ubicación principal en el Campus UPP.');
         } finally {
             setSearching(false);
         }

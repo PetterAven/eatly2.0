@@ -12,9 +12,16 @@ class GoogleController extends Controller
 {
     public function redirect()
     {
+        $role = request()->query('role', 'client');
+        $allowedRoles = ['client', 'merchant', 'driver'];
+        $role = in_array($role, $allowedRoles) ? $role : 'client';
+
         // Forzamos a Google a mostrar siempre la ventana de selección de cuenta y consentimiento
         return Socialite::driver('google')
-            ->with(['prompt' => 'select_account consent'])
+            ->with([
+                'prompt' => 'select_account consent',
+                'state' => $role,
+            ])
             ->redirect();
     }
 
@@ -48,13 +55,22 @@ class GoogleController extends Controller
                     'email_verified_at' => $user->email_verified_at ?? now(),
                 ]);
             } else {
+                $requestedRole = request()->input('state', 'client');
+                $roleMap = [
+                    'client' => 1,
+                    'merchant' => 2,
+                    'driver' => 3,
+                ];
+                $role = array_key_exists($requestedRole, $roleMap) ? $requestedRole : 'client';
+                $levelId = $roleMap[$role];
+
                 $user = User::create([
                     'name' => $googleUser->getName() ?? 'Usuario Google',
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
-                    'role' => 'client',
-                    'level_id' => 1,
+                    'role' => $role,
+                    'level_id' => $levelId,
                     'password' => bcrypt(Str::random(16)),
                     'email_verified_at' => now(),
                 ]);
@@ -63,9 +79,13 @@ class GoogleController extends Controller
             Auth::login($user, true);
             request()->session()->regenerate();
 
-            return redirect()->route('dashboard');
+            return redirect()->route($user->redirectRouteName());
 
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Google Auth Error: '.$e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+            ]);
             // En caso de error, redirigimos al login con mensaje flash explicativo
             return redirect()->route('login')->with('error', 'Ocurrió un error al autenticar con Google: '.$e->getMessage());
         }

@@ -17,12 +17,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(LevelSeeder::class);
+        $adminLevel = \App\Models\Level::where('name', 'admin')->first();
+
         // 1. Creamos un usuario dueño de prueba para cumplir con la restricción de 'owner_id'
         $owner = User::create([
             'name' => 'Admin Eatly',
             'email' => 'admin.eatly@upp.edu.mx',
             'email_verified_at' => now(),
             'password' => bcrypt('password'), // Contraseña genérica por defecto
+            'role' => 'admin',
+            'level_id' => $adminLevel?->id ?? 4,
             'remember_token' => Str::random(10),
         ]);
 
@@ -68,10 +73,49 @@ class DatabaseSeeder extends Seeder
                 'lng' => -98.6834,
                 'image' => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=640',
             ],
+            [
+                'restaurant_name' => 'Tacos y Tortas El Ingeniero',
+                'branch_name' => 'Sucursal Talleres',
+                'city' => 'Zempoala',
+                'address' => 'Junto a Talleres Pesados UPP',
+                'phone' => '7715551006',
+                'lat' => 19.9628,
+                'lng' => -98.6840,
+                'image' => 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=640',
+            ],
+            [
+                'restaurant_name' => 'Pizzas & Paninis Rectoría',
+                'branch_name' => 'Sucursal Plaza Central',
+                'city' => 'Zempoala',
+                'address' => 'Plaza Principal frente a Rectoría UPP',
+                'phone' => '7715551007',
+                'lat' => 19.9620,
+                'lng' => -98.6830,
+                'image' => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=640',
+            ],
+            [
+                'restaurant_name' => 'Frutas & Licuados Fit UPP',
+                'branch_name' => 'Sucursal Gimnasio',
+                'city' => 'Zempoala',
+                'address' => 'Área Deportiva y Gimnasio UPP',
+                'phone' => '7715551008',
+                'lat' => 19.9635,
+                'lng' => -98.6845,
+                'image' => 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=640',
+            ],
+            [
+                'restaurant_name' => 'El Rincón del Café UPP',
+                'branch_name' => 'Sucursal Biblioteca',
+                'city' => 'Zempoala',
+                'address' => 'Planta Baja de Biblioteca UPP',
+                'phone' => '7715551009',
+                'lat' => 19.9615,
+                'lng' => -98.6825,
+                'image' => 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=640',
+            ],
         ];
 
         foreach ($localesReales as $local) {
-
             // 2. Creamos el restaurante asignando obligatoriamente el 'owner_id' y los campos del fillable
             $restaurant = Restaurant::create([
                 'owner_id' => $owner->id,
@@ -99,7 +143,7 @@ class DatabaseSeeder extends Seeder
                 'name' => $local['branch_name'],
                 'phone' => $local['phone'],
                 'capacity_per_slot' => rand(25, 60),
-                'opening_hours' => ['open' => '08:00', 'close' => '19:00'],
+                'opening_hours' => 'Lunes a Viernes - 8:00 AM a 5:00 PM',
                 'is_active' => true,
             ]);
 

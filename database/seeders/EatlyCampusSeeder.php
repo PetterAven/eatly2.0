@@ -34,6 +34,9 @@ class EatlyCampusSeeder extends Seeder
                 if (Schema::hasColumn('locations', 'name')) {
                     $locationData['name'] = 'Campus UPP';
                 }
+                if (Schema::hasColumn('locations', 'address_line')) {
+                    $locationData['address_line'] = 'Edificio de Servicios Estudiantiles, UPP';
+                }
 
                 DB::table('locations')->insert($locationData);
             }
@@ -58,22 +61,28 @@ class EatlyCampusSeeder extends Seeder
                 $restaurantData['description'] = 'Servicios de alimentación dentro del campus universitario';
             }
             if (Schema::hasColumn('restaurants', 'phone')) {
-                $restaurantData['phone'] = '7710000000';
+                $restaurantData['phone'] = '771 555 1001';
             }
             if (Schema::hasColumn('restaurants', 'email')) {
                 $restaurantData['email'] = 'cafeteria@upp.edu.mx';
+            }
+            if (Schema::hasColumn('restaurants', 'address')) {
+                $restaurantData['address'] = 'Campus UPP - Jagüey de Téllez';
             }
 
             DB::table('restaurants')->insert($restaurantData);
         }
 
-        // 4. Crear los 5 locales (branches) correspondientes al menú de React
+        // 4. Crear los locales (branches) correspondientes (8 branches para probar rotación > 6)
         $locales = [
-            ['id' => 1, 'name' => 'Cafetería Central UPP'],
-            ['id' => 2, 'name' => 'The Potro Burger'],
-            ['id' => 3, 'name' => 'Antojitos Los Pasillos'],
-            ['id' => 4, 'name' => 'El Sultán Snack Bar'],
-            ['id' => 5, 'name' => 'Bebidas & Co. Campus'],
+            ['id' => 1, 'name' => 'Cafetería Central UPP', 'phone' => '771 555 1001', 'opening_hours' => 'Lunes a Viernes - 7:00 AM a 6:00 PM'],
+            ['id' => 2, 'name' => 'The Potro Burger', 'phone' => '771 555 1002', 'opening_hours' => 'Lunes a Viernes - 11:00 AM a 5:00 PM'],
+            ['id' => 3, 'name' => 'Antojos Los Pasillos', 'phone' => '771 555 1003', 'opening_hours' => 'Lunes a Sábado - 8:00 AM a 4:00 PM'],
+            ['id' => 4, 'name' => 'El Sultán Snack Bar', 'phone' => '771 555 1004', 'opening_hours' => 'Lunes a Viernes - 9:00 AM a 7:00 PM'],
+            ['id' => 5, 'name' => 'Bebidas & Co. Campus', 'phone' => '771 555 1005', 'opening_hours' => 'Lunes a Viernes - 8:00 AM a 6:00 PM'],
+            ['id' => 6, 'name' => 'Tacos y Tortas El Ingeniero', 'phone' => '771 555 1006', 'opening_hours' => 'Lunes a Viernes - 8:30 AM a 4:30 PM'],
+            ['id' => 7, 'name' => 'Pizzas & Paninis Rectoría', 'phone' => '771 555 1007', 'opening_hours' => 'Lunes a Viernes - 10:00 AM a 5:00 PM'],
+            ['id' => 8, 'name' => 'Frutas & Licuados Fit UPP', 'phone' => '771 555 1008', 'opening_hours' => 'Lunes a Sábado - 7:30 AM a 3:00 PM'],
         ];
 
         foreach ($locales as $local) {
@@ -87,13 +96,13 @@ class EatlyCampusSeeder extends Seeder
                 $branchData['name'] = $local['name'];
             }
             if (Schema::hasColumn('branches', 'phone')) {
-                $branchData['phone'] = '7710000000';
+                $branchData['phone'] = $local['phone'];
             }
             if (Schema::hasColumn('branches', 'capacity_per_slot')) {
                 $branchData['capacity_per_slot'] = 50;
             }
             if (Schema::hasColumn('branches', 'opening_hours')) {
-                $branchData['opening_hours'] = '08:00 - 18:00';
+                $branchData['opening_hours'] = $local['opening_hours'];
             }
             if (Schema::hasColumn('branches', 'is_active')) {
                 $branchData['is_active'] = true;
@@ -105,11 +114,30 @@ class EatlyCampusSeeder extends Seeder
             );
         }
 
-        // 5. Crear categorías de comida asociándolas obligatoriamente a un local existente
+        // 5. Seed real food images for branches
+        $imagesByBranch = [
+            1 => 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
+            2 => 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80',
+            3 => 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=600&q=80',
+            4 => 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80',
+            5 => 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80',
+            6 => 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=600&q=80',
+            7 => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
+            8 => 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
+        ];
+
+        foreach ($imagesByBranch as $branchId => $imgUrl) {
+            DB::table('images')->updateOrInsert(
+                ['imageable_type' => \App\Models\Branch::class, 'imageable_id' => $branchId],
+                ['url' => $imgUrl, 'alt' => 'Cafetería UPP', 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
+
+        // 6. Crear categorías de comida
         $categories = [
-            ['id' => 1, 'name' => 'Comida', 'branch_id' => 1], // Asignado a Cafetería Central UPP
-            ['id' => 2, 'name' => 'Snacks', 'branch_id' => 2], // Asignado a The Potro Burger
-            ['id' => 3, 'name' => 'Bebidas', 'branch_id' => 5], // Asignado a Bebidas & Co. Campus
+            ['id' => 1, 'name' => 'Comida', 'branch_id' => 1],
+            ['id' => 2, 'name' => 'Snacks', 'branch_id' => 2],
+            ['id' => 3, 'name' => 'Bebidas', 'branch_id' => 5],
         ];
 
         foreach ($categories as $cat) {
@@ -128,7 +156,7 @@ class EatlyCampusSeeder extends Seeder
             );
         }
 
-        // 6. Crear los 7 platillos con su respectiva relación de categoría
+        // 7. Crear platillos
         $platillos = [
             ['id' => 1, 'name' => 'Chilaquiles Tecolote con Pollo', 'price' => 65.00, 'branch_id' => 1, 'category_id' => 1, 'description' => 'Totopos crujientes, salsa verde viva, crema, queso de aro y pollo deshebrado.'],
             ['id' => 2, 'name' => 'Hamburguesa Monumental Potro', 'price' => 85.00, 'branch_id' => 2, 'category_id' => 1, 'description' => '150g de res, queso cheddar, tocino ahumado y papas a la francesa.'],

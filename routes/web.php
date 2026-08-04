@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'welcome'])->name('welcome');
 Route::get('/home', [HomeController::class, 'welcome'])->name('home');
 
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
@@ -49,7 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Panel para Tienda / Local (Merchant)
     Route::get('/vendor', fn () => redirect()->route('vendor.dashboard'));
-    Route::prefix('vendor')->name('vendor.')->group(function () {
+    Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'verified', 'role:merchant'])->group(function () {
         Route::get('/dashboard', [VendorController::class, 'index'])->name('dashboard');
         Route::get('/profile', [VendorController::class, 'profile'])->name('profile');
         Route::put('/profile', [VendorController::class, 'updateProfile'])->name('profile.update');
@@ -61,7 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Panel para Repartidor (Driver)
     Route::get('/delivery', fn () => redirect()->route('delivery.dashboard'));
-    Route::prefix('delivery')->name('delivery.')->group(function () {
+    Route::prefix('delivery')->name('delivery.')->middleware(['auth', 'verified', 'role:driver'])->group(function () {
         Route::get('/dashboard', [DeliveryController::class, 'index'])->name('dashboard');
         Route::post('/orders/{order}/take', [DeliveryController::class, 'takeOrder'])->name('orders.take');
         Route::patch('/orders/{order}/status', [DeliveryController::class, 'updateOrderStatus'])->name('orders.status');

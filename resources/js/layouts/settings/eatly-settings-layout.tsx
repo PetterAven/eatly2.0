@@ -1,9 +1,15 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { LogOut, Menu, Settings, X } from 'lucide-react';
 import { useState, type PropsWithChildren } from 'react';
+import { type SharedData } from '@/types';
 
 export default function EatlySettingsLayout({ children }: PropsWithChildren) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const { auth } = usePage<SharedData>().props;
+    const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
+
+    const homeUrl = userRole === 'merchant' ? '/vendor/dashboard' : userRole === 'driver' ? '/delivery/dashboard' : '/dashboard';
+    const homeLabel = userRole === 'merchant' ? '🏪 Panel Concesionario' : userRole === 'driver' ? '🚀 Panel Repartidor' : '🍽️ Menú / Catálogo';
 
     const handleLogout = (e: React.FormEvent) => {
         e.preventDefault();
@@ -62,7 +68,7 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
                         )}
                     </div>
 
-                    <Link href="/dashboard" className="flex items-center gap-2">
+                    <Link href={homeUrl} className="flex items-center gap-2">
                         <span className="text-2xl font-black tracking-tight text-gray-900">
                             Eatly <span className="text-[#FF5722]">Eats</span> 🐴
                         </span>
@@ -71,10 +77,10 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
 
                 <div className="flex items-center space-x-3">
                     <Link
-                        href="/dashboard"
+                        href={homeUrl}
                         className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                     >
-                        🍽️ Menú / Catálogo
+                        {homeLabel}
                     </Link>
 
                     <Link

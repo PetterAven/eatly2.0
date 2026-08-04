@@ -16,6 +16,8 @@ class Item extends Model
         'price',
         'preparation_time_minutes',
         'is_available',
+        'sale_unit',
+        'unit_label',
     ];
 
     protected $casts = [

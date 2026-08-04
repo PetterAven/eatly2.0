@@ -27,7 +27,8 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     <Head title="Restablecer Contraseña - Eatly UPP" />
 
                     <Form
-                        {...update.form()}
+                        action={update.url()}
+                        method={update.definition.methods[0]}
                         transform={(data) => ({ ...data, token, email })}
                         resetOnSuccess={['password', 'password_confirmation']}
                         className="mt-4"

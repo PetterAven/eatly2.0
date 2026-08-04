@@ -1,5 +1,6 @@
 import RatingModal from '@/components/RatingModal';
 import StarRating from '@/components/StarRating';
+import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, CheckCircle2, Clock, LogOut, Settings } from 'lucide-react';
 import { useState } from 'react';
@@ -44,7 +45,10 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function History() {
-    const { orders } = usePage<HistoryProps>().props;
+    const { orders, auth } = usePage<HistoryProps & SharedData>().props;
+    const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
+    const homeUrl = userRole === 'merchant' ? '/vendor/dashboard' : userRole === 'driver' ? '/delivery/dashboard' : '/dashboard';
+    const homeLabel = userRole === 'merchant' ? '🏪 Panel Concesionario' : userRole === 'driver' ? '🚀 Panel Repartidor' : '🍽️ Menú / Catálogo';
     const [ratingOrder, setRatingOrder] = useState<OrderRow | null>(null);
 
     const ordersData = orders?.data ?? [];
@@ -87,7 +91,7 @@ export default function History() {
                 {/* Navbar unificado con la identidad de marca */}
                 <header className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-3.5 shadow-sm">
                     <div className="flex items-center space-x-4">
-                        <Link href="/dashboard" className="flex items-center gap-2">
+                        <Link href={homeUrl} className="flex items-center gap-2">
                             <span className="text-2xl font-black tracking-tight text-gray-900">
                                 Eatly <span className="text-[#FF5722]">Eats</span> 🐴
                             </span>
@@ -96,10 +100,10 @@ export default function History() {
 
                     <div className="flex items-center space-x-3">
                         <Link
-                            href="/dashboard"
+                            href={homeUrl}
                             className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                         >
-                            🍽️ Menú / Catálogo
+                            {homeLabel}
                         </Link>
 
                         <Link
@@ -213,12 +217,12 @@ export default function History() {
                                 <span className="mb-2 block text-4xl">🍽️</span>
                                 <p className="text-sm font-bold text-gray-900">Aún no tienes pedidos registrados</p>
                                 <p className="mt-1 text-xs text-gray-400">Realiza tu primera compra desde el menú del campus.</p>
-                                <Link 
-                                    href="/dashboard"
-                                    className="mt-4 inline-block rounded-xl bg-[#FF5722] px-4 py-2 text-xs font-bold text-white hover:bg-[#F4511E]"
-                                >
-                                    Ver Menú
-                                </Link>
+                                 <Link 
+                                     href={homeUrl}
+                                     className="mt-4 inline-block rounded-xl bg-[#FF5722] px-4 py-2 text-xs font-bold text-white hover:bg-[#F4511E]"
+                                 >
+                                     Ver Menú / Panel
+                                 </Link>
                             </div>
                         )}
                     </div>

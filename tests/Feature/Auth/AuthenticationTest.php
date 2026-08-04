@@ -96,4 +96,17 @@ class AuthenticationTest extends TestCase
 
         $response->assertTooManyRequests();
     }
+
+    public function test_unregistered_email_shows_custom_error()
+    {
+        $response = $this->post(route('login.store'), [
+            'email' => 'nonexistent@upp.edu.mx',
+            'password' => 'password',
+        ]);
+
+        $response->assertSessionHasErrors([
+            'email' => 'El correo electrónico ingresado aún no está registrado. Por favor regístrate primero.',
+        ]);
+        $this->assertGuest();
+    }
 }

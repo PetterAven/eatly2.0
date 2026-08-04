@@ -331,20 +331,6 @@ export default function Dashboard({
                         </div>
                     </div>
 
-                    {/* Barra de búsqueda central en navbar (Sincronizada con searchQuery) */}
-                    <div className="relative mx-8 hidden max-w-md flex-1 items-center lg:flex">
-                        <span className="absolute left-3.5 text-gray-400">
-                            🔍
-                        </span>
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Comida, cafeterías, platillos..."
-                            className="w-full rounded-2xl border-0 bg-gray-100 py-2.5 pr-4 pl-10 text-xs font-semibold text-gray-800 transition focus:bg-white focus:ring-2 focus:ring-[#FF5722]"
-                        />
-                    </div>
-
                     {/* Enlaces a la derecha: Avatar con primera letra, Carrito con contador y Mis Pedidos */}
                     <div className="flex items-center space-x-3">
                         <Link
