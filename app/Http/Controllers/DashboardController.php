@@ -25,8 +25,7 @@ class DashboardController extends Controller
         $products = $items->map(function ($item) {
             $branch = $item->category?->branch;
             $restaurant = $branch?->restaurant;
-            $imageUrl = $item->images->first()?->url
-                ?? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80';
+            $imageUrl = $item->images->first()?->url ?? null;
 
             // Usar dinámicamente el nombre y descripción del restaurante configurado (ej. Moto Restaurante)
             $restaurantName = $restaurant?->name ?? $branch?->name ?? Restaurant::first()?->name ?? Branch::first()?->name ?? 'Cafetería UPP';

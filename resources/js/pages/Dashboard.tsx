@@ -657,15 +657,22 @@ export default function Dashboard({
                                                             </span>
                                                         </div>
                                                         <div className="relative">
-                                                            <img
-                                                                src={
-                                                                    product.image
-                                                                }
-                                                                alt={
-                                                                    product.name
-                                                                }
-                                                                className="h-28 w-28 flex-shrink-0 rounded-2xl bg-gray-100 object-cover shadow-inner transition duration-300 group-hover:scale-105"
-                                                            />
+                                                            {product.image ? (
+                                                                <img
+                                                                    src={
+                                                                        product.image
+                                                                    }
+                                                                    alt={
+                                                                        product.name
+                                                                    }
+                                                                    className="h-28 w-28 flex-shrink-0 rounded-2xl bg-gray-100 object-cover shadow-inner transition duration-300 group-hover:scale-105"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-28 w-28 flex-shrink-0 flex-col items-center justify-center rounded-2xl border border-orange-100 bg-orange-50 text-orange-400 shadow-inner">
+                                                                    <span className="mb-1 text-2xl">🍽️</span>
+                                                                    <span className="px-1 text-center text-[9px] font-black tracking-wider text-orange-500 uppercase">Sin imagen</span>
+                                                                </div>
+                                                            )}
                                                             <div className="absolute -right-2 -bottom-2 transform rounded-full bg-[#FF5722] p-2 text-white opacity-0 shadow-lg transition duration-300 group-hover:scale-110 group-hover:opacity-100">
                                                                 <svg
                                                                     xmlns="http://www.w3.org/2000/svg"
