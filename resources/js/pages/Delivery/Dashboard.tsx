@@ -45,7 +45,7 @@ export default function DeliveryDashboard({
     availableOrders,
     myDeliveries,
     myRatings,
-}: Props) {
+}: Readonly<Props>) {
     const [loadingOrderId, setLoadingOrderId] = useState<number | null>(null);
 
     useEffect(() => {
@@ -96,18 +96,17 @@ export default function DeliveryDashboard({
                         className="flex items-center gap-2"
                     >
                         <span className="text-2xl font-black tracking-tight text-gray-900">
-                            Eatly <span className="text-[#FF5722]">Eats</span>{' '}
-                            🐴
+                            Eatly <span className="text-[#FF5722]">Eats</span>
                         </span>
                     </Link>
                     <span className="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
-                        <Bike className="h-3.5 w-3.5" /> Panel de Repartidor
+                        <Bike className="h-3.5 w-3.5" /> Panel de repartidor
                     </span>
                 </div>
 
                 <div className="flex items-center space-x-4">
                     <span className="hidden text-xs font-bold text-gray-700 sm:inline">
-                        👤 {auth?.user?.name || 'Repartidor'}
+                        {auth?.user?.name || 'Repartidor'}
                     </span>
                     <Link
                         href="/settings/profile"
@@ -116,6 +115,7 @@ export default function DeliveryDashboard({
                         <Settings className="h-3.5 w-3.5 text-[#FF5722]" /> Ajustes
                     </Link>
                     <button
+                        type="button"
                         onClick={handleLogout}
                         className="flex items-center gap-1 rounded-2xl px-3.5 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-50"
                     >
@@ -127,15 +127,12 @@ export default function DeliveryDashboard({
             <main className="mx-auto w-full max-w-7xl flex-1 space-y-8 px-6 py-8">
                 {/* Header Banner */}
                 <div className="relative flex flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 to-orange-600 p-8 text-white shadow-xl">
-                    <div className="pointer-events-none absolute right-0 bottom-0 translate-x-8 translate-y-8 transform opacity-15">
-                        <span className="text-9xl">🛵</span>
-                    </div>
                     <div className="relative z-10 max-w-xl">
                         <span className="mb-3 inline-block rounded-full bg-white/25 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase backdrop-blur-md">
-                            🚀 Logística Campus UPP
+                            Logística campus UPP
                         </span>
                         <h1 className="mb-2 text-3xl font-black tracking-tight lg:text-4xl">
-                            Entregas en Campus UPP
+                            Entregas en campus UPP
                         </h1>
                         <p className="text-xs font-medium text-amber-100 lg:text-sm">
                             Toma pedidos listos en las cafeterías y llévalos
@@ -197,15 +194,14 @@ export default function DeliveryDashboard({
                                                     Platillos:
                                                 </strong>
                                                 <ul className="mt-1 list-inside list-disc">
-                                                    {order.items?.map(
-                                                        (i, idx) => (
-                                                            <li key={idx}>
-                                                                {i.quantity}x{' '}
-                                                                {i.item?.name ||
-                                                                    'Platillo'}
-                                                            </li>
-                                                        ),
-                                                    )}
+                                                    {order.items?.map((i) => (
+                                                        <li
+                                                            key={`${order.id}-${i.id ?? i.item?.name ?? 'item'}-${i.quantity}`}
+                                                        >
+                                                            {i.quantity}x{' '}
+                                                            {i.item?.name || 'Platillo'}
+                                                        </li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                         </div>
@@ -217,6 +213,7 @@ export default function DeliveryDashboard({
                                         </span>
                                         {order.status !== 'completed' && (
                                             <button
+                                                type="button"
                                                 onClick={() =>
                                                     updateStatus(
                                                         order.id,
@@ -291,15 +288,14 @@ export default function DeliveryDashboard({
                                                     Contenido:
                                                 </strong>
                                                 <ul className="mt-1 list-inside list-disc">
-                                                    {order.items?.map(
-                                                        (i, idx) => (
-                                                            <li key={idx}>
-                                                                {i.quantity}x{' '}
-                                                                {i.item?.name ||
-                                                                    'Platillo'}
-                                                            </li>
-                                                        ),
-                                                    )}
+                                                    {order.items?.map((i) => (
+                                                        <li
+                                                            key={`${order.id}-${i.id ?? i.item?.name ?? 'item'}-${i.quantity}`}
+                                                        >
+                                                            {i.quantity}x{' '}
+                                                            {i.item?.name || 'Platillo'}
+                                                        </li>
+                                                    ))}
                                                 </ul>
                                             </div>
                                         </div>
@@ -310,6 +306,7 @@ export default function DeliveryDashboard({
                                             ${Number(order.total).toFixed(2)}
                                         </span>
                                         <button
+                                            type="button"
                                             onClick={() => takeOrder(order.id)}
                                             disabled={
                                                 loadingOrderId === order.id
@@ -331,7 +328,7 @@ export default function DeliveryDashboard({
                 {/* Mis Calificaciones y Reseñas como Repartidor */}
                 <div>
                     <h2 className="mb-4 flex items-center gap-2 text-lg font-black text-slate-800">
-                        ⭐ Mis Calificaciones Recibidas ({myRatings.length})
+                        Mis calificaciones recibidas ({myRatings.length})
                     </h2>
 
                     {myRatings.length === 0 ? (
@@ -353,8 +350,7 @@ export default function DeliveryDashboard({
                                                     'Comensal UPP'}
                                             </span>
                                             <div className="flex items-center text-sm font-bold text-amber-500">
-                                                {'⭐'.repeat(rating.stars)} (
-                                                {rating.stars}/5)
+                                                ({rating.stars}/5)
                                             </div>
                                         </div>
                                         <p className="mb-2 text-xs text-slate-500">

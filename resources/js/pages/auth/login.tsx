@@ -31,13 +31,6 @@ export default function Login() {
         post('/login');
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSubmit(e);
-        }
-    };
-
     const handleGoogleLogin = () => {
         window.location.href = '/auth/google/redirect';
     };
@@ -54,12 +47,8 @@ export default function Login() {
 
                 {/* Detalle visual de llamas y parrilla */}
                 <div className="mb-2 flex items-center justify-center gap-2">
-                    <span className="animate-bounce text-2xl">🔥</span>
                     <span className="rounded-full border border-amber-200/60 bg-amber-50 px-3 py-1 text-xs font-black tracking-widest text-amber-600 uppercase shadow-inner">
                         Asador & Antojos UPP
-                    </span>
-                    <span className="animate-bounce text-2xl delay-150">
-                        🍔
                     </span>
                 </div>
 
@@ -75,7 +64,7 @@ export default function Login() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="mt-4 flex flex-col gap-5">
+                    <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-5">
                         <div className="grid gap-5">
                             <div className="grid gap-2">
                                 <Label

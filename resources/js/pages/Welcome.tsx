@@ -22,7 +22,7 @@ interface WelcomeProps {
     branches?: CafeBranch[];
 }
 
-export default function Welcome({ auth, branches = [] }: WelcomeProps) {
+export default function Welcome({ auth, branches = [] }: Readonly<WelcomeProps>) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -69,6 +69,7 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                     <div className="flex items-center space-x-4">
                         {/* Botón ☰ a la izquierda para abrir el sidebar */}
                         <button
+                            type="button"
                             onClick={() => setIsSidebarOpen(true)}
                             className="rounded-xl p-2 text-gray-700 transition hover:bg-gray-100 focus:outline-none"
                             aria-label="Abrir menú"
@@ -93,13 +94,12 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                         <Link href="/" className="flex items-center gap-2">
                             <span className="text-2xl font-black tracking-tight text-gray-900">
                                 Eatly{' '}
-                                <span className="text-[#FF5722]">Eats</span> 🐴
+                                <span className="text-[#FF5722]">Eats</span>
                             </span>
                         </Link>
 
                         {/* Selector de ubicación */}
                         <div className="hidden cursor-pointer items-center gap-2 rounded-2xl bg-gray-100/85 px-3.5 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-100 md:flex">
-                            <span className="text-base">📍</span>
                             <div>
                                 <p className="text-[10px] font-extrabold text-gray-400 uppercase">
                                     Entrega en
@@ -119,13 +119,13 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                                     href="/historial"
                                     className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                                 >
-                                    📋 Mis Pedidos
+                                    Mis pedidos
                                 </Link>
                                 <Link
                                     href="/profile"
                                     className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                                 >
-                                    ⚙️ Mi Cuenta
+                                    Mi cuenta
                                 </Link>
                                 <Link
                                     href="/dashboard"
@@ -134,6 +134,7 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                                     Ir al Menú
                                 </Link>
                                 <button
+                                    type="button"
                                     onClick={handleLogout}
                                     className="rounded-2xl px-3 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-50"
                                 >
@@ -170,12 +171,9 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                 <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
                     {/* HERO BANNER */}
                     <div className="relative mb-12 overflow-hidden rounded-3xl bg-gradient-to-r from-orange-500 to-red-600 p-8 text-white shadow-xl lg:p-12">
-                        <div className="pointer-events-none absolute right-0 bottom-0 translate-x-8 translate-y-8 transform opacity-15">
-                            <span className="text-9xl">🍔</span>
-                        </div>
                         <div className="relative z-10 mb-6 max-w-xl">
                             <span className="mb-3 inline-block rounded-full bg-white/25 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase backdrop-blur-md">
-                                🚀 Delivery Express en Campus UPP
+                                Delivery express en campus UPP
                             </span>
                             <h1 className="mb-3 text-3xl font-black tracking-tight lg:text-5xl">
                                 Si tienes Eatly Eats, tienes Todo.
@@ -188,7 +186,6 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
 
                         {/* Buscador */}
                         <div className="relative z-10 flex max-w-2xl items-center rounded-2xl bg-white p-4 text-gray-900 shadow-xl">
-                            <span className="pl-2 text-lg">🔍</span>
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -205,7 +202,7 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                         </div>
 
                         <div className="relative z-10 mt-4 flex items-center gap-2 text-[11px] font-bold text-orange-100">
-                            <span>📍 Campus UPP - Jagüey de Téllez</span>
+                            <span>Campus UPP - Jagüey de Téllez</span>
                         </div>
                     </div>
 
@@ -247,14 +244,12 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                                             <div className="space-y-2 text-xs text-gray-600">
                                                 <p className="flex items-start">
                                                     <span className="mr-1.5 font-semibold text-gray-900">
-                                                        📍
                                                     </span>{' '}
                                                     {cafe.location ||
                                                         'Campus UPP'}
                                                 </p>
                                                 <p className="flex items-center">
                                                     <span className="mr-1.5 font-semibold text-gray-900">
-                                                        📞
                                                     </span>{' '}
                                                     {cafe.phone ||
                                                         '771 555 1001'}
@@ -263,8 +258,7 @@ export default function Welcome({ auth, branches = [] }: WelcomeProps) {
                                         </div>
                                         <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
                                             <span className="rounded-xl border border-emerald-200/60 bg-emerald-50 px-2.5 py-1 text-[10px] font-black text-emerald-700">
-                                                🟢{' '}
-                                                {cafe.schedule || 'Abierto Hoy'}
+                                                {cafe.schedule || 'Abierto hoy'}
                                             </span>
                                             <Link
                                                 href={

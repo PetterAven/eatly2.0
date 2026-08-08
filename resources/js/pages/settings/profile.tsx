@@ -10,30 +10,42 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import EatlySettingsLayout from '@/layouts/settings/eatly-settings-layout';
 
+interface ProfileProps {
+    readonly mustVerifyEmail: boolean;
+    readonly status?: string;
+}
+
 export default function Profile({
     mustVerifyEmail,
     status,
-}: {
-    mustVerifyEmail: boolean;
-    status?: string;
-}) {
+}: Readonly<ProfileProps>) {
     const { auth } = usePage<SharedData>().props;
     const isGoogleUser = Boolean((auth.user as Record<string, unknown>)?.google_id);
 
     const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
-    const profileTypeLabel = 
-        userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante' 
-            ? '🏪 Perfil de Restaurante / Local' 
-            : userRole === 'driver' 
-                ? '🛵 Perfil de Repartidor' 
-                : '🎓 Perfil de Estudiante / Comensal';
 
-    const badgeColor = 
-        userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante' 
-            ? 'bg-orange-100 text-orange-800 border-orange-200' 
-            : userRole === 'driver' 
-                ? 'bg-amber-100 text-amber-800 border-amber-200' 
-                : 'bg-purple-100 text-purple-800 border-purple-200';
+    const getProfileTypeLabel = () => {
+        if (userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante') {
+            return 'Perfil de restaurante / local';
+        }
+        if (userRole === 'driver') {
+            return 'Perfil de repartidor';
+        }
+        return 'Perfil de estudiante / comensal';
+    };
+
+    const getBadgeColor = () => {
+        if (userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante') {
+            return 'bg-orange-100 text-orange-800 border-orange-200';
+        }
+        if (userRole === 'driver') {
+            return 'bg-amber-100 text-amber-800 border-amber-200';
+        }
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+    };
+
+    const profileTypeLabel = getProfileTypeLabel();
+    const badgeColor = getBadgeColor();
 
     const { data, setData, patch, processing, errors, recentlySuccessful } =
         useForm({
@@ -102,7 +114,7 @@ export default function Profile({
                         />
                         {isGoogleUser && (
                             <p className="text-[11px] font-medium text-orange-600">
-                                🔒 Vinculado a cuenta de Google (correo de sólo lectura).
+                                Vinculado a cuenta de Google (correo de solo lectura).
                             </p>
                         )}
 

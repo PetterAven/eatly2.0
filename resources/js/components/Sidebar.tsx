@@ -2,15 +2,15 @@ import { Link, router } from '@inertiajs/react';
 import React, { useState } from 'react';
 
 interface SidebarProps {
-    isOpen: boolean;
-    onClose: () => void;
-    auth: {
-        user?: {
-            name: string;
-            email: string;
+    readonly isOpen: boolean;
+    readonly onClose: () => void;
+    readonly auth: {
+        readonly user?: {
+            readonly name: string;
+            readonly email: string;
         };
     };
-    onSelectCategory?: (category: string) => void;
+    readonly onSelectCategory?: (category: string) => void;
 }
 
 export default function Sidebar({
@@ -18,7 +18,7 @@ export default function Sidebar({
     onClose,
     auth,
     onSelectCategory,
-}: SidebarProps) {
+}: Readonly<SidebarProps>) {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     if (!isOpen) return null;
@@ -34,7 +34,9 @@ export default function Sidebar({
     return (
         <div className="fixed inset-0 z-50 overflow-hidden">
             {/* Fondo oscuro traslúcido de superposición (backdrop/overlay) que al hacer clic afuera cierre el menú */}
-            <div
+            <button
+                type="button"
+                aria-label="Cerrar menú lateral"
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
@@ -49,16 +51,16 @@ export default function Sidebar({
                         onClick={onClose}
                     >
                         <span className="text-xl font-black tracking-tight text-gray-900">
-                            Eatly <span className="text-[#FF5722]">Eats</span>{' '}
-                            🐴
+                            Eatly <span className="text-[#FF5722]">Eats</span>
                         </span>
                     </Link>
                     <button
+                        type="button"
                         onClick={onClose}
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-700 shadow-sm transition hover:bg-gray-200"
                         aria-label="Cerrar menú"
                     >
-                        ✖️
+                        ×
                     </button>
                 </div>
 
@@ -89,24 +91,21 @@ export default function Sidebar({
                             className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-white text-lg shadow-sm transition hover:bg-gray-50 hover:text-[#FF5722]"
                             title="Ajustes"
                         >
-                            ⚙️
+                            
                         </Link>
                     </div>
 
-                    {/* CARD DESTACADA: Botón azul "⚽ Descubre nuestras promociones del Campus" */}
                     <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-4 text-white shadow-lg">
-                        <div className="absolute right-2 bottom-2 text-4xl opacity-20">
-                            ⚽
-                        </div>
                         <div className="relative z-10 mb-3">
                             <span className="mb-2 inline-block rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-black text-white uppercase">
                                 Promoción UPP
                             </span>
                             <h4 className="text-xs leading-snug font-black">
-                                ⚽ Descubre nuestras promociones del Campus
+                                Descubre nuestras promociones del campus
                             </h4>
                         </div>
                         <button
+                            type="button"
                             onClick={() => {
                                 if (onSelectCategory) onSelectCategory('Todos');
                                 onClose();
@@ -126,6 +125,7 @@ export default function Sidebar({
                         </p>
 
                         <button
+                            type="button"
                             onClick={() => {
                                 if (onSelectCategory)
                                     onSelectCategory('Comida');
@@ -134,7 +134,7 @@ export default function Sidebar({
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                🍽️ Cafeterías / Restaurantes
+                                Cafeterías y restaurantes
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -142,6 +142,7 @@ export default function Sidebar({
                         </button>
 
                         <button
+                            type="button"
                             onClick={() => {
                                 if (onSelectCategory)
                                     onSelectCategory('Snacks');
@@ -150,7 +151,7 @@ export default function Sidebar({
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                🍿 Snacks & Botanas
+                                Snacks y botanas
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -158,6 +159,7 @@ export default function Sidebar({
                         </button>
 
                         <button
+                            type="button"
                             onClick={() => {
                                 if (onSelectCategory) onSelectCategory('Bares');
                                 onClose();
@@ -165,7 +167,7 @@ export default function Sidebar({
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                🥤 Bebidas
+                                Bebidas
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -173,6 +175,7 @@ export default function Sidebar({
                         </button>
 
                         <button
+                            type="button"
                             onClick={() => {
                                 if (onSelectCategory)
                                     onSelectCategory('Comida');
@@ -181,7 +184,7 @@ export default function Sidebar({
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                ⚡ Pedidos Express
+                                Pedidos express
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -196,7 +199,7 @@ export default function Sidebar({
                         </p>
                         <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3 text-xs">
                             <span className="flex items-center gap-2 font-bold text-gray-700">
-                                💰 Créditos Eatly
+                                Créditos Eatly
                             </span>
                             <span className="font-black text-[#FF5722]">
                                 $ 0.00 MXN
@@ -216,7 +219,7 @@ export default function Sidebar({
                             className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                ⚙️ Información de mi cuenta
+                                Información de mi cuenta
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -224,11 +227,12 @@ export default function Sidebar({
                         </Link>
 
                         <button
+                            type="button"
                             onClick={() => setShowPaymentModal(true)}
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                💳 Métodos de pago
+                                Métodos de pago
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -241,7 +245,7 @@ export default function Sidebar({
                             className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                📦 Últimas órdenes
+                                Últimas órdenes
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -261,7 +265,7 @@ export default function Sidebar({
                             className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                🏪 Registra tu cafetería
+                                Registrar cafetería
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -274,7 +278,7 @@ export default function Sidebar({
                             className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
                             <span className="flex items-center gap-2">
-                                🛵 Quiero ser Repartidor UPP
+                                Quiero ser repartidor UPP
                             </span>
                             <span className="text-gray-400 group-hover:text-[#FF5722]">
                                 &gt;
@@ -287,7 +291,7 @@ export default function Sidebar({
                                 className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-red-600 transition hover:bg-red-50"
                             >
                                 <span className="flex items-center gap-2">
-                                    🚪 Cerrar sesión
+                                    Cerrar sesión
                                 </span>
                                 <span className="text-red-400 group-hover:text-red-600">
                                     &gt;
@@ -303,6 +307,7 @@ export default function Sidebar({
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
                     <div className="relative w-full max-w-sm rounded-3xl border border-gray-100 bg-white p-6 shadow-2xl">
                         <button
+                            type="button"
                             onClick={() => setShowPaymentModal(false)}
                             className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-700 hover:bg-gray-200"
                         >
@@ -310,9 +315,8 @@ export default function Sidebar({
                         </button>
 
                         <div className="space-y-4 pt-2 text-center">
-                            <span className="block text-4xl">💳</span>
                             <h3 className="text-base font-black text-gray-900">
-                                Métodos de Pago Registrados
+                                Métodos de pago registrados
                             </h3>
                             <p className="text-xs text-gray-500">
                                 Actualmente tienes configurado efectivo contra
@@ -320,13 +324,14 @@ export default function Sidebar({
                             </p>
 
                             <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3 text-left text-xs font-bold text-gray-800">
-                                <span>💵 Efectivo en Campus UPP</span>
+                                <span>Efectivo en campus UPP</span>
                                 <span className="text-[10px] text-emerald-600">
                                     Predeterminado
                                 </span>
                             </div>
 
                             <button
+                                type="button"
                                 onClick={() => setShowPaymentModal(false)}
                                 className="w-full rounded-xl bg-[#FF5722] py-3 text-xs font-black tracking-wider text-white uppercase"
                             >

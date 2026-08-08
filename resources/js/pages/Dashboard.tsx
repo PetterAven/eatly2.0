@@ -59,7 +59,7 @@ function useDeliveryLocation() {
                 const { latitude, longitude } = position.coords;
                 setCoords({ latitude, longitude });
                 setLocationText(
-                    `📍 Ubicación detectada en Campus UPP (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
+                    `Ubicación detectada en Campus UPP (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
                 );
                 setIsConfirmed(true);
                 setLoadingGeo(false);
@@ -94,7 +94,7 @@ export default function Dashboard({
     auth,
     databaseProducts,
     restaurants = [],
-}: DashboardProps) {
+}: Readonly<DashboardProps>) {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -239,10 +239,10 @@ export default function Dashboard({
 
     const addToCart = (product: Product) => {
         setCart((prev) => {
-            const existing = prev.find(
+            const itemExists = prev.some(
                 (item) => item.product.id === product.id,
             );
-            if (existing) {
+            if (itemExists) {
                 return prev.map((item) =>
                     item.product.id === product.id
                         ? { ...item, quantity: item.quantity + 1 }
@@ -286,6 +286,7 @@ export default function Dashboard({
                     <div className="flex items-center space-x-4">
                         {/* Botón ☰ a la izquierda para abrir el sidebar */}
                         <button
+                            type="button"
                             onClick={() => setIsSidebarOpen(true)}
                             className="rounded-xl p-2 text-gray-700 transition hover:bg-gray-100 focus:outline-none"
                             aria-label="Abrir menú"
@@ -313,13 +314,12 @@ export default function Dashboard({
                         >
                             <span className="text-2xl font-black tracking-tight text-gray-900">
                                 Eatly{' '}
-                                <span className="text-[#FF5722]">Eats</span> 🐴
+                                <span className="text-[#FF5722]">Eats</span>
                             </span>
                         </Link>
 
                         {/* Selector de ubicación */}
                         <div className="hidden cursor-pointer items-center gap-2 rounded-2xl bg-gray-100/85 px-3.5 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-100 md:flex">
-                            <span className="text-base">📍</span>
                             <div>
                                 <p className="text-[10px] font-extrabold text-gray-400 uppercase">
                                     Entrega en
@@ -337,7 +337,7 @@ export default function Dashboard({
                             href="/historial"
                             className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
                         >
-                            📋 Mis Pedidos
+                            Mis pedidos
                         </Link>
 
                         <Link
@@ -345,11 +345,12 @@ export default function Dashboard({
                             className="flex items-center gap-1 rounded-2xl bg-gray-100 px-3.5 py-2.5 text-xs font-bold text-gray-700 transition duration-200 hover:bg-gray-200"
                             title="Ajustes"
                         >
-                            ⚙️ Ajustes
+                            Ajustes
                         </Link>
 
                         {/* Botón de Carrito con Contador */}
                         <button
+                            type="button"
                             onClick={() => {
                                 const aside =
                                     document.getElementById('cart-sidebar');
@@ -357,7 +358,7 @@ export default function Dashboard({
                             }}
                             className="relative flex items-center gap-2 rounded-2xl bg-orange-50 px-4 py-2.5 text-xs font-black text-[#FF5722] transition hover:bg-orange-100"
                         >
-                            🛒 Carrito
+                            Carrito
                             {totalItems > 0 && (
                                 <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#FF5722] text-[10px] font-black text-white shadow-md">
                                     {totalItems}
@@ -366,6 +367,7 @@ export default function Dashboard({
                         </button>
 
                         <button
+                            type="button"
                             onClick={() => router.post('/logout')}
                             className="rounded-2xl px-3 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-50"
                         >
@@ -386,12 +388,9 @@ export default function Dashboard({
                     <main className="flex-1 overflow-y-auto p-6 lg:p-8">
                         {/* 2. HERO BANNER PRINCIPAL CON SALUDO DINÁMICO */}
                         <div className="relative mb-8 flex flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-r from-orange-500 to-red-600 p-8 text-white shadow-xl">
-                            <div className="pointer-events-none absolute right-0 bottom-0 translate-x-8 translate-y-8 transform opacity-15">
-                                <span className="text-9xl">🍔</span>
-                            </div>
                             <div className="relative z-10 mb-6 max-w-xl">
                                 <span className="mb-3 inline-block rounded-full bg-white/25 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase backdrop-blur-md">
-                                    🚀 Delivery Express en Campus UPP
+                                    Delivery express en campus UPP
                                 </span>
                                 {/* Título dinámico según la hora del día y el nombre del usuario */}
                                 <h1 className="mb-2 text-3xl font-black tracking-tight lg:text-4xl">
@@ -406,7 +405,6 @@ export default function Dashboard({
 
                             {/* Buscador central de fondo blanco con sombra (Sincronizado con searchQuery) */}
                             <div className="relative z-10 flex max-w-2xl items-center rounded-2xl bg-white p-4 text-gray-900 shadow-xl">
-                                <span className="pl-2 text-lg">🔍</span>
                                 <input
                                     type="text"
                                     value={searchQuery}
@@ -433,9 +431,8 @@ export default function Dashboard({
                                 </button>
                             </div>
 
-                            {/* Subtexto: "📍 Campus UPP - Jagüey de Téllez" */}
                             <div className="relative z-10 mt-4 flex items-center gap-2 text-[11px] font-bold text-orange-100">
-                                <span>📍 Campus UPP - Jagüey de Téllez</span>
+                                <span>Campus UPP - Jagüey de Téllez</span>
                             </div>
                         </div>
 
@@ -444,7 +441,7 @@ export default function Dashboard({
                             <div className="mb-4 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
                                 <div>
                                     <h3 className="flex items-center gap-2 text-sm font-black text-gray-900">
-                                        📍 Dirección de Entrega en Campus UPP
+                                        Dirección de entrega en campus UPP
                                     </h3>
                                     <p className="mt-0.5 text-xs text-gray-400">
                                         Usa tu ubicación GPS o indica tu
@@ -455,7 +452,7 @@ export default function Dashboard({
                                 <div className="flex w-full items-center gap-3 md:w-auto">
                                     {deliveryLocation.isConfirmed && (
                                         <span className="flex items-center gap-1 rounded-xl border border-emerald-200/60 bg-emerald-50 px-3 py-1.5 text-[11px] font-black whitespace-nowrap text-emerald-700 shadow-sm">
-                                            🟢 Ubicación confirmada
+                                            Ubicación confirmada
                                         </span>
                                     )}
                                     <button
@@ -468,16 +465,14 @@ export default function Dashboard({
                                     >
                                         {deliveryLocation.loadingGeo
                                             ? 'Obteniendo GPS...'
-                                            : '📍 Usa tu ubicación actual'}
+                                            : 'Usa tu ubicación actual'}
                                     </button>
                                 </div>
                             </div>
 
                             {/* Input editable de entrega */}
                             <div className="relative">
-                                <span className="absolute top-3.5 left-3.5 text-sm text-gray-400">
-                                    🏫
-                                </span>
+                                <span className="absolute top-3.5 left-3.5 text-sm text-gray-400" />
                                 <input
                                     type="text"
                                     value={deliveryLocation.locationText}
@@ -506,35 +501,32 @@ export default function Dashboard({
                                 {[
                                     {
                                         id: 'Todos',
-                                        label: '📱 Todo el Menú',
+                                        label: 'Todo el menú',
                                         color: 'from-purple-500 to-indigo-600',
-                                        icon: '🍽️',
                                     },
                                     {
                                         id: 'Comida',
-                                        label: '🍔 Comida Caliente',
+                                        label: 'Comida caliente',
                                         color: 'from-amber-500 to-orange-600',
-                                        icon: '🔥',
                                     },
                                     {
                                         id: 'Snacks',
-                                        label: '🍿 Snacks & Antojos',
+                                        label: 'Snacks y antojitos',
                                         color: 'from-pink-500 to-rose-600',
-                                        icon: '🍟',
                                     },
                                     {
                                         id: 'Bares',
-                                        label: '🥤 Bebidas & Bares',
+                                        label: 'Bebidas y bares',
                                         color: 'from-emerald-500 to-teal-600',
-                                        icon: '🧋',
                                     },
                                 ].map((cat) => (
-                                    <div
+                                    <button
+                                        type="button"
                                         key={cat.id}
                                         onClick={() =>
                                             setSelectedCategory(cat.id)
                                         }
-                                        className={`flex transform cursor-pointer flex-col items-start justify-between rounded-2xl border p-4 shadow-sm transition-all duration-300 active:scale-95 ${
+                                        className={`flex transform flex-col items-start justify-between rounded-2xl border p-4 text-left shadow-sm transition-all duration-300 active:scale-95 ${
                                             selectedCategory === cat.id
                                                 ? 'bg-gradient-to-br ' +
                                                   cat.color +
@@ -542,9 +534,6 @@ export default function Dashboard({
                                                 : 'border-gray-100 bg-white text-gray-800 hover:border-orange-200 hover:shadow-md'
                                         }`}
                                     >
-                                        <span className="mb-2 text-2xl">
-                                            {cat.icon}
-                                        </span>
                                         <div>
                                             <p className="text-xs font-black lg:text-sm">
                                                 {cat.label}
@@ -555,7 +544,7 @@ export default function Dashboard({
                                                 Disponibles hoy
                                             </p>
                                         </div>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -572,7 +561,6 @@ export default function Dashboard({
 
                         {uniqueRestaurants.length === 0 ? (
                             <div className="rounded-3xl border border-gray-100 bg-white p-12 text-center shadow-sm">
-                                <span className="mb-3 block text-5xl">🔍</span>
                                 <h3 className="text-base font-black text-gray-800">
                                     No se encontraron platillos o cafeterías que
                                     coincidan con la búsqueda.
@@ -603,7 +591,7 @@ export default function Dashboard({
                                         <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-3">
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-base font-black text-[#FF5722] shadow-sm">
-                                                    🏪
+                                                    •
                                                 </div>
                                                 <div>
                                                     <h3 className="text-base font-black text-gray-900">
@@ -615,7 +603,7 @@ export default function Dashboard({
                                                 </div>
                                             </div>
                                             <span className="flex items-center gap-1 rounded-full border border-emerald-200/60 bg-emerald-50 px-3 py-1 text-[11px] font-black tracking-wide text-emerald-700 shadow-sm">
-                                                🟢 Abierto Ahora
+                                                Abierto ahora
                                             </span>
                                         </div>
                                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -626,12 +614,13 @@ export default function Dashboard({
                                                         restaurantName,
                                                 )
                                                 .map((product) => (
-                                                    <div
+                                                    <button
+                                                        type="button"
                                                         key={product.id}
                                                         onClick={() =>
                                                             addToCart(product)
                                                         }
-                                                        className="group flex transform cursor-pointer items-center justify-between gap-5 rounded-3xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:border-[#FF5722]/50 hover:shadow-xl active:scale-[0.98]"
+                                                        className="group flex w-full transform items-center justify-between gap-5 rounded-3xl border border-gray-100 bg-white p-5 text-left shadow-sm transition-all duration-300 hover:border-[#FF5722]/50 hover:shadow-xl active:scale-[0.98]"
                                                     >
                                                         <div className="flex h-28 flex-1 flex-col justify-between">
                                                             <div>
@@ -669,7 +658,6 @@ export default function Dashboard({
                                                                 />
                                                             ) : (
                                                                 <div className="flex h-28 w-28 flex-shrink-0 flex-col items-center justify-center rounded-2xl border border-orange-100 bg-orange-50 text-orange-400 shadow-inner">
-                                                                    <span className="mb-1 text-2xl">🍽️</span>
                                                                     <span className="px-1 text-center text-[9px] font-black tracking-wider text-orange-500 uppercase">Sin imagen</span>
                                                                 </div>
                                                             )}
@@ -692,7 +680,7 @@ export default function Dashboard({
                                                                 </svg>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </button>
                                                 ))}
                                         </div>
                                     </div>
@@ -709,7 +697,7 @@ export default function Dashboard({
                         <div className="flex-1 overflow-y-auto pr-1">
                             <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-3">
                                 <h2 className="flex items-center gap-2 text-sm font-black tracking-wider text-gray-900 uppercase">
-                                    🛒 Tu Pedido Actual
+                                    Tu pedido actual
                                 </h2>
                                 <span className="rounded-xl bg-orange-50 px-2.5 py-1 text-xs font-black text-[#FF5722]">
                                     {totalItems} ítems
@@ -718,9 +706,6 @@ export default function Dashboard({
 
                             {cart.length === 0 ? (
                                 <div className="px-4 py-24 text-center">
-                                    <span className="mb-3 block animate-bounce text-5xl">
-                                        🛒
-                                    </span>
                                     <p className="text-xs font-bold text-gray-700">
                                         Tu carrito está vacío
                                     </p>
@@ -750,6 +735,7 @@ export default function Dashboard({
                                             </div>
                                             <div className="flex items-center space-x-3 rounded-2xl bg-gray-100 px-3 py-1.5 shadow-inner">
                                                 <button
+                                                    type="button"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         updateQuantity(
@@ -765,6 +751,7 @@ export default function Dashboard({
                                                     {item.quantity}
                                                 </span>
                                                 <button
+                                                    type="button"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         updateQuantity(
@@ -792,6 +779,7 @@ export default function Dashboard({
                                     </span>
                                 </div>
                                 <button
+                                    type="button"
                                     onClick={() => setIsCheckoutOpen(true)}
                                     className="flex w-full transform items-center justify-center gap-2 rounded-2xl bg-[#FF5722] py-4 text-xs font-black tracking-wider text-white uppercase shadow-lg shadow-orange-500/25 transition-all duration-200 hover:bg-[#F4511E] active:scale-95"
                                 >
@@ -820,6 +808,7 @@ export default function Dashboard({
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
                         <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-gray-100 bg-white p-6 shadow-2xl">
                             <button
+                                type="button"
                                 onClick={() => setIsCheckoutOpen(false)}
                                 className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-400 transition hover:text-black"
                             >

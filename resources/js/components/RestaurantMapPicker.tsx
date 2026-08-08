@@ -4,16 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 
 interface MapPickerProps {
-    latitude: number;
-    longitude: number;
-    address?: string;
-    onChange: (lat: number, lng: number, address: string) => void;
+    readonly latitude: number;
+    readonly longitude: number;
+    readonly onChange: (lat: number, lng: number, address: string) => void;
 }
 
 // Icono personalizado con SVG para evitar problemas de assets rotos en Leaflet
 const customIcon = L.divIcon({
     className: 'custom-map-marker',
-    html: `<div style="background-color: #FF5722; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">📍</div>`,
+    html: `<div style="background-color: #FF5722; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">•</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14],
 });
@@ -74,7 +73,7 @@ export default function RestaurantMapPicker({
     latitude,
     longitude,
     onChange,
-}: MapPickerProps) {
+}: Readonly<MapPickerProps>) {
     const [position, setPosition] = useState<[number, number]>([
         latitude || 19.8145,
         longitude || -98.7389,
@@ -128,8 +127,8 @@ export default function RestaurantMapPicker({
             );
             const results = await res.json();
             if (results && results.length > 0) {
-                const lat = parseFloat(results[0].lat);
-                const lon = parseFloat(results[0].lon);
+                const lat = Number.parseFloat(results[0].lat);
+                const lon = Number.parseFloat(results[0].lon);
                 const newPos: [number, number] = [lat, lon];
                 setPosition(newPos);
                 onChange(lat, lon, results[0].display_name);
@@ -194,7 +193,7 @@ export default function RestaurantMapPicker({
                 </MapContainer>
             </div>
             <p className="text-[11px] text-slate-400">
-                💡 Haz clic en el mapa o arrastra el pin naranja para ubicar con
+                Haz clic en el mapa o arrastra el pin naranja para ubicar con
                 exactitud tu local.
             </p>
         </div>

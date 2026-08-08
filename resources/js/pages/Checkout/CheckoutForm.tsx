@@ -12,12 +12,12 @@ interface CartItemProps {
 }
 
 interface CheckoutProps {
-    subtotalComida: number;
-    localId: number;
-    vendedorId?: number | null;
-    repartidorId?: number | null;
-    itemsCarrito: CartItemProps[];
-    initialDeliveryLocation?: string;
+    readonly subtotalComida: number;
+    readonly localId: number;
+    readonly vendedorId?: number | null;
+    readonly repartidorId?: number | null;
+    readonly itemsCarrito: CartItemProps[];
+    readonly initialDeliveryLocation?: string;
 }
 
 interface FormState {
@@ -36,6 +36,118 @@ interface FormState {
     }>;
 }
 
+const getSafeStringValue = (value: unknown, fallback: string): string => {
+    if (typeof value === 'string' && value.trim().length > 0) {
+        return value;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+        return String(value);
+    }
+
+    return fallback;
+};
+
+const getPedidoCode = (value: unknown, fallback: string): string =>
+    getSafeStringValue(value, fallback);
+
+function PedidoExitosoCard({
+    esTarjeta,
+    codigoPedido,
+    initialDeliveryLocation,
+    data,
+    descargado,
+    onDownloadTicket,
+}: Readonly<{
+    esTarjeta: boolean;
+    codigoPedido: string;
+    initialDeliveryLocation: string;
+    data: FormState;
+    descargado: boolean;
+    onDownloadTicket: () => void;
+}>) {
+    return (
+        <div className="animate-fadeIn space-y-5 rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm">
+            <div
+                className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-xl font-black ${
+                    esTarjeta
+                        ? 'bg-green-100 text-green-600'
+                        : 'bg-amber-100 text-amber-600'
+                }`}
+            >
+                {esTarjeta ? 'Pago' : 'Efectivo'}
+            </div>
+
+            <div>
+                <h3 className="text-lg font-black text-gray-900">
+                    {esTarjeta
+                        ? '¡Pago Procesado con Éxito!'
+                        : '¡Pedido Confirmado!'}
+                </h3>
+                <p className="mt-1 px-4 text-xs leading-relaxed text-gray-500">
+                    {esTarjeta
+                        ? 'Tu cargo con tarjeta fue aprobado de forma segura. El comercio comenzará tu orden.'
+                        : 'Prepara tu efectivo. Le pagarás directamente al repartidor al recibir tus alimentos.'}
+                </p>
+            </div>
+
+            <div className="space-y-2 rounded-xl border border-gray-100 bg-gray-50 p-4 text-left text-xs font-medium text-gray-600">
+                <div className="flex justify-between border-b border-gray-200 pb-2">
+                    <span>Código de Pedido:</span>
+                    <span className="font-bold tracking-wider text-gray-900">
+                        {codigoPedido}
+                    </span>
+                </div>
+                <div className="flex justify-between border-b border-gray-200 pb-2">
+                    <span>Método Registrado:</span>
+                    <span className="text-[10px] font-bold text-gray-900 uppercase">
+                        {esTarjeta
+                            ? 'Transacción Digital'
+                            : 'Efectivo contra entrega'}
+                    </span>
+                </div>
+                <div className="flex justify-between">
+                    <span>Destino de Entrega:</span>
+                    <span className="font-bold text-gray-900">
+                        {initialDeliveryLocation || `${data.destino_edificio}, ${data.destino_aula}`}
+                    </span>
+                </div>
+                <div className="flex justify-between border-t border-gray-200 pt-2 font-bold text-gray-950">
+                    <span>
+                        {esTarjeta ? 'Total Cobrado:' : 'Monto Total a Pagar:'}
+                    </span>
+                    <span className="font-black text-purple-600">
+                        ${(data.subtotal_comida + 12.0).toFixed(2)} MXN
+                    </span>
+                </div>
+            </div>
+
+            <div className="space-y-2 pt-2">
+                <button
+                    type="button"
+                    onClick={onDownloadTicket}
+                    className={`w-full rounded-xl py-2.5 text-xs font-bold tracking-wider text-white uppercase transition ${
+                        descargado
+                            ? 'bg-green-600 hover:bg-green-700'
+                            : 'bg-gray-950 hover:bg-gray-800'
+                    }`}
+                >
+                    {descargado ? 'Ticket guardado' : 'Descargar ticket de compra'}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => {
+                        window.location.href = '/historial';
+                    }}
+                    className="w-full rounded-xl border border-purple-200 py-2.5 text-xs font-bold tracking-wider text-purple-600 uppercase transition hover:bg-purple-50"
+                >
+                    Ver pedido y calificar
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function CheckoutForm({
     subtotalComida,
     localId,
@@ -43,7 +155,7 @@ export default function CheckoutForm({
     repartidorId = null,
     itemsCarrito,
     initialDeliveryLocation = '',
-}: CheckoutProps) {
+}: Readonly<CheckoutProps>) {
     const {
         auth,
         flash,
@@ -101,13 +213,14 @@ export default function CheckoutForm({
     };
 
     const descargarTicketDigital = () => {
+        const orderCode = getPedidoCode(flash?.orderCode, 'EAT-SIMULADO');
         const lines = [
             '=========================================',
             '            EATLY EATS CAMPUS            ',
             '         Universidad Politécnica         ',
             '=========================================',
             `Fecha: ${new Date().toLocaleDateString()}`,
-            `Código Pedido: ${flash?.orderCode || 'EAT-SIMULADO'}`,
+            `Código Pedido: ${orderCode}`,
             `Cliente: ${auth?.user?.name || 'Usuario Campus'}`,
             '-----------------------------------------',
             'Detalle de Compra:',
@@ -139,103 +252,29 @@ export default function CheckoutForm({
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `Ticket-${flash?.orderCode || 'EAT'}.txt`;
+        link.download = `Ticket-${orderCode}.txt`;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
         setDescargado(true);
+        URL.revokeObjectURL(url);
     };
 
     const pedidoExitoso = flash?.success === true;
     const metodoPagoFinal = flash?.metodoPago || data.metodo_pago;
     const esTarjeta = metodoPagoFinal === 'tarjeta';
-    const codigoPedido = flash?.orderCode || 'EAT-PROCESANDO';
+    const codigoPedido = getPedidoCode(flash?.orderCode, 'EAT-PROCESANDO');
 
     if (pedidoExitoso) {
         return (
-            <div className="animate-fadeIn space-y-5 rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm">
-                <div
-                    className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl ${
-                        esTarjeta
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-amber-100 text-amber-600'
-                    }`}
-                >
-                    {esTarjeta ? '💳' : '💵'}
-                </div>
-
-                <div>
-                    <h3 className="text-lg font-black text-gray-900">
-                        {esTarjeta
-                            ? '¡Pago Procesado con Éxito!'
-                            : '¡Pedido Confirmado!'}
-                    </h3>
-                    <p className="mt-1 px-4 text-xs leading-relaxed text-gray-500">
-                        {esTarjeta
-                            ? 'Tu cargo con tarjeta fue aprobado de forma segura. El comercio comenzará tu orden.'
-                            : 'Prepara tu efectivo. Le pagarás directamente al repartidor al recibir tus alimentos.'}
-                    </p>
-                </div>
-
-                <div className="space-y-2 rounded-xl border border-gray-100 bg-gray-50 p-4 text-left text-xs font-medium text-gray-600">
-                    <div className="flex justify-between border-b border-gray-200 pb-2">
-                        <span>Código de Pedido:</span>
-                        <span className="font-bold tracking-wider text-gray-900">
-                            {String(codigoPedido)}
-                        </span>
-                    </div>
-                    <div className="flex justify-between border-b border-gray-200 pb-2">
-                        <span>Método Registrado:</span>
-                        <span className="text-[10px] font-bold text-gray-900 uppercase">
-                            {esTarjeta
-                                ? 'Transacción Digital'
-                                : 'Efectivo contra entrega'}
-                        </span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span>Destino de Entrega:</span>
-                        <span className="font-bold text-gray-900">
-                            {initialDeliveryLocation ||
-                                `${data.destino_edificio}, ${data.destino_aula}`}
-                        </span>
-                    </div>
-                    <div className="flex justify-between border-t border-gray-200 pt-2 font-bold text-gray-950">
-                        <span>
-                            {esTarjeta
-                                ? 'Total Cobrado:'
-                                : 'Monto Total a Pagar:'}
-                        </span>
-                        <span className="font-black text-purple-600">
-                            ${(data.subtotal_comida + 12.0).toFixed(2)} MXN
-                        </span>
-                    </div>
-                </div>
-
-                <div className="space-y-2 pt-2">
-                    <button
-                        type="button"
-                        onClick={descargarTicketDigital}
-                        className={`w-full rounded-xl py-2.5 text-xs font-bold tracking-wider text-white uppercase transition ${
-                            descargado
-                                ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-gray-950 hover:bg-gray-800'
-                        }`}
-                    >
-                        {descargado
-                            ? '✔️ Ticket Guardado'
-                            : '📄 Descargar Ticket de Compra'}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            window.location.href = '/historial';
-                        }}
-                        className="w-full rounded-xl border border-purple-200 py-2.5 text-xs font-bold tracking-wider text-purple-600 uppercase transition hover:bg-purple-50"
-                    >
-                        ⭐ Ver pedido y Calificar
-                    </button>
-                </div>
-            </div>
+            <PedidoExitosoCard
+                esTarjeta={esTarjeta}
+                codigoPedido={codigoPedido}
+                initialDeliveryLocation={initialDeliveryLocation}
+                data={data}
+                descargado={descargado}
+                onDownloadTicket={descargarTicketDigital}
+            />
         );
     }
 
@@ -253,7 +292,7 @@ export default function CheckoutForm({
             {Object.keys(errors).length > 0 && (
                 <div className="space-y-1 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-600">
                     <p className="font-bold">
-                        ⚠️ Corrige los siguientes errores:
+                        Corrige los siguientes errores:
                     </p>
                     <ul className="list-inside list-disc pl-1 text-[11px] font-medium">
                         {Object.entries(errors).map(([key, msg]) => (
@@ -264,7 +303,7 @@ export default function CheckoutForm({
             )}
             {serverErrors?.error && (
                 <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-600">
-                    ⚠️ {serverErrors.error}
+                    {serverErrors.error}
                 </div>
             )}
 
@@ -277,37 +316,40 @@ export default function CheckoutForm({
                         {initialDeliveryLocation || 'Campus UPP - Edificio 2'}
                     </p>
                 </div>
-                <span className="text-xl">📍</span>
             </div>
 
             <div>
-                <label className="mb-1.5 block text-[11px] font-bold text-gray-400 uppercase">
-                    Método de Pago
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                    <button
-                        type="button"
-                        onClick={() => setData('metodo_pago', 'efectivo')}
-                        className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-xs font-bold transition ${
-                            data.metodo_pago === 'efectivo'
-                                ? 'border-[#FF5722] bg-orange-50 text-[#FF5722]'
-                                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
-                    >
-                        <span className="text-lg">💵</span> Cash / Efectivo
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setData('metodo_pago', 'tarjeta')}
-                        className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-xs font-bold transition ${
-                            data.metodo_pago === 'tarjeta'
-                                ? 'border-[#FF5722] bg-orange-50 text-[#FF5722]'
-                                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
-                    >
-                        <span className="text-lg">💳</span> Tarjeta Bancaria
-                    </button>
-                </div>
+                <fieldset className="border-0 p-0">
+                    <legend className="mb-1.5 block text-[11px] font-bold text-gray-400 uppercase">
+                        Método de Pago
+                    </legend>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            aria-pressed={data.metodo_pago === 'efectivo'}
+                            onClick={() => setData('metodo_pago', 'efectivo')}
+                            className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-xs font-bold transition ${
+                                data.metodo_pago === 'efectivo'
+                                    ? 'border-[#FF5722] bg-orange-50 text-[#FF5722]'
+                                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                            }`}
+                        >
+                            Efectivo
+                        </button>
+                        <button
+                            type="button"
+                            aria-pressed={data.metodo_pago === 'tarjeta'}
+                            onClick={() => setData('metodo_pago', 'tarjeta')}
+                            className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-xs font-bold transition ${
+                                data.metodo_pago === 'tarjeta'
+                                    ? 'border-[#FF5722] bg-orange-50 text-[#FF5722]'
+                                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                            }`}
+                        >
+                            Tarjeta bancaria
+                        </button>
+                    </div>
+                </fieldset>
             </div>
 
             {data.metodo_pago === 'tarjeta' && (
@@ -322,10 +364,11 @@ export default function CheckoutForm({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
+                        <label htmlFor="numero-tarjeta" className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
                             Número de Tarjeta
                         </label>
                         <input
+                            id="numero-tarjeta"
                             type="text"
                             placeholder="4242 4242 4242 4242"
                             value={numeroTarjeta}
@@ -337,10 +380,11 @@ export default function CheckoutForm({
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
+                            <label htmlFor="tarjeta-expiracion" className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
                                 Expiración
                             </label>
                             <input
+                                id="tarjeta-expiracion"
                                 type="text"
                                 placeholder="MM/AA"
                                 maxLength={5}
@@ -351,10 +395,11 @@ export default function CheckoutForm({
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
+                            <label htmlFor="tarjeta-cvv" className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
                                 CVV
                             </label>
                             <input
+                                id="tarjeta-cvv"
                                 type="password"
                                 placeholder="***"
                                 maxLength={3}

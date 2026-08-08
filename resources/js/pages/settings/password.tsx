@@ -61,7 +61,7 @@ export default function Password() {
 
                 {isGoogleUser ? (
                     <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4 text-xs font-bold text-orange-800">
-                        🔒 Tu cuenta inició sesión con Google. No es necesario establecer una contraseña en Eatly, ya que tu acceso está protegido por Google.
+                        Tu cuenta inició sesión con Google. No es necesario establecer una contraseña en Eatly, ya que tu acceso está protegido por Google.
                     </div>
                 ) : (
                     <form onSubmit={updatePassword} className="space-y-6">

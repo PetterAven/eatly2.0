@@ -47,14 +47,38 @@ const statusLabels: Record<string, string> = {
 export default function History() {
     const { orders, auth } = usePage<HistoryProps & SharedData>().props;
     const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
-    const homeUrl = userRole === 'merchant' ? '/vendor/dashboard' : userRole === 'driver' ? '/delivery/dashboard' : '/dashboard';
-    const homeLabel = userRole === 'merchant' ? '🏪 Panel Concesionario' : userRole === 'driver' ? '🚀 Panel Repartidor' : '🍽️ Menú / Catálogo';
+    const getHomeUrl = () => {
+        if (userRole === 'merchant') return '/vendor/dashboard';
+        if (userRole === 'driver') return '/delivery/dashboard';
+        return '/dashboard';
+    };
+
+    const getHomeLabel = () => {
+        if (userRole === 'merchant') return 'Panel de concesionario';
+        if (userRole === 'driver') return 'Panel de repartidor';
+        return 'Menú / catálogo';
+    };
+
+    const homeUrl = getHomeUrl();
+    const homeLabel = getHomeLabel();
     const [ratingOrder, setRatingOrder] = useState<OrderRow | null>(null);
 
     const ordersData = orders?.data ?? [];
 
     const hasBranchRating = (order: OrderRow) =>
         order.ratings?.some((r) => r.rateable_type.endsWith('Branch')) ?? false;
+
+    const getStatusClasses = (status: string) => {
+        if (status === 'delivered' || status === 'completed') {
+            return 'bg-green-100 text-green-700';
+        }
+
+        if (status === 'cancelled') {
+            return 'bg-red-100 text-red-700';
+        }
+
+        return 'bg-amber-100 text-amber-700';
+    };
 
     // Formateador de fecha amigable en español
     const formatFecha = (fechaStr: string) => {
@@ -93,7 +117,7 @@ export default function History() {
                     <div className="flex items-center space-x-4">
                         <Link href={homeUrl} className="flex items-center gap-2">
                             <span className="text-2xl font-black tracking-tight text-gray-900">
-                                Eatly <span className="text-[#FF5722]">Eats</span> 🐴
+                                Eatly <span className="text-[#FF5722]">Eats</span>
                             </span>
                         </Link>
                     </div>
@@ -115,6 +139,7 @@ export default function History() {
                         </Link>
 
                         <button
+                            type="button"
                             onClick={() => router.post('/logout')}
                             className="flex items-center gap-1 rounded-2xl px-3 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-50"
                         >
@@ -128,10 +153,10 @@ export default function History() {
                     <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-orange-500 to-red-600 p-6 text-white shadow-xl">
                         <div className="relative z-10">
                             <span className="mb-2 inline-block rounded-full bg-white/25 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase backdrop-blur-md">
-                                📋 Historial de Compras
+                                Historial de compras
                             </span>
                             <h1 className="text-2xl font-black tracking-tight lg:text-3xl">
-                                Mis Pedidos 🐴
+                                Mis pedidos
                             </h1>
                             <p className="mt-1 text-xs text-orange-100">
                                 Revisa el estado de tus pedidos anteriores y califica tu experiencia.
@@ -170,13 +195,7 @@ export default function History() {
                                         </div>
                                     </div>
                                     
-                                    <span className={`rounded-full px-3 py-1 text-[10px] font-black tracking-wider uppercase ${
-                                        order.status === 'delivered' 
-                                            ? 'bg-green-100 text-green-700' 
-                                            : order.status === 'cancelled' 
-                                            ? 'bg-red-100 text-red-700' 
-                                            : 'bg-amber-100 text-amber-700'
-                                    }`}>
+                                    <span className={`rounded-full px-3 py-1 text-[10px] font-black tracking-wider uppercase ${getStatusClasses(order.status)}`}>
                                         {statusLabels[order.status] ?? order.status}
                                     </span>
                                 </div>
@@ -189,17 +208,18 @@ export default function History() {
 
                                     {['delivered', 'completed'].includes(order.status) && !hasBranchRating(order) && (
                                         <button
+                                            type="button"
                                             onClick={() => setRatingOrder(order)}
                                             className="rounded-xl bg-[#FF5722] px-4 py-2.5 text-xs font-black tracking-wider text-white uppercase shadow-sm transition hover:bg-[#F4511E]"
                                         >
-                                            ⭐ Calificar Pedido
+                                            Calificar pedido
                                         </button>
                                     )}
 
                                     {hasBranchRating(order) && (
                                         <div className="flex flex-col items-end gap-1">
                                             <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 uppercase">
-                                                <CheckCircle2 className="h-3.5 w-3.5" /> Pedido Calificado ⭐
+                                                <CheckCircle2 className="h-3.5 w-3.5" /> Pedido calificado
                                             </span>
                                             <StarRating
                                                 value={order.ratings?.find((r) => r.rateable_type.endsWith('Branch'))?.stars ?? 0}
@@ -214,7 +234,6 @@ export default function History() {
 
                         {ordersData.length === 0 && (
                             <div className="rounded-2xl border border-gray-150 bg-white px-4 py-16 text-center">
-                                <span className="mb-2 block text-4xl">🍽️</span>
                                 <p className="text-sm font-bold text-gray-900">Aún no tienes pedidos registrados</p>
                                 <p className="mt-1 text-xs text-gray-400">Realiza tu primera compra desde el menú del campus.</p>
                                  <Link 

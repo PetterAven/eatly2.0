@@ -57,12 +57,8 @@ export default function Register() {
 
                 {/* Detalle visual de llamas y parrilla */}
                 <div className="mb-2 flex items-center justify-center gap-2">
-                    <span className="animate-bounce text-2xl">🔥</span>
                     <span className="rounded-full border border-amber-200/60 bg-amber-50 px-3 py-1 text-xs font-black tracking-widest text-amber-600 uppercase shadow-inner">
                         Asador & Antojos UPP
-                    </span>
-                    <span className="animate-bounce text-2xl delay-150">
-                        🍔
                     </span>
                 </div>
 
@@ -101,7 +97,6 @@ export default function Register() {
                                     }
                                     required
                                     autoFocus
-                                    tabIndex={1}
                                     autoComplete="name"
                                     placeholder="Ingresa tu nombre"
                                     className="rounded-xl border-gray-200 bg-slate-50 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
@@ -126,7 +121,6 @@ export default function Register() {
                                         setData('email', e.target.value)
                                     }
                                     required
-                                    tabIndex={2}
                                     autoComplete="email"
                                     placeholder="ejemplo@upp.edu.mx"
                                     className="rounded-xl border-gray-200 bg-slate-50 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
@@ -150,17 +144,16 @@ export default function Register() {
                                         setData('role', e.target.value)
                                     }
                                     required
-                                    tabIndex={3}
                                     className="h-10 rounded-xl border-gray-200 bg-slate-50 px-3 text-sm text-slate-700 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
                                 >
                                     <option value="client">
-                                        🍽️ Cliente (Estudiante / Comensal)
+                                        Cliente (Estudiante / Comensal)
                                     </option>
                                     <option value="driver">
-                                        🛵 Repartidor (Campus)
+                                        Repartidor (Campus)
                                     </option>
                                     <option value="merchant">
-                                        🏪 Tienda / Local (Cafetería / Comercio)
+                                        Tienda / Local (Cafetería / Comercio)
                                     </option>
                                 </select>
                                 <InputError message={errors.role} />
@@ -183,7 +176,6 @@ export default function Register() {
                                         setData('password', e.target.value)
                                     }
                                     required
-                                    tabIndex={4}
                                     autoComplete="new-password"
                                     placeholder="Mínimo 8 caracteres"
                                     className="rounded-xl border-gray-200 bg-slate-50 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
@@ -211,7 +203,6 @@ export default function Register() {
                                         )
                                     }
                                     required
-                                    tabIndex={5}
                                     autoComplete="new-password"
                                     placeholder="Repite tu contraseña"
                                     className="rounded-xl border-gray-200 bg-slate-50 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
@@ -225,7 +216,6 @@ export default function Register() {
                             <Button
                                 type="submit"
                                 className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-amber-500 text-xs font-black tracking-wider text-purple-950 uppercase shadow-md transition-all duration-200 hover:bg-amber-600 active:scale-[0.99] disabled:opacity-50"
-                                tabIndex={6}
                                 disabled={processing}
                             >
                                 {processing ? (
@@ -258,7 +248,6 @@ export default function Register() {
                             ¿Ya tienes una cuenta?{' '}
                             <Link
                                 href="/login"
-                                tabIndex={7}
                                 className="font-bold text-purple-700 hover:underline"
                             >
                                 Inicia Sesión
@@ -274,6 +263,7 @@ export default function Register() {
                     <div className="animate-fade-in relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-y-auto rounded-3xl border border-gray-100 bg-white p-6 shadow-2xl sm:p-8">
                         {/* Botón de cerrar */}
                         <button
+                            type="button"
                             onClick={() => setShowTermsModal(false)}
                             className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-600 transition hover:bg-gray-200"
                         >
@@ -281,7 +271,6 @@ export default function Register() {
                         </button>
 
                         <div className="mb-6 pr-8">
-                            <span className="mb-2 block text-2xl">📜</span>
                             <h3 className="text-xl font-black tracking-tight text-gray-900">
                                 Términos y condiciones
                             </h3>

@@ -3,13 +3,25 @@ import { LogOut, Menu, Settings, X } from 'lucide-react';
 import { useState, type PropsWithChildren } from 'react';
 import { type SharedData } from '@/types';
 
-export default function EatlySettingsLayout({ children }: PropsWithChildren) {
+export default function EatlySettingsLayout({ children }: Readonly<PropsWithChildren>) {
     const [menuOpen, setMenuOpen] = useState(false);
     const { auth } = usePage<SharedData>().props;
     const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
 
-    const homeUrl = userRole === 'merchant' ? '/vendor/dashboard' : userRole === 'driver' ? '/delivery/dashboard' : '/dashboard';
-    const homeLabel = userRole === 'merchant' ? '🏪 Panel Concesionario' : userRole === 'driver' ? '🛵 Mis Entregas' : '🍽️ Menú / Catálogo';
+    const getHomeUrl = () => {
+        if (userRole === 'merchant') return '/vendor/dashboard';
+        if (userRole === 'driver') return '/delivery/dashboard';
+        return '/dashboard';
+    };
+
+    const getHomeLabel = () => {
+        if (userRole === 'merchant') return 'Panel de concesionario';
+        if (userRole === 'driver') return 'Mis entregas';
+        return 'Menú / catálogo';
+    };
+
+    const homeUrl = getHomeUrl();
+    const homeLabel = getHomeLabel();
 
     const handleLogout = (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,6 +36,7 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
                     {/* Botón hamburguesa desplegable para navegar entre ajustes */}
                     <div className="relative">
                         <button
+                            type="button"
                             onClick={() => setMenuOpen(!menuOpen)}
                             className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-700 transition hover:bg-gray-200"
                             aria-label="Menú de ajustes"
@@ -41,28 +54,28 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
                                     onClick={() => setMenuOpen(false)}
                                     className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
                                 >
-                                    👤 Perfil
+                                    Perfil
                                 </Link>
                                 <Link
                                     href="/settings/password"
                                     onClick={() => setMenuOpen(false)}
                                     className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
                                 >
-                                    🔒 Contraseña
+                                    Contraseña
                                 </Link>
                                 <Link
                                     href="/settings/two-factor"
                                     onClick={() => setMenuOpen(false)}
                                     className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
                                 >
-                                    🛡️ Verificación en dos pasos
+                                    Verificación en dos pasos
                                 </Link>
                                 <Link
                                     href="/settings/appearance"
                                     onClick={() => setMenuOpen(false)}
                                     className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
                                 >
-                                    🎨 Apariencia
+                                    Apariencia
                                 </Link>
                             </div>
                         )}
@@ -70,7 +83,7 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
 
                     <Link href={homeUrl} className="flex items-center gap-2">
                         <span className="text-2xl font-black tracking-tight text-gray-900">
-                            Eatly <span className="text-[#FF5722]">Eats</span> 🐴
+                            Eatly <span className="text-[#FF5722]">Eats</span>
                         </span>
                     </Link>
                 </div>
@@ -92,6 +105,7 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
                     </Link>
 
                     <button
+                        type="button"
                         onClick={handleLogout}
                         className="flex items-center gap-1 rounded-2xl px-3 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-50"
                     >
@@ -105,10 +119,10 @@ export default function EatlySettingsLayout({ children }: PropsWithChildren) {
                 <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-orange-500 to-red-600 p-6 text-white shadow-xl">
                     <div className="relative z-10">
                         <span className="mb-2 inline-block rounded-full bg-white/25 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase backdrop-blur-md">
-                            ⚙️ Configuración de Cuenta
+                            Configuración de cuenta
                         </span>
                         <h1 className="text-2xl font-black tracking-tight lg:text-3xl">
-                            Ajustes y Perfil 🐴
+                            Ajustes y perfil
                         </h1>
                         <p className="mt-1 text-xs text-orange-100">
                             Administra tu información personal, contraseña y preferencias de seguridad.
