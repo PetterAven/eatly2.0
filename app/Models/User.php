@@ -77,8 +77,8 @@ class User extends Authenticatable
     public function redirectRouteName(): string
     {
         return match ($this->role) {
-            'vendor' => 'vendor.dashboard',
-            'delivery' => 'delivery.dashboard',
+            'merchant', 'vendor' => 'vendor.dashboard',
+            'driver', 'delivery' => 'delivery.dashboard',
             default => 'dashboard',
         };
     }

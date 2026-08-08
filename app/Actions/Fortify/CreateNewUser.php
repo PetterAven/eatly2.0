@@ -28,14 +28,32 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
-            'role' => ['sometimes', 'string', Rule::in(['client', 'driver', 'merchant'])],
+            'role' => ['sometimes', 'string', Rule::in(['client', 'driver', 'merchant', 'vendor', 'delivery'])],
         ])->validate();
+
+        $role = $input['role'] ?? 'client';
+        $roleMap = [
+            'client' => 1,
+            'merchant' => 2,
+            'vendor' => 2,
+            'driver' => 3,
+            'delivery' => 3,
+        ];
+
+        $normalizedRole = match ($role) {
+            'vendor' => 'merchant',
+            'delivery' => 'driver',
+            default => $role,
+        };
+
+        $levelId = $roleMap[$role] ?? 1;
 
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
-            'role' => $input['role'] ?? 'client',
+            'role' => $normalizedRole,
+            'level_id' => $levelId,
         ]);
     }
 }
