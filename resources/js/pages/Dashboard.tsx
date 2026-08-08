@@ -216,10 +216,7 @@ export default function Dashboard({
         },
     ];
 
-    const products: Product[] =
-        databaseProducts && databaseProducts.length > 0
-            ? databaseProducts
-            : staticProducts;
+    const products: Product[] = databaseProducts ?? [];
 
     // Filtrado de productos basado en la categoría y barra de búsqueda en tiempo real (case-insensitive)
     const filteredProducts = products.filter((p) => {

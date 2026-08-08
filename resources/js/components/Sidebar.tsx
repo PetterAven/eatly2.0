@@ -25,10 +25,22 @@ export default function Sidebar({
 
     const userName = auth?.user?.name || 'Comensal UPP';
     const userInitial = userName.charAt(0).toUpperCase();
+    const isAuthenticated = Boolean(auth?.user);
+    const accountHref = isAuthenticated ? '/profile' : '/login';
+    const settingsHref = isAuthenticated ? '/settings/profile' : '/login';
 
     const handleLogout = (e: React.FormEvent) => {
         e.preventDefault();
         router.post('/logout');
+    };
+
+    const selectCategory = (category: string) => {
+        if (onSelectCategory) {
+            onSelectCategory(category);
+        } else {
+            router.visit('/login');
+        }
+        onClose();
     };
 
     return (
@@ -46,7 +58,7 @@ export default function Sidebar({
                 {/* 1. HEADER: Logo de Eatly Eats + Botón de cerrar ✖️ arriba a la derecha */}
                 <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-5">
                     <Link
-                        href="/dashboard"
+                        href={isAuthenticated ? '/dashboard' : '/'}
                         className="flex items-center gap-2"
                         onClick={onClose}
                     >
@@ -69,7 +81,7 @@ export default function Sidebar({
                     {/* PERFIL USUARIO: Avatar con inicial + "Hola, {auth.user.name}" */}
                     <div className="flex items-center gap-2">
                         <Link
-                            href="/profile"
+                            href={accountHref}
                             onClick={onClose}
                             className="group flex flex-1 items-center gap-3.5 rounded-2xl border border-orange-100 bg-orange-50/60 p-3 transition hover:bg-orange-100/80"
                         >
@@ -86,7 +98,7 @@ export default function Sidebar({
                             </div>
                         </Link>
                         <Link
-                            href="/settings/profile"
+                            href={settingsHref}
                             onClick={onClose}
                             className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-white text-lg shadow-sm transition hover:bg-gray-50 hover:text-[#FF5722]"
                             title="Ajustes"
@@ -107,8 +119,7 @@ export default function Sidebar({
                         <button
                             type="button"
                             onClick={() => {
-                                if (onSelectCategory) onSelectCategory('Todos');
-                                onClose();
+                                selectCategory('Todos');
                             }}
                             className="relative z-10 w-full rounded-xl bg-white py-2 text-center text-[11px] font-black tracking-wider text-blue-700 uppercase shadow-sm transition hover:bg-blue-50"
                         >
@@ -127,9 +138,7 @@ export default function Sidebar({
                         <button
                             type="button"
                             onClick={() => {
-                                if (onSelectCategory)
-                                    onSelectCategory('Comida');
-                                onClose();
+                                selectCategory('Comida');
                             }}
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
@@ -144,9 +153,7 @@ export default function Sidebar({
                         <button
                             type="button"
                             onClick={() => {
-                                if (onSelectCategory)
-                                    onSelectCategory('Snacks');
-                                onClose();
+                                selectCategory('Snacks');
                             }}
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
@@ -161,8 +168,7 @@ export default function Sidebar({
                         <button
                             type="button"
                             onClick={() => {
-                                if (onSelectCategory) onSelectCategory('Bares');
-                                onClose();
+                                selectCategory('Bares');
                             }}
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
@@ -177,9 +183,7 @@ export default function Sidebar({
                         <button
                             type="button"
                             onClick={() => {
-                                if (onSelectCategory)
-                                    onSelectCategory('Comida');
-                                onClose();
+                                selectCategory('Comida');
                             }}
                             className="group flex w-full items-center justify-between rounded-2xl p-3 text-left text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
@@ -214,7 +218,7 @@ export default function Sidebar({
                         </p>
 
                         <Link
-                            href="/profile"
+                            href={accountHref}
                             onClick={onClose}
                             className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >
@@ -240,7 +244,7 @@ export default function Sidebar({
                         </button>
 
                         <Link
-                            href="/historial"
+                            href={isAuthenticated ? '/historial' : '/login'}
                             onClick={onClose}
                             className="group flex items-center justify-between rounded-2xl p-3 text-xs font-bold text-gray-800 transition hover:bg-orange-50"
                         >

@@ -18,22 +18,14 @@ class HomeController extends Controller
 
         $branches = Branch::with(['restaurant', 'location', 'images', 'image'])
             ->where('is_active', true)
+            ->whereHas('restaurant.owner', function ($query) {
+                $query->where('role', 'merchant');
+            })
             ->get()
             ->map(function ($branch) {
                 $imageUrl = $branch->image?->url
                     ?? $branch->images->first()?->url
-                    ?? $branch->restaurant?->image
-                    ?? match ($branch->id) {
-                        1 => 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80',
-                        2 => 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80',
-                        3 => 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=600&q=80',
-                        4 => 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=600&q=80',
-                        5 => 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=600&q=80',
-                        6 => 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=600&q=80',
-                        7 => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80',
-                        8 => 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
-                        default => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500',
-                    };
+                    ?? $branch->restaurant?->image;
 
                 return [
                     'id' => $branch->id,

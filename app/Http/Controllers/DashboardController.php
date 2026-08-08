@@ -20,7 +20,15 @@ class DashboardController extends Controller
             return redirect()->route($redirectRoute);
         }
 
-        $items = Item::with(['category.branch.restaurant', 'images'])->get();
+        $items = Item::with(['category.branch.restaurant', 'images'])
+            ->where('is_available', true)
+            ->whereHas('category.branch', function ($query) {
+                $query->where('is_active', true)
+                    ->whereHas('restaurant.owner', function ($ownerQuery) {
+                        $ownerQuery->where('role', 'merchant');
+                    });
+            })
+            ->get();
 
         $products = $items->map(function ($item) {
             $branch = $item->category?->branch;
@@ -47,7 +55,7 @@ class DashboardController extends Controller
                 'restaurant_name' => $restaurantName,
                 'restaurant_description' => $restaurantDescription,
                 'image' => $imageUrl,
-                'local_id' => $branch?->id ?? 1,
+                'local_id' => $branch?->id,
             ];
         });
 
@@ -57,8 +65,13 @@ class DashboardController extends Controller
                 ->latest()
                 ->first(),
             'databaseProducts' => $products,
-            'restaurants' => Restaurant::with('branches')->get(),
-            'branches' => Branch::with(['restaurant', 'location', 'images'])->get(),
+            'restaurants' => Restaurant::with('branches')
+                ->whereHas('owner', fn ($query) => $query->where('role', 'merchant'))
+                ->get(),
+            'branches' => Branch::with(['restaurant', 'location', 'images'])
+                ->where('is_active', true)
+                ->whereHas('restaurant.owner', fn ($query) => $query->where('role', 'merchant'))
+                ->get(),
         ]);
     }
 }

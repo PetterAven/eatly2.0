@@ -8,7 +8,7 @@ interface CafeBranch {
     location?: string;
     phone?: string;
     schedule?: string;
-    image: string;
+    image?: string | null;
     [key: string]: unknown;
 }
 
@@ -165,7 +165,6 @@ export default function Welcome({ auth, branches = [] }: Readonly<WelcomeProps>)
                     isOpen={isSidebarOpen}
                     onClose={() => setIsSidebarOpen(false)}
                     auth={auth ?? {}}
-                    onSelectCategory={() => {}}
                 />
 
                 <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
@@ -225,12 +224,18 @@ export default function Welcome({ auth, branches = [] }: Readonly<WelcomeProps>)
                                     key={cafe.id}
                                     className="flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition hover:shadow-lg md:flex-row"
                                 >
-                                    <div className="relative h-48 md:h-auto md:w-1/2">
-                                        <img
-                                            src={cafe.image}
-                                            alt={cafe.name}
-                                            className="h-full w-full object-cover"
-                                        />
+                                    <div className="relative flex h-48 items-center justify-center bg-orange-50 md:h-auto md:w-1/2">
+                                        {cafe.image ? (
+                                            <img
+                                                src={cafe.image}
+                                                alt={cafe.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-xs font-bold text-orange-700">
+                                                Imagen pendiente
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex flex-col justify-between p-6 md:w-1/2">
                                         <div>
@@ -275,6 +280,22 @@ export default function Welcome({ auth, branches = [] }: Readonly<WelcomeProps>)
                                 </div>
                             ))}
                         </div>
+                        {cafeList.length === 0 && (
+                            <div className="rounded-3xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center">
+                                <h3 className="text-base font-black text-gray-900">
+                                    Aún no hay cafeterías registradas
+                                </h3>
+                                <p className="mt-2 text-xs text-gray-500">
+                                    Cuando una cafetería se registre en Eatly Eats aparecerá aquí.
+                                </p>
+                                <Link
+                                    href="/vendor/register"
+                                    className="mt-5 inline-flex rounded-xl bg-[#FF5722] px-4 py-2.5 text-xs font-black text-white transition hover:bg-[#F4511E]"
+                                >
+                                    Registrar cafetería
+                                </Link>
+                            </div>
+                        )}
                     </section>
                 </main>
 
