@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'session-or-token' => \App\Http\Middleware\AuthenticateWithSessionOrToken::class,
         ]);
 
         $middleware->web(append: [

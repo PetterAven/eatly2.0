@@ -38,8 +38,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Redirección por rol o vista de cliente
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/historial', [OrderHistoryController::class, 'index'])->name('orders.history');
-
     // Perfil de usuario
     Route::get('/profile', [\App\Http\Controllers\Settings\ProfileController::class, 'edit'])->name('profile');
 
@@ -67,6 +65,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/orders/{order}/take', [DeliveryController::class, 'takeOrder'])->name('orders.take');
         Route::patch('/orders/{order}/status', [DeliveryController::class, 'updateOrderStatus'])->name('orders.status');
     });
+});
+
+// Ruta de Historial migrada a session-or-token para prueba A/B
+Route::middleware(['session-or-token', 'verified'])->group(function () {
+    Route::get('/historial', [OrderHistoryController::class, 'index'])->name('orders.history');
 });
 
 Route::post('/logout', function () {

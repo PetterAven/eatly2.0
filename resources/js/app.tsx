@@ -2,8 +2,11 @@ import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+import { configureTabAuth } from './lib/tab-auth';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Eatly';
+
+configureTabAuth();
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

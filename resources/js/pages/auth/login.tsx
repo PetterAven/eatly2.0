@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { storeTabToken } from '@/lib/tab-auth';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import React from 'react';
 
 interface PageProps {
@@ -16,19 +18,52 @@ interface PageProps {
     [key: string]: unknown;
 }
 
+interface LoginResponse {
+    token: string;
+    redirect: string;
+}
+
 export default function Login() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, setError, clearErrors, errors } = useForm({
         email: '',
         password: '',
         remember: true,
     });
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
 
     const { props } = usePage<PageProps>();
     const flashError = props.flash?.error;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        post('/login');
+        clearErrors();
+        setIsSubmitting(true);
+
+        try {
+            const response = await axios.post<LoginResponse>('/login', data, {
+                headers: { Accept: 'application/json' },
+            });
+
+            storeTabToken(response.data.token);
+            router.visit(response.data.redirect || '/dashboard');
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
+                const validationErrors = error.response.data.errors as Record<
+                    string,
+                    string[]
+                >;
+
+                Object.entries(validationErrors).forEach(([field, messages]) => {
+                    if (field === 'email' || field === 'password') {
+                        setError(field, messages[0]);
+                    }
+                });
+            } else {
+                setError('email', 'No fue posible iniciar sesión. Intenta de nuevo.');
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleGoogleLogin = () => {
@@ -136,10 +171,10 @@ export default function Login() {
 
                             <Button
                                 type="submit"
-                                disabled={processing}
+                                disabled={isSubmitting}
                                 className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-amber-500 text-xs font-black tracking-wider text-purple-950 uppercase shadow-md transition-all duration-200 hover:bg-amber-600 active:scale-[0.99] disabled:opacity-50"
                             >
-                                {processing ? (
+                                {isSubmitting ? (
                                     <Spinner className="h-4 w-4 text-purple-950" />
                                 ) : null}
                                 Iniciar Sesión

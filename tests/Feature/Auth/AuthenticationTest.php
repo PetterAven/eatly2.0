@@ -32,6 +32,28 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
+    public function test_json_login_returns_a_personal_token_without_removing_the_web_session()
+    {
+        $user = User::factory()->withoutTwoFactor()->create();
+
+        $response = $this->postJson(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('two_factor', false)
+            ->assertJsonStructure(['token', 'redirect']);
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'tokenable_id' => $user->id,
+            'tokenable_type' => User::class,
+            'name' => 'web-tab',
+        ]);
+    }
+
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()
     {
         if (! Features::canManageTwoFactorAuthentication()) {

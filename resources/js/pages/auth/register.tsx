@@ -20,7 +20,7 @@ export default function Register() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
-        role: 'client',
+        role: '',
         password: '',
         password_confirmation: '',
     });
@@ -136,26 +136,29 @@ export default function Register() {
                                 >
                                     Tipo de Cuenta
                                 </Label>
-                                <select
-                                    id="role"
-                                    name="role"
-                                    value={data.role}
-                                    onChange={(e) =>
-                                        setData('role', e.target.value)
-                                    }
-                                    required
-                                    className="h-10 rounded-xl border-gray-200 bg-slate-50 px-3 text-sm text-slate-700 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
-                                >
-                                    <option value="client">
-                                        Cliente (Estudiante / Comensal)
-                                    </option>
-                                    <option value="driver">
-                                        Repartidor (Campus)
-                                    </option>
-                                    <option value="merchant">
-                                        Tienda / Local (Cafetería / Comercio)
-                                    </option>
-                                </select>
+                                 <select
+                                     id="role"
+                                     name="role"
+                                     value={data.role}
+                                     onChange={(e) =>
+                                         setData('role', e.target.value)
+                                     }
+                                     required
+                                     className="h-10 rounded-xl border-gray-200 bg-slate-50 px-3 text-sm text-slate-700 focus-visible:border-purple-600 focus-visible:ring-purple-600/20"
+                                 >
+                                     <option value="" disabled>
+                                         -- Selecciona tu tipo de cuenta --
+                                     </option>
+                                     <option value="client">
+                                         Cliente (Estudiante / Comensal)
+                                     </option>
+                                     <option value="driver">
+                                         Repartidor (Campus)
+                                     </option>
+                                     <option value="merchant">
+                                         Tienda / Local (Cafetería / Comercio)
+                                     </option>
+                                 </select>
                                 <InputError message={errors.role} />
                             </div>
 
@@ -236,7 +239,13 @@ export default function Register() {
 
                         {/* Botón Google */}
                         <a
-                            href="/auth/google/redirect"
+                            href={data.role ? `/auth/google/redirect?role=${data.role}` : '#'}
+                            onClick={(e) => {
+                                if (!data.role) {
+                                    e.preventDefault();
+                                    alert('Por favor selecciona un tipo de cuenta antes de registrarte con Google.');
+                                }
+                            }}
                             className="group inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold tracking-wider text-slate-700 uppercase shadow-sm transition-all hover:bg-slate-50 active:scale-[0.99]"
                         >
                             <GoogleIcon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
