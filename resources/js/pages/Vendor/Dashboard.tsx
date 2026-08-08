@@ -1,6 +1,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { Utensils, Plus, Trash2, Edit, Store, Package, Settings, LogOut } from 'lucide-react';
+import ImageUploadPreview from '@/components/ImageUploadPreview';
 
 interface Category {
     id: number;
@@ -17,6 +18,7 @@ interface Product {
     is_available: boolean;
     sale_unit?: string;
     unit_label?: string | null;
+    images?: { url: string }[];
 }
 
 interface OrderItem {
@@ -66,6 +68,7 @@ export default function VendorDashboard({ products, categories, orders, ratings 
         is_available: true,
         sale_unit: 'orden',
         unit_label: '',
+        image: null as File | string | null,
     });
 
     const openCreateModal = () => {
@@ -84,6 +87,7 @@ export default function VendorDashboard({ products, categories, orders, ratings 
             is_available: product.is_available,
             sale_unit: product.sale_unit || 'orden',
             unit_label: product.unit_label || '',
+            image: product.images?.[0]?.url || null,
         });
         setIsModalOpen(true);
     };
@@ -91,7 +95,10 @@ export default function VendorDashboard({ products, categories, orders, ratings 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editingProduct) {
-            put(`/vendor/products/${editingProduct.id}`, {
+            router.post(`/vendor/products/${editingProduct.id}`, {
+                _method: 'PUT',
+                ...data,
+            }, {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     reset();
@@ -478,8 +485,18 @@ export default function VendorDashboard({ products, categories, orders, ratings 
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Descripción</label>
+                                 <div>
+                                     <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Imagen de Referencia del Platillo</label>
+                                     <ImageUploadPreview
+                                         value={data.image}
+                                         onChange={(file) => setData('image', file)}
+                                         label="Sube una foto del platillo"
+                                     />
+                                     {errors.image && <p className="text-xs text-red-500 mt-1">{errors.image}</p>}
+                                 </div>
+
+                                 <div>
+                                     <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Descripción</label>
                                     <textarea
                                         value={data.description}
                                         onChange={e => setData('description', e.target.value)}
