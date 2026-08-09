@@ -51,7 +51,7 @@ export default function VendorRegister() {
                     </div>
 
                     <div className="relative z-10 text-[11px] font-bold text-orange-100 flex items-center gap-2">
-                        <span>Universidad Politécnica de Pachuca - Campus Jagüey de Téllez</span>
+                        <span>Universidad Politécnica de Pachuca - Campus Pachuca Hidalgo</span>
                     </div>
                 </div>
 

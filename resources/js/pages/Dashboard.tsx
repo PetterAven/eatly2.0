@@ -403,7 +403,7 @@ export default function Dashboard({
                             </div>
 
                             <div className="relative z-10 mt-4 flex items-center gap-2 text-[11px] font-bold text-orange-100">
-                                <span>Campus UPP - Jagüey de Téllez</span>
+                                <span>Campus UPP - Pachuca Hidalgo</span>
                             </div>
                         </div>
 

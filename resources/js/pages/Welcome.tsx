@@ -105,7 +105,7 @@ export default function Welcome({ auth, branches = [] }: Readonly<WelcomeProps>)
                                     Entrega en
                                 </p>
                                 <p className="font-black text-gray-900">
-                                    Campus UPP - Jagüey de Téllez
+                                    Campus UPP - Pachuca Hidalgo
                                 </p>
                             </div>
                         </div>
@@ -201,7 +201,7 @@ export default function Welcome({ auth, branches = [] }: Readonly<WelcomeProps>)
                         </div>
 
                         <div className="relative z-10 mt-4 flex items-center gap-2 text-[11px] font-bold text-orange-100">
-                            <span>Campus UPP - Jagüey de Téllez</span>
+                            <span>Campus UPP - Pachuca Hidalgo</span>
                         </div>
                     </div>
 

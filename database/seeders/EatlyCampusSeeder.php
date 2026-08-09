@@ -67,7 +67,7 @@ class EatlyCampusSeeder extends Seeder
                 $restaurantData['email'] = 'cafeteria@upp.edu.mx';
             }
             if (Schema::hasColumn('restaurants', 'address')) {
-                $restaurantData['address'] = 'Campus UPP - Jagüey de Téllez';
+                $restaurantData['address'] = 'Campus UPP - Pachuca Hidalgo';
             }
 
             DB::table('restaurants')->insert($restaurantData);
