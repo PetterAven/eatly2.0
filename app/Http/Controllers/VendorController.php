@@ -10,6 +10,8 @@ use Inertia\Inertia;
 
 class VendorController extends Controller
 {
+    private const STORAGE_PREFIX = '/storage/';
+
     public function index()
     {
         $branchIds = \App\Models\Branch::pluck('id');
@@ -96,7 +98,7 @@ class VendorController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('items', 'public');
-            $item->images()->create(['url' => '/storage/'.$path]);
+            $item->images()->create(['url' => self::STORAGE_PREFIX.$path]);
         }
 
         return redirect()->back()->with('success', 'Platillo creado exitosamente.');
@@ -128,7 +130,7 @@ class VendorController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('items', 'public');
             $product->images()->delete();
-            $product->images()->create(['url' => '/storage/'.$path]);
+            $product->images()->create(['url' => self::STORAGE_PREFIX.$path]);
         }
 
         return redirect()->back()->with('success', 'Platillo actualizado exitosamente.');
@@ -240,6 +242,7 @@ class VendorController extends Controller
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
             'role' => 'merchant',
+            'level_id' => 2,
             'email_verified_at' => now(),
         ]);
 

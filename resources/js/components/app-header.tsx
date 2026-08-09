@@ -63,46 +63,55 @@ const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
 interface AppHeaderProps {
-    breadcrumbs?: BreadcrumbItem[];
+    readonly breadcrumbs?: BreadcrumbItem[];
 }
 
-export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
+export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const user = auth?.user;
-    const role = user?.role || 'client';
+    const role = (user?.role as string) || 'client';
 
-    const mainNavItems: NavItem[] =
-        role === 'merchant'
-            ? [
-                  {
-                      title: 'Panel de Tienda',
-                      href: '/vendor/dashboard',
-                      icon: Store,
-                  },
-                  { title: 'Mi Perfil', href: '/profile', icon: Settings },
-              ]
-            : role === 'driver'
-              ? [
-                    {
-                        title: 'Panel de Repartidor',
-                        href: '/delivery/dashboard',
-                        icon: Bike,
-                    },
-                    { title: 'Mi Perfil', href: '/profile', icon: Settings },
-                ]
-              : [
-                    { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
-                    { title: 'Mis Pedidos', href: '/historial', icon: Clock },
-                    { title: 'Mi Perfil', href: '/profile', icon: Settings },
-                ];
+    const getMainNavItems = (userRole: string): NavItem[] => {
+        if (userRole === 'merchant') {
+            return [
+                {
+                    title: 'Panel de Tienda',
+                    href: '/vendor/dashboard',
+                    icon: Store,
+                },
+                { title: 'Mi Perfil', href: '/profile', icon: Settings },
+            ];
+        }
+        if (userRole === 'driver') {
+            return [
+                {
+                    title: 'Panel de Repartidor',
+                    href: '/delivery/dashboard',
+                    icon: Bike,
+                },
+                { title: 'Mi Perfil', href: '/profile', icon: Settings },
+            ];
+        }
+        return [
+            { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+            { title: 'Mis Pedidos', href: '/historial', icon: Clock },
+            { title: 'Mi Perfil', href: '/profile', icon: Settings },
+        ];
+    };
 
-    const homeUrl =
-        role === 'merchant'
-            ? '/vendor/dashboard'
-            : role === 'driver'
-              ? '/delivery/dashboard'
-              : dashboard();
+    const getHomeUrl = (userRole: string) => {
+        if (userRole === 'merchant') {
+            return '/vendor/dashboard';
+        }
+        if (userRole === 'driver') {
+            return '/delivery/dashboard';
+        }
+        return dashboard();
+    };
+
+    const mainNavItems = getMainNavItems(role);
+    const homeUrl = getHomeUrl(role);
     const getInitials = useInitials();
     return (
         <>
@@ -189,9 +198,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {mainNavItems.map((item) => (
                                     <NavigationMenuItem
-                                        key={index}
+                                        key={item.title}
                                         className="relative flex h-full items-center"
                                     >
                                         <Link

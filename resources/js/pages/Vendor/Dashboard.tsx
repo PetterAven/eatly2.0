@@ -60,7 +60,7 @@ export default function VendorDashboard({ products, categories, orders, ratings 
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [loadingOrderId, setLoadingOrderId] = useState<number | null>(null);
 
-    const { data, setData, post, put, delete: destroy, processing, reset, errors } = useForm({
+    const { data, setData, post, delete: destroy, processing, reset, errors } = useForm({
         name: '',
         category_id: categories[0]?.id || 1,
         price: '',
@@ -405,7 +405,7 @@ export default function VendorDashboard({ products, categories, orders, ratings 
                 {/* Modal Crear / Editar Platillo */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 shadow-2xl border border-gray-100">
+                        <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-y-auto rounded-3xl border border-gray-100 bg-white p-8 shadow-2xl">
                             <h3 className="text-lg font-black text-gray-900 mb-6">
                                 {editingProduct ? 'Editar Platillo' : 'Nuevo Platillo para el Menú'}
                             </h3>

@@ -12,16 +12,22 @@ class GoogleController extends Controller
 {
     public function redirect()
     {
-        $role = request()->query('role', 'client');
+        $requestedRole = request()->query('role');
         $allowedRoles = ['client', 'merchant', 'driver'];
-        $role = in_array($role, $allowedRoles) ? $role : 'client';
 
-        // Forzamos a Google a mostrar siempre la ventana de selección de cuenta y consentimiento
+        $with = [
+            'prompt' => 'select_account consent',
+        ];
+
+        if ($requestedRole && in_array($requestedRole, $allowedRoles, true)) {
+            $with['state'] = $requestedRole;
+        }
+
+        // Forzamos a Google a mostrar siempre la ventana de selección de cuenta y consentimiento.
+        // Si no llegó un rol explícito (ej. login normal), no forzamos 'client' porque ese
+        // overwrite rompe a usuarios existentes con merchant/driver ya registrados.
         return Socialite::driver('google')
-            ->with([
-                'prompt' => 'select_account consent',
-                'state' => $role,
-            ])
+            ->with($with)
             ->redirect();
     }
 
@@ -48,32 +54,30 @@ class GoogleController extends Controller
             // Buscamos si el correo ya existe en la Base de Datos
             $user = User::where('email', $googleUser->getEmail())->first();
 
+            $roleMap = [
+                'client' => 1,
+                'merchant' => 2,
+                'driver' => 3,
+            ];
+
+            $resolvedRole = $this->resolveGoogleUserRole(request()->input('state'), $user);
+
             if ($user) {
-                $requestedRole = request()->input('state');
-                $roleMap = [
-                    'client' => 1,
-                    'merchant' => 2,
-                    'driver' => 3,
-                ];
                 $updateData = [
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
                     'email_verified_at' => $user->email_verified_at ?? now(),
                 ];
-                if ($requestedRole && array_key_exists($requestedRole, $roleMap)) {
-                    $updateData['role'] = $requestedRole;
-                    $updateData['level_id'] = $roleMap[$requestedRole];
+
+                if ($resolvedRole) {
+                    $updateData['role'] = $resolvedRole;
+                    $updateData['level_id'] = $roleMap[$resolvedRole] ?? 1;
                 }
+
                 $user->update($updateData);
             } else {
-                $requestedRole = request()->input('state', 'client');
-                $roleMap = [
-                    'client' => 1,
-                    'merchant' => 2,
-                    'driver' => 3,
-                ];
-                $role = array_key_exists($requestedRole, $roleMap) ? $requestedRole : 'client';
-                $levelId = $roleMap[$role];
+                $role = $resolvedRole ?? 'client';
+                $levelId = $roleMap[$role] ?? 1;
 
                 $user = User::create([
                     'name' => $googleUser->getName() ?? 'Usuario Google',
@@ -101,5 +105,31 @@ class GoogleController extends Controller
             // En caso de error, redirigimos al login con mensaje flash explicativo
             return redirect()->route('login')->with('error', 'Ocurrió un error al autenticar con Google: '.$e->getMessage());
         }
+    }
+
+    private function resolveGoogleUserRole(?string $requestedRole, ?User $existingUser = null): ?string
+    {
+        $roleMap = [
+            'client' => 1,
+            'merchant' => 2,
+            'driver' => 3,
+        ];
+
+        $resolvedRole = null;
+
+        if ($requestedRole && array_key_exists($requestedRole, $roleMap)) {
+            $resolvedRole = $requestedRole;
+        } elseif ($existingUser && $existingUser->level_id) {
+            $resolvedRole = match ((int) $existingUser->level_id) {
+                2 => 'merchant',
+                3 => 'driver',
+                4 => 'admin',
+                default => 'client',
+            };
+        } elseif ($existingUser && in_array($existingUser->role, ['merchant', 'driver', 'client', 'admin'], true)) {
+            $resolvedRole = $existingUser->role;
+        }
+
+        return $resolvedRole;
     }
 }

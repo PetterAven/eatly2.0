@@ -58,8 +58,16 @@ class User extends Authenticatable
 
     public function getRoleAttribute($value)
     {
-        if ($this->level_id) {
-            return match ((int) $this->level_id) {
+        $role = $value ?? ($this->attributes['role'] ?? null);
+
+        if ($role === 'vendor' || $role === 'restaurante') {
+            $role = 'merchant';
+        } elseif ($role === 'delivery') {
+            $role = 'driver';
+        }
+
+        if (! in_array($role, ['client', 'merchant', 'driver', 'admin'], true)) {
+            $role = match ((int) ($this->level_id ?? 1)) {
                 2 => 'merchant',
                 3 => 'driver',
                 4 => 'admin',
@@ -67,11 +75,7 @@ class User extends Authenticatable
             };
         }
 
-        if ($value === 'vendor' || $value === 'restaurante') {
-            return 'merchant';
-        }
-
-        return $value ?? 'client';
+        return $role ?? 'client';
     }
 
     public function redirectRouteName(): string

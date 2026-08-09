@@ -1,132 +1,122 @@
-import { Link, router, usePage } from '@inertiajs/react';
-import { LogOut, Menu, Settings, X } from 'lucide-react';
+import { AppHeader } from '@/components/app-header';
+import { cn } from '@/lib/utils';
+import { edit as editAppearance } from '@/routes/appearance';
+import { edit as editProfile } from '@/routes/profile';
+import { show as showTwoFactor } from '@/routes/two-factor';
+import { edit as editPassword } from '@/routes/user-password';
+import { Link } from '@inertiajs/react';
+import { KeyRound, Menu, Monitor, Shield, User, X } from 'lucide-react';
 import { useState, type PropsWithChildren } from 'react';
-import { type SharedData } from '@/types';
+
+const settingsNavItems = [
+    {
+        title: 'Perfil',
+        href: editProfile(),
+        icon: User,
+    },
+    {
+        title: 'Contraseña',
+        href: editPassword(),
+        icon: KeyRound,
+    },
+    {
+        title: 'Verificación en dos pasos',
+        href: showTwoFactor(),
+        icon: Shield,
+    },
+    {
+        title: 'Apariencia',
+        href: editAppearance(),
+        icon: Monitor,
+    },
+];
 
 export default function EatlySettingsLayout({ children }: Readonly<PropsWithChildren>) {
     const [menuOpen, setMenuOpen] = useState(false);
-    const { auth } = usePage<SharedData>().props;
-    const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
-    const getHomeUrl = () => {
-        if (userRole === 'merchant') return '/vendor/dashboard';
-        if (userRole === 'driver') return '/delivery/dashboard';
-        return '/dashboard';
-    };
-
-    const getHomeLabel = () => {
-        if (userRole === 'merchant') return 'Panel de concesionario';
-        if (userRole === 'driver') return 'Mis entregas';
-        return 'Menú / catálogo';
-    };
-
-    const homeUrl = getHomeUrl();
-    const homeLabel = getHomeLabel();
-
-    const handleLogout = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.post('/logout');
-    };
+    const currentItem = settingsNavItems.find((item) => String(item.href) === currentPath) || settingsNavItems[0];
 
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-900">
-            {/* Header unificado */}
-            <header className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-3.5 shadow-sm">
-                <div className="flex items-center space-x-3">
-                    {/* Botón hamburguesa desplegable para navegar entre ajustes */}
-                    <div className="relative">
-                        <button
-                            type="button"
-                            onClick={() => setMenuOpen(!menuOpen)}
-                            className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-700 transition hover:bg-gray-200"
-                            aria-label="Menú de ajustes"
-                        >
-                            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                        </button>
-
-                        {menuOpen && (
-                            <div className="absolute top-12 left-0 z-50 w-64 rounded-2xl border border-gray-100 bg-white p-2 shadow-xl">
-                                <p className="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-400">
-                                    Navegación de Ajustes
-                                </p>
-                                <Link
-                                    href="/settings/profile"
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
-                                >
-                                    Perfil
-                                </Link>
-                                <Link
-                                    href="/settings/password"
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
-                                >
-                                    Contraseña
-                                </Link>
-                                <Link
-                                    href="/settings/two-factor"
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
-                                >
-                                    Verificación en dos pasos
-                                </Link>
-                                <Link
-                                    href="/settings/appearance"
-                                    onClick={() => setMenuOpen(false)}
-                                    className="block rounded-xl px-3 py-2.5 text-xs font-bold text-gray-700 transition hover:bg-orange-50 hover:text-[#FF5722]"
-                                >
-                                    Apariencia
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-
-                    <Link href={homeUrl} className="flex items-center gap-2">
-                        <span className="text-2xl font-black tracking-tight text-gray-900">
-                            Eatly <span className="text-[#FF5722]">Eats</span>
-                        </span>
-                    </Link>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                    <Link
-                        href={homeUrl}
-                        className="flex items-center gap-1.5 rounded-2xl px-3.5 py-2.5 text-xs font-extrabold text-gray-700 transition duration-200 hover:bg-orange-50 hover:text-[#FF5722]"
-                    >
-                        {homeLabel}
-                    </Link>
-
-                    <Link
-                        href="/settings/profile"
-                        className="flex items-center gap-1 rounded-2xl bg-orange-50 px-3.5 py-2.5 text-xs font-bold text-[#FF5722] transition duration-200 hover:bg-orange-100"
-                        title="Ajustes"
-                    >
-                        <Settings className="h-4 w-4" /> Ajustes
-                    </Link>
-
-                    <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="flex items-center gap-1 rounded-2xl px-3 py-2 text-xs font-bold text-red-600 transition duration-200 hover:bg-red-50"
-                    >
-                        <LogOut className="h-3.5 w-3.5" /> Salir
-                    </button>
-                </div>
-            </header>
+            <AppHeader
+                breadcrumbs={[
+                    { title: 'Configuración', href: String(editProfile()) },
+                    { title: currentItem.title, href: String(currentItem.href) },
+                ]}
+            />
 
             <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 pb-24">
-                {/* Banner de Sección */}
-                <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-orange-500 to-red-600 p-6 text-white shadow-xl">
-                    <div className="relative z-10">
-                        <span className="mb-2 inline-block rounded-full bg-white/25 px-3 py-1 text-[10px] font-black tracking-widest text-white uppercase backdrop-blur-md">
-                            Configuración de cuenta
-                        </span>
-                        <h1 className="text-2xl font-black tracking-tight lg:text-3xl">
-                            Ajustes y perfil
-                        </h1>
-                        <p className="mt-1 text-xs text-orange-100">
-                            Administra tu información personal, contraseña y preferencias de seguridad.
-                        </p>
+                {/* Settings Navigation Bar with Small Hamburger Menu */}
+                <div className="mb-6 flex items-center justify-between rounded-2xl border border-gray-200/80 bg-white p-3 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        {/* Small Hamburger Menu for Settings Navigation */}
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setMenuOpen(!menuOpen)}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-[#FF5722] transition hover:bg-orange-100"
+                                aria-label="Menú de navegación de ajustes"
+                            >
+                                {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                            </button>
+
+                            {menuOpen && (
+                                <div className="absolute top-12 left-0 z-50 w-64 rounded-2xl border border-gray-100 bg-white p-2 shadow-xl animate-in fade-in zoom-in-95">
+                                    <p className="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                                        Secciones de Ajustes
+                                    </p>
+                                    {settingsNavItems.map((item) => {
+                                        const IconComponent = item.icon;
+                                        const isActive = String(item.href) === currentPath;
+                                        return (
+                                            <Link
+                                                key={String(item.href)}
+                                                href={item.href}
+                                                onClick={() => setMenuOpen(false)}
+                                                className={cn(
+                                                    'flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-bold transition',
+                                                    isActive
+                                                        ? 'bg-orange-50 text-[#FF5722]'
+                                                        : 'text-gray-700 hover:bg-orange-50 hover:text-[#FF5722]',
+                                                )}
+                                            >
+                                                {IconComponent && <IconComponent className="h-4 w-4" />}
+                                                {item.title}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <h2 className="text-sm font-black text-gray-900">{currentItem.title}</h2>
+                            <p className="text-[11px] text-gray-500">Administra y actualiza la configuración de tu cuenta</p>
+                        </div>
+                    </div>
+
+                    {/* Desktop horizontal pills */}
+                    <div className="hidden md:flex items-center gap-1 bg-gray-50 p-1 rounded-xl">
+                        {settingsNavItems.map((item) => {
+                            const IconComponent = item.icon;
+                            const isActive = String(item.href) === currentPath;
+                            return (
+                                <Link
+                                    key={String(item.href)}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition',
+                                        isActive
+                                            ? 'bg-white text-[#FF5722] shadow-sm'
+                                            : 'text-gray-600 hover:text-[#FF5722] hover:bg-white/50',
+                                    )}
+                                >
+                                    {IconComponent && <IconComponent className="h-3.5 w-3.5" />}
+                                    {item.title}
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
 
