@@ -110,7 +110,8 @@ export default function History() {
             `eatly-delivery-notice-${deliveredOrder.id}`,
             'shown',
         );
-        setDeliveryNoticeOrder(deliveredOrder);
+        // Deferred to avoid cascading renders and linting warnings
+        setTimeout(() => setDeliveryNoticeOrder(deliveredOrder), 0);
 
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('¿Recibiste tu pedido?', {
