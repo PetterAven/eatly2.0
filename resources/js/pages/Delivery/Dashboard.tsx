@@ -15,6 +15,8 @@ interface OrderItem {
     item?: { name: string };
 }
 
+type GeoCoord = number | string | null;
+
 interface Order {
     id: number;
     code: string;
@@ -25,21 +27,21 @@ interface Order {
         name: string;
         restaurant?: {
             address?: string | null;
-            latitude?: number | string | null;
-            longitude?: number | string | null;
+            latitude?: GeoCoord;
+            longitude?: GeoCoord;
         };
         location?: {
             address_line?: string | null;
-            lat?: number | string | null;
-            lng?: number | string | null;
+            lat?: GeoCoord;
+            lng?: GeoCoord;
         };
     };
     items: OrderItem[];
     driver_id?: number;
     destino_edificio?: string | null;
     destino_aula?: string | null;
-    delivery_lat?: number | string | null;
-    delivery_lng?: number | string | null;
+    delivery_lat?: GeoCoord;
+    delivery_lng?: GeoCoord;
 }
 
 interface Rating {
@@ -151,6 +153,18 @@ export default function DeliveryDashboard({
         router.post('/logout');
     };
 
+    const getStatusClasses = (status: string) => {
+        if (status === 'delivered') return 'bg-amber-100 text-amber-800';
+        if (status === 'completed') return 'bg-emerald-100 text-emerald-800';
+        return 'bg-blue-100 text-blue-800';
+    };
+
+    const getStatusLabel = (status: string) => {
+        if (status === 'delivered') return 'Esperando confirmación';
+        if (status === 'completed') return 'Entrega confirmada';
+        return 'En ruta';
+    };
+
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-900">
             <Head title="Panel de Repartidor - Eatly UPP" />
@@ -234,14 +248,9 @@ export default function DeliveryDashboard({
                                                 Pedido #{order.code || order.id}
                                             </span>
                                             <span
-                                                className={`rounded-full px-2.5 py-1 text-xs font-bold ${order.status === 'delivered' ? 'bg-amber-100 text-amber-800' : order.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}
+                                                className={`rounded-full px-2.5 py-1 text-xs font-bold ${getStatusClasses(order.status)}`}
                                             >
-                                                {order.status === 'delivered'
-                                                    ? 'Esperando confirmación'
-                                                    : order.status ===
-                                                        'completed'
-                                                      ? 'Entrega confirmada'
-                                                      : 'En ruta'}
+                                                {getStatusLabel(order.status)}
                                             </span>
                                         </div>
 
