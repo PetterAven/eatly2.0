@@ -140,7 +140,8 @@ export default function Dashboard({
         }
 
         window.sessionStorage.setItem(noticeKey, 'shown');
-        setDeliveryAlertVisible(true);
+        // Deferred to avoid cascading renders and linting warnings
+        setTimeout(() => setDeliveryAlertVisible(true), 0);
 
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('¿Recibiste tu pedido?', {
