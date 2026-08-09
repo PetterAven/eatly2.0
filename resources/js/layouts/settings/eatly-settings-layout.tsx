@@ -39,10 +39,7 @@ export default function EatlySettingsLayout({ children }: Readonly<PropsWithChil
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-900">
             <AppHeader
-                breadcrumbs={[
-                    { title: 'Configuración', href: String(editProfile()) },
-                    { title: currentItem.title, href: String(currentItem.href) },
-                ]}
+                breadcrumbs={[]}
             />
 
             <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 pb-24">
