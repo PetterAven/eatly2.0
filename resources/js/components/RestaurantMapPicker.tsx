@@ -80,12 +80,42 @@ export default function RestaurantMapPicker({
     ]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
+    const [locating, setLocating] = useState(false);
 
     useEffect(() => {
         if (latitude && longitude) {
             setPosition([latitude, longitude]);
         }
     }, [latitude, longitude]);
+
+    const useCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            alert(
+                'Tu navegador no permite obtener la ubicación. Usa el mapa o el buscador.',
+            );
+            return;
+        }
+
+        setLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const nextPosition: [number, number] = [
+                    position.coords.latitude,
+                    position.coords.longitude,
+                ];
+                setPosition(nextPosition);
+                fetchAddress(nextPosition[0], nextPosition[1], onChange);
+                setLocating(false);
+            },
+            () => {
+                alert(
+                    'No se pudo obtener tu ubicación. Revisa los permisos e inténtalo de nuevo.',
+                );
+                setLocating(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000 },
+        );
+    };
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,15 +124,50 @@ export default function RestaurantMapPicker({
         const query = searchQuery.trim().toLowerCase();
 
         // Campus UPP predefined locations/fallback
-        const campusLocations: Record<string, { lat: number; lng: number; name: string }> = {
-            'upp': { lat: 19.8145, lng: -98.7389, name: 'Universidad Politécnica de Pachuca (Campus Principal)' },
-            'edificio': { lat: 19.8148, lng: -98.7392, name: 'Campus UPP - Edificio Académico' },
-            'cafeteria': { lat: 19.8142, lng: -98.7385, name: 'Campus UPP - Zona de Cafeterías y Concesionarios' },
-            'biblioteca': { lat: 19.8150, lng: -98.7395, name: 'Campus UPP - Biblioteca Central' },
-            'canchas': { lat: 19.8138, lng: -98.7380, name: 'Campus UPP - Canchas Deportivas' },
-            'rectoria': { lat: 19.8152, lng: -98.7382, name: 'Campus UPP - Edificio de Rectoría y Administrativo' },
-            'servicios': { lat: 19.8143, lng: -98.7388, name: 'Campus UPP - Edificio de Servicios Estudiantiles' },
-            'pachuca': { lat: 20.1237, lng: -98.7364, name: 'Pachuca de Soto, Hidalgo' },
+        const campusLocations: Record<
+            string,
+            { lat: number; lng: number; name: string }
+        > = {
+            upp: {
+                lat: 19.8145,
+                lng: -98.7389,
+                name: 'Universidad Politécnica de Pachuca (Campus Principal)',
+            },
+            edificio: {
+                lat: 19.8148,
+                lng: -98.7392,
+                name: 'Campus UPP - Edificio Académico',
+            },
+            cafeteria: {
+                lat: 19.8142,
+                lng: -98.7385,
+                name: 'Campus UPP - Zona de Cafeterías y Concesionarios',
+            },
+            biblioteca: {
+                lat: 19.815,
+                lng: -98.7395,
+                name: 'Campus UPP - Biblioteca Central',
+            },
+            canchas: {
+                lat: 19.8138,
+                lng: -98.738,
+                name: 'Campus UPP - Canchas Deportivas',
+            },
+            rectoria: {
+                lat: 19.8152,
+                lng: -98.7382,
+                name: 'Campus UPP - Edificio de Rectoría y Administrativo',
+            },
+            servicios: {
+                lat: 19.8143,
+                lng: -98.7388,
+                name: 'Campus UPP - Edificio de Servicios Estudiantiles',
+            },
+            pachuca: {
+                lat: 20.1237,
+                lng: -98.7364,
+                name: 'Pachuca de Soto, Hidalgo',
+            },
         };
 
         // Check if query matches any campus keyword
@@ -123,7 +188,7 @@ export default function RestaurantMapPicker({
                     headers: {
                         'User-Agent': 'EatlyEatsUPP/1.0 (eatly@upp.edu.mx)',
                     },
-                }
+                },
             );
             const results = await res.json();
             if (results && results.length > 0) {
@@ -139,7 +204,9 @@ export default function RestaurantMapPicker({
                 const defaultAddr = `Campus UPP - Ubicación: ${searchQuery}`;
                 setPosition([defaultLat, defaultLng]);
                 onChange(defaultLat, defaultLng, defaultAddr);
-                alert(`No se encontró "${searchQuery}" en mapas externos, pero se ha asignado al Campus UPP. Puedes ajustar el pin o la dirección manualmente.`);
+                alert(
+                    `No se encontró "${searchQuery}" en mapas externos, pero se ha asignado al Campus UPP. Puedes ajustar el pin o la dirección manualmente.`,
+                );
             }
         } catch (err) {
             console.error('Error buscando dirección:', err);
@@ -148,7 +215,9 @@ export default function RestaurantMapPicker({
             const defaultAddr = `Campus UPP - Ubicación: ${searchQuery}`;
             setPosition([defaultLat, defaultLng]);
             onChange(defaultLat, defaultLng, defaultAddr);
-            alert('No se pudo conectar con el servicio de mapas externos. Se ha asignado la ubicación principal en el Campus UPP.');
+            alert(
+                'No se pudo conectar con el servicio de mapas externos. Se ha asignado la ubicación principal en el Campus UPP.',
+            );
         } finally {
             setSearching(false);
         }
@@ -173,6 +242,16 @@ export default function RestaurantMapPicker({
                     {searching ? 'Buscando...' : 'Buscar'}
                 </button>
             </form>
+            <button
+                type="button"
+                onClick={useCurrentLocation}
+                disabled={locating}
+                className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-2 text-xs font-bold text-[#FF5722] transition hover:bg-orange-100 disabled:opacity-50"
+            >
+                {locating
+                    ? 'Obteniendo ubicación...'
+                    : 'Usar mi ubicación actual'}
+            </button>
 
             <div className="relative z-0 h-[300px] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-inner">
                 <MapContainer

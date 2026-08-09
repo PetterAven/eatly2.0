@@ -66,49 +66,49 @@ interface AppHeaderProps {
     readonly breadcrumbs?: BreadcrumbItem[];
 }
 
+function getMainNavItems(userRole: string): NavItem[] {
+    if (userRole === 'merchant') {
+        return [
+            {
+                title: 'Panel de Tienda',
+                href: '/vendor/dashboard',
+                icon: Store,
+            },
+            { title: 'Mi Perfil', href: '/profile', icon: Settings },
+        ];
+    }
+    if (userRole === 'driver') {
+        return [
+            {
+                title: 'Panel de Repartidor',
+                href: '/delivery/dashboard',
+                icon: Bike,
+            },
+            { title: 'Mi Perfil', href: '/profile', icon: Settings },
+        ];
+    }
+    return [
+        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+        { title: 'Mis Pedidos', href: '/historial', icon: Clock },
+        { title: 'Mi Perfil', href: '/profile', icon: Settings },
+    ];
+}
+
+function getHomeUrl(userRole: string): string {
+    if (userRole === 'merchant') {
+        return '/vendor/dashboard';
+    }
+    if (userRole === 'driver') {
+        return '/delivery/dashboard';
+    }
+    return dashboard.url();
+}
+
 export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const user = auth?.user;
     const role = (user?.role as string) || 'client';
-
-    const getMainNavItems = (userRole: string): NavItem[] => {
-        if (userRole === 'merchant') {
-            return [
-                {
-                    title: 'Panel de Tienda',
-                    href: '/vendor/dashboard',
-                    icon: Store,
-                },
-                { title: 'Mi Perfil', href: '/profile', icon: Settings },
-            ];
-        }
-        if (userRole === 'driver') {
-            return [
-                {
-                    title: 'Panel de Repartidor',
-                    href: '/delivery/dashboard',
-                    icon: Bike,
-                },
-                { title: 'Mi Perfil', href: '/profile', icon: Settings },
-            ];
-        }
-        return [
-            { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
-            { title: 'Mis Pedidos', href: '/historial', icon: Clock },
-            { title: 'Mi Perfil', href: '/profile', icon: Settings },
-        ];
-    };
-
-    const getHomeUrl = (userRole: string) => {
-        if (userRole === 'merchant') {
-            return '/vendor/dashboard';
-        }
-        if (userRole === 'driver') {
-            return '/delivery/dashboard';
-        }
-        return dashboard();
-    };
 
     const mainNavItems = getMainNavItems(role);
     const homeUrl = getHomeUrl(role);

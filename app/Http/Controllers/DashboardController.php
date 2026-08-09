@@ -61,7 +61,7 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'activeOrder' => Order::where('user_id', Auth::id())
-                ->whereIn('status', ['pending', 'preparing', 'ready'])
+                ->whereIn('status', ['pending', 'preparing', 'ready', 'delivering', 'delivered'])
                 ->latest()
                 ->first(),
             'databaseProducts' => $products,

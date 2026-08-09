@@ -46,7 +46,8 @@ RUN chmod -R 777 storage bootstrap/cache
 EXPOSE 10000
 
 # Start command: Cache config/routes/views, run migrations, and start server
-CMD php artisan config:cache && \
+CMD php artisan storage:link --force && \
+    php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
     php artisan migrate --force && \

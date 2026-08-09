@@ -24,6 +24,10 @@ class Pedido extends Model
         'discount',
         'total',
         'driver_id',
+        'destino_edificio',
+        'destino_aula',
+        'delivery_lat',
+        'delivery_lng',
     ];
 
     protected $casts = [
@@ -31,6 +35,8 @@ class Pedido extends Model
         'subtotal' => 'decimal:2',
         'discount' => 'decimal:2',
         'total' => 'decimal:2',
+        'delivery_lat' => 'decimal:7',
+        'delivery_lng' => 'decimal:7',
     ];
 
     public function cliente()

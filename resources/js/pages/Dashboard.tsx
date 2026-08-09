@@ -36,17 +36,27 @@ interface DashboardProps {
     };
     databaseProducts?: Product[];
     restaurants?: RestaurantProp[];
+    activeOrder?: {
+        id: number;
+        code: string;
+        status: string;
+    } | null;
 }
 
 // Custom hook para manejar la ubicación de entrega y geolocalización
 function useDeliveryLocation() {
-    const [locationText, setLocationText] = useState('Edificio 2 - Aula 104');
+    const [building, setBuilding] = useState('Edificio 2');
+    const [classroom, setClassroom] = useState('Aula 104');
     const [coords, setCoords] = useState<{
         latitude: number | null;
         longitude: number | null;
     }>({ latitude: null, longitude: null });
-    const [isConfirmed, setIsConfirmed] = useState(true);
     const [loadingGeo, setLoadingGeo] = useState(false);
+
+    const locationText = [building, classroom]
+        .filter((value) => value.trim().length > 0)
+        .join(' - ');
+    const isConfirmed = Boolean(locationText) || coords.latitude !== null;
 
     const requestGeolocation = () => {
         if (!navigator.geolocation) {
@@ -58,10 +68,8 @@ function useDeliveryLocation() {
             (position) => {
                 const { latitude, longitude } = position.coords;
                 setCoords({ latitude, longitude });
-                setLocationText(
-                    `Ubicación detectada en Campus UPP (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
-                );
-                setIsConfirmed(true);
+                setBuilding('Ubicación GPS actual');
+                setClassroom(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
                 setLoadingGeo(false);
             },
             (error) => {
@@ -75,18 +83,16 @@ function useDeliveryLocation() {
         );
     };
 
-    const updateReference = (ref: string) => {
-        setLocationText(ref);
-        setIsConfirmed(ref.trim().length > 0);
-    };
-
     return {
+        building,
+        classroom,
+        setBuilding,
+        setClassroom,
         locationText,
         coords,
         isConfirmed,
         loadingGeo,
         requestGeolocation,
-        updateReference,
     };
 }
 
@@ -94,12 +100,15 @@ export default function Dashboard({
     auth,
     databaseProducts,
     restaurants = [],
+    activeOrder = null,
 }: Readonly<DashboardProps>) {
     const [cart, setCart] = useState<CartItem[]>([]);
+    const [failedImageIds, setFailedImageIds] = useState<number[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [deliveryAlertVisible, setDeliveryAlertVisible] = useState(false);
 
     const deliveryLocation = useDeliveryLocation();
 
@@ -111,6 +120,34 @@ export default function Dashboard({
             }
         }
     }, []);
+
+    useEffect(() => {
+        const interval = window.setInterval(() => {
+            router.reload({ only: ['activeOrder'] });
+        }, 15000);
+
+        return () => window.clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (!activeOrder || activeOrder.status !== 'delivered') {
+            return;
+        }
+
+        const noticeKey = `eatly-delivery-notice-${activeOrder.id}`;
+        if (window.sessionStorage.getItem(noticeKey)) {
+            return;
+        }
+
+        window.sessionStorage.setItem(noticeKey, 'shown');
+        setDeliveryAlertVisible(true);
+
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('¿Recibiste tu pedido?', {
+                body: `El repartidor marcó como entregado el pedido ${activeOrder.code}.`,
+            });
+        }
+    }, [activeOrder]);
 
     // Saludo dinámico según la hora del día y el nombre del usuario
     const getDynamicGreeting = (name?: string) => {
@@ -282,6 +319,33 @@ export default function Dashboard({
                     </div>
                 </header>
 
+                {deliveryAlertVisible && activeOrder && (
+                    <div className="fixed right-4 bottom-4 z-50 w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-orange-100 bg-white p-5 shadow-2xl sm:right-6 sm:bottom-6">
+                        <p className="text-sm font-black text-slate-900">
+                            ¿Recibiste tu pedido?
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                            El repartidor reportó la entrega del pedido{' '}
+                            {activeOrder.code}. Confírmalo para poder calificar.
+                        </p>
+                        <div className="mt-4 flex justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setDeliveryAlertVisible(false)}
+                                className="rounded-xl px-3 py-2 text-xs font-black text-slate-600 hover:bg-slate-100"
+                            >
+                                Después
+                            </button>
+                            <Link
+                                href="/historial"
+                                className="rounded-xl bg-[#FF5722] px-3 py-2 text-xs font-black text-white transition hover:bg-[#F4511E]"
+                            >
+                                Confirmar
+                            </Link>
+                        </div>
+                    </div>
+                )}
+
                 {/* MENÚ LATERAL ESTILO RAPPI (SIDEBAR / DRAWER) */}
                 <Sidebar
                     isOpen={isSidebarOpen}
@@ -376,19 +440,36 @@ export default function Dashboard({
                                 </div>
                             </div>
 
-                            {/* Input editable de entrega */}
-                            <div className="relative">
-                                <span className="absolute top-3.5 left-3.5 text-sm text-gray-400" />
+                            <div>
+                                <label className="mb-1 block text-[10px] font-black tracking-wider text-gray-500 uppercase">
+                                    Edificio o zona
+                                </label>
                                 <input
                                     type="text"
-                                    value={deliveryLocation.locationText}
+                                    value={deliveryLocation.building}
                                     onChange={(e) =>
-                                        deliveryLocation.updateReference(
+                                        deliveryLocation.setBuilding(
                                             e.target.value,
                                         )
                                     }
                                     placeholder="¿Dónde quieres recibir tu compra? (ej. Edificio 2 - Aula 104, Biblioteca, Canchas)"
-                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 py-3 pr-4 pl-10 text-xs font-bold text-gray-800 transition focus:bg-white focus:ring-2 focus:ring-[#FF5722]"
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-800 transition focus:bg-white focus:ring-2 focus:ring-[#FF5722]"
+                                />
+                            </div>
+                            <div className="mt-3">
+                                <label className="mb-1 block text-[10px] font-black tracking-wider text-gray-500 uppercase">
+                                    Salón o referencia
+                                </label>
+                                <input
+                                    type="text"
+                                    value={deliveryLocation.classroom}
+                                    onChange={(e) =>
+                                        deliveryLocation.setClassroom(
+                                            e.target.value,
+                                        )
+                                    }
+                                    placeholder="Ej. Aula 104, Biblioteca o Canchas"
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-800 transition focus:bg-white focus:ring-2 focus:ring-[#FF5722]"
                                 />
                             </div>
                         </div>
@@ -552,7 +633,10 @@ export default function Dashboard({
                                                             </span>
                                                         </div>
                                                         <div className="relative">
-                                                            {product.image ? (
+                                                            {product.image &&
+                                                            !failedImageIds.includes(
+                                                                product.id,
+                                                            ) ? (
                                                                 <img
                                                                     src={
                                                                         product.image
@@ -560,11 +644,30 @@ export default function Dashboard({
                                                                     alt={
                                                                         product.name
                                                                     }
+                                                                    onError={() =>
+                                                                        setFailedImageIds(
+                                                                            (
+                                                                                current,
+                                                                            ) =>
+                                                                                current.includes(
+                                                                                    product.id,
+                                                                                )
+                                                                                    ? current
+                                                                                    : [
+                                                                                          ...current,
+                                                                                          product.id,
+                                                                                      ],
+                                                                        )
+                                                                    }
                                                                     className="h-28 w-28 flex-shrink-0 rounded-2xl bg-gray-100 object-cover shadow-inner transition duration-300 group-hover:scale-105"
                                                                 />
                                                             ) : (
                                                                 <div className="flex h-28 w-28 flex-shrink-0 flex-col items-center justify-center rounded-2xl border border-orange-100 bg-orange-50 text-orange-400 shadow-inner">
-                                                                    <span className="px-1 text-center text-[9px] font-black tracking-wider text-orange-500 uppercase">Sin imagen</span>
+                                                                    <span className="px-1 text-center text-[9px] font-black tracking-wider text-orange-500 uppercase">
+                                                                        Sin
+                                                                        imagen
+                                                                        disponible
+                                                                    </span>
                                                                 </div>
                                                             )}
                                                             <div className="absolute -right-2 -bottom-2 transform rounded-full bg-[#FF5722] p-2 text-white opacity-0 shadow-lg transition duration-300 group-hover:scale-110 group-hover:opacity-100">
@@ -728,6 +831,9 @@ export default function Dashboard({
                                 initialDeliveryLocation={
                                     deliveryLocation.locationText
                                 }
+                                initialBuilding={deliveryLocation.building}
+                                initialClassroom={deliveryLocation.classroom}
+                                deliveryCoordinates={deliveryLocation.coords}
                             />
                         </div>
                     </div>

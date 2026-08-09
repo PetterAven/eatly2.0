@@ -10,6 +10,62 @@ use Illuminate\Support\Str;
 
 class PedidoController extends Controller
 {
+    /**
+     * El repartidor puede reportar una entrega, pero el pedido no se cierra
+     * hasta que el cliente la confirma desde su historial.
+     */
+    public function confirmarEntrega(Request $request, Pedido $pedido)
+    {
+        abort_unless($pedido->user_id === $request->user()->id, 403, 'No tienes permiso para confirmar este pedido.');
+
+        if ($pedido->status !== 'delivered') {
+            return back()->withErrors([
+                'error' => 'Este pedido aún no está listo para ser confirmado.',
+            ]);
+        }
+
+        $pedido->update(['status' => 'completed']);
+
+        return back()->with('success', 'Entrega confirmada. Ya puedes calificar al local y al repartidor.');
+    }
+
+    /**
+     * Las cancelaciones por parte del cliente solo se permiten antes de que
+     * un repartidor tome el pedido. Una vez en ruta, evitar cancelar protege
+     * al repartidor y al comercio que ya están atendiendo la orden.
+     */
+    public function cancelar(Request $request, Pedido $pedido)
+    {
+        abort_unless($pedido->user_id === $request->user()->id, 403, 'No tienes permiso para cancelar este pedido.');
+
+        $canBeCancelled = in_array($pedido->status, ['pending', 'preparing', 'ready'], true)
+            && $pedido->driver_id === null;
+
+        if (! $canBeCancelled) {
+            return back()->withErrors([
+                'error' => 'Este pedido ya está siendo entregado o finalizó, por lo que no puede cancelarse desde la app.',
+            ]);
+        }
+
+        $changes = ['status' => 'cancelled'];
+        $refundRequested = $pedido->payment_status === 'paid';
+
+        // El cobro es simulado: dejamos una señal clara para que un futuro
+        // proveedor de pagos procese el reembolso sin marcarlo como hecho.
+        if ($refundRequested) {
+            $changes['payment_status'] = 'refund_pending';
+        }
+
+        $pedido->update($changes);
+
+        return back()->with(
+            'success',
+            $refundRequested
+                ? 'Pedido cancelado. Tu reembolso quedó solicitado.'
+                : 'Pedido cancelado correctamente.'
+        );
+    }
+
     public function procesarPagoSimulado(Request $request)
     {
         $user = $request->user();
@@ -19,8 +75,10 @@ class PedidoController extends Controller
 
         $request->validate([
             'subtotal_comida' => 'required|numeric|min:0',
-            'destino_edificio' => 'required|string',
-            'destino_aula' => 'required|string',
+            'destino_edificio' => 'nullable|string|max:255|required_without:delivery_lat',
+            'destino_aula' => 'nullable|string|max:255',
+            'delivery_lat' => 'nullable|numeric|between:-90,90|required_without:destino_edificio',
+            'delivery_lng' => 'nullable|numeric|between:-180,180|required_with:delivery_lat',
             'metodo_pago' => 'required|in:tarjeta,efectivo',
             'vendedor_id' => 'nullable|exists:users,id',
             'repartidor_id' => 'nullable|exists:users,id',
@@ -56,6 +114,10 @@ class PedidoController extends Controller
                     'discount' => 0.00,
                     'total' => $totalPagado,
                     'driver_id' => null,
+                    'destino_edificio' => $request->destino_edificio,
+                    'destino_aula' => $request->destino_aula,
+                    'delivery_lat' => $request->delivery_lat,
+                    'delivery_lng' => $request->delivery_lng,
                 ]);
 
                 foreach ($request->items as $item) {

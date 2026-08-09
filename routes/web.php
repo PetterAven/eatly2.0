@@ -43,6 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Calificar un pedido entregado (comercio + repartidor)
     Route::post('/pedidos/{pedido}/calificar', [RatingController::class, 'store'])->name('pedidos.calificar');
+    Route::patch('/pedidos/{pedido}/confirmar-entrega', [PedidoController::class, 'confirmarEntrega'])->name('pedidos.confirmar-entrega');
+    Route::patch('/pedidos/{pedido}/cancelar', [PedidoController::class, 'cancelar'])->name('pedidos.cancelar');
 
     Route::post('/pedidos/simular-pago', [PedidoController::class, 'procesarPagoSimulado'])->name('pedidos.simular_pago');
 

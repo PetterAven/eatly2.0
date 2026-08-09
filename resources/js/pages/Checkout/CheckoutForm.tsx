@@ -18,6 +18,12 @@ interface CheckoutProps {
     readonly repartidorId?: number | null;
     readonly itemsCarrito: CartItemProps[];
     readonly initialDeliveryLocation?: string;
+    readonly initialBuilding?: string;
+    readonly initialClassroom?: string;
+    readonly deliveryCoordinates?: {
+        latitude: number | null;
+        longitude: number | null;
+    };
 }
 
 interface FormState {
@@ -25,6 +31,8 @@ interface FormState {
     subtotal_comida: number;
     destino_edificio: string;
     destino_aula: string;
+    delivery_lat: number | null;
+    delivery_lng: number | null;
     metodo_pago: 'tarjeta' | 'efectivo';
     vendedor_id: number | null;
     repartidor_id: number | null;
@@ -109,7 +117,8 @@ function PedidoExitosoCard({
                 <div className="flex justify-between">
                     <span>Destino de Entrega:</span>
                     <span className="font-bold text-gray-900">
-                        {initialDeliveryLocation || `${data.destino_edificio}, ${data.destino_aula}`}
+                        {initialDeliveryLocation ||
+                            `${data.destino_edificio}, ${data.destino_aula}`}
                     </span>
                 </div>
                 <div className="flex justify-between border-t border-gray-200 pt-2 font-bold text-gray-950">
@@ -132,7 +141,9 @@ function PedidoExitosoCard({
                             : 'bg-gray-950 hover:bg-gray-800'
                     }`}
                 >
-                    {descargado ? 'Ticket guardado' : 'Descargar ticket de compra'}
+                    {descargado
+                        ? 'Ticket guardado'
+                        : 'Descargar ticket de compra'}
                 </button>
                 <button
                     type="button"
@@ -155,6 +166,9 @@ export default function CheckoutForm({
     repartidorId = null,
     itemsCarrito,
     initialDeliveryLocation = '',
+    initialBuilding = '',
+    initialClassroom = '',
+    deliveryCoordinates,
 }: Readonly<CheckoutProps>) {
     const {
         auth,
@@ -174,8 +188,10 @@ export default function CheckoutForm({
     const { data, setData, post, processing, errors } = useForm<FormState>({
         cliente_id: auth.user ? auth.user.id : '',
         subtotal_comida: subtotalComida || 0,
-        destino_edificio: initialDeliveryLocation || 'Edificio 2',
-        destino_aula: initialDeliveryLocation || 'Aula 104',
+        destino_edificio: initialBuilding || initialDeliveryLocation || '',
+        destino_aula: initialClassroom,
+        delivery_lat: deliveryCoordinates?.latitude ?? null,
+        delivery_lng: deliveryCoordinates?.longitude ?? null,
         metodo_pago: 'efectivo',
         vendedor_id: vendedorId,
         repartidor_id: repartidorId,
@@ -195,8 +211,10 @@ export default function CheckoutForm({
             subtotal_comida: subtotalComida,
             local_id: localId,
             items: itemsMapeados,
+            delivery_lat: deliveryCoordinates?.latitude ?? null,
+            delivery_lng: deliveryCoordinates?.longitude ?? null,
         }));
-    }, [subtotalComida, localId, itemsCarrito, setData]);
+    }, [subtotalComida, localId, itemsCarrito, deliveryCoordinates, setData]);
 
     const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const valorLimpio = e.target.value.replace(/\D/g, '');
@@ -291,9 +309,7 @@ export default function CheckoutForm({
 
             {Object.keys(errors).length > 0 && (
                 <div className="space-y-1 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-600">
-                    <p className="font-bold">
-                        Corrige los siguientes errores:
-                    </p>
+                    <p className="font-bold">Corrige los siguientes errores:</p>
                     <ul className="list-inside list-disc pl-1 text-[11px] font-medium">
                         {Object.entries(errors).map(([key, msg]) => (
                             <li key={key}>{String(msg)}</li>
@@ -313,8 +329,67 @@ export default function CheckoutForm({
                         Destino Seleccionado
                     </span>
                     <p className="mt-0.5 text-xs font-bold text-gray-900">
-                        {initialDeliveryLocation || 'Campus UPP - Edificio 2'}
+                        {data.delivery_lat !== null &&
+                        data.delivery_lng !== null
+                            ? 'Ubicación GPS lista para el repartidor'
+                            : initialDeliveryLocation ||
+                              'Indica tu edificio y salón'}
                     </p>
+                </div>
+            </div>
+
+            <div className="space-y-3 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                <div>
+                    <h3 className="text-xs font-black text-gray-900">
+                        Punto de entrega
+                    </h3>
+                    <p className="mt-0.5 text-[11px] text-gray-500">
+                        Escribe tu edificio y salón, o usa la ubicación GPS que
+                        seleccionaste en el menú.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                        <label
+                            htmlFor="destino-edificio"
+                            className="mb-1 block text-[10px] font-bold text-gray-500 uppercase"
+                        >
+                            Edificio o zona
+                        </label>
+                        <input
+                            id="destino-edificio"
+                            type="text"
+                            value={data.destino_edificio}
+                            onChange={(event) =>
+                                setData('destino_edificio', event.target.value)
+                            }
+                            placeholder="Ej. Edificio 2"
+                            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-bold text-gray-800 focus:border-[#FF5722] focus:outline-none"
+                        />
+                        {errors.destino_edificio && (
+                            <p className="mt-1 text-[11px] text-red-600">
+                                {errors.destino_edificio}
+                            </p>
+                        )}
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="destino-aula"
+                            className="mb-1 block text-[10px] font-bold text-gray-500 uppercase"
+                        >
+                            Salón o referencia
+                        </label>
+                        <input
+                            id="destino-aula"
+                            type="text"
+                            value={data.destino_aula}
+                            onChange={(event) =>
+                                setData('destino_aula', event.target.value)
+                            }
+                            placeholder="Ej. Aula 104"
+                            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs font-bold text-gray-800 focus:border-[#FF5722] focus:outline-none"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -364,7 +439,10 @@ export default function CheckoutForm({
                     </div>
 
                     <div>
-                        <label htmlFor="numero-tarjeta" className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
+                        <label
+                            htmlFor="numero-tarjeta"
+                            className="mb-1 block text-[9px] font-bold text-gray-400 uppercase"
+                        >
                             Número de Tarjeta
                         </label>
                         <input
@@ -380,7 +458,10 @@ export default function CheckoutForm({
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label htmlFor="tarjeta-expiracion" className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
+                            <label
+                                htmlFor="tarjeta-expiracion"
+                                className="mb-1 block text-[9px] font-bold text-gray-400 uppercase"
+                            >
                                 Expiración
                             </label>
                             <input
@@ -395,7 +476,10 @@ export default function CheckoutForm({
                             />
                         </div>
                         <div>
-                            <label htmlFor="tarjeta-cvv" className="mb-1 block text-[9px] font-bold text-gray-400 uppercase">
+                            <label
+                                htmlFor="tarjeta-cvv"
+                                className="mb-1 block text-[9px] font-bold text-gray-400 uppercase"
+                            >
                                 CVV
                             </label>
                             <input

@@ -1,5 +1,12 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Bike, LogOut, Navigation, Package, Settings } from 'lucide-react';
+import {
+    Bike,
+    LogOut,
+    MapPin,
+    Navigation,
+    Package,
+    Settings,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface OrderItem {
@@ -14,9 +21,25 @@ interface Order {
     status: string;
     total: number;
     user?: { name: string; phone?: string };
-    branch?: { name: string };
+    branch?: {
+        name: string;
+        restaurant?: {
+            address?: string | null;
+            latitude?: number | string | null;
+            longitude?: number | string | null;
+        };
+        location?: {
+            address_line?: string | null;
+            lat?: number | string | null;
+            lng?: number | string | null;
+        };
+    };
     items: OrderItem[];
     driver_id?: number;
+    destino_edificio?: string | null;
+    destino_aula?: string | null;
+    delivery_lat?: number | string | null;
+    delivery_lng?: number | string | null;
 }
 
 interface Rating {
@@ -38,6 +61,50 @@ interface Props {
     availableOrders: Order[];
     myDeliveries: Order[];
     myRatings: Rating[];
+}
+
+function mapsUrl(
+    latitude: number | string | null | undefined,
+    longitude: number | string | null | undefined,
+    reference: string,
+) {
+    const hasCoordinates =
+        latitude !== null &&
+        latitude !== undefined &&
+        longitude !== null &&
+        longitude !== undefined &&
+        Number.isFinite(Number(latitude)) &&
+        Number.isFinite(Number(longitude));
+    const destination = hasCoordinates ? `${latitude},${longitude}` : reference;
+
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+}
+
+function restaurantMapsUrl(order: Order) {
+    const restaurant = order.branch?.restaurant;
+    const location = order.branch?.location;
+
+    return mapsUrl(
+        restaurant?.latitude ?? location?.lat,
+        restaurant?.longitude ?? location?.lng,
+        restaurant?.address ??
+            location?.address_line ??
+            `${order.branch?.name ?? 'Cafetería'} Universidad Politécnica de Pachuca`,
+    );
+}
+
+function clientMapsUrl(order: Order) {
+    return mapsUrl(
+        order.delivery_lat,
+        order.delivery_lng,
+        [
+            order.destino_edificio,
+            order.destino_aula,
+            'Universidad Politécnica de Pachuca',
+        ]
+            .filter(Boolean)
+            .join(', '),
+    );
 }
 
 export default function DeliveryDashboard({
@@ -112,7 +179,8 @@ export default function DeliveryDashboard({
                         href="/settings/profile"
                         className="flex items-center gap-1 rounded-2xl bg-gray-100 px-3.5 py-2 text-xs font-bold text-gray-700 transition duration-200 hover:bg-gray-200"
                     >
-                        <Settings className="h-3.5 w-3.5 text-[#FF5722]" /> Ajustes
+                        <Settings className="h-3.5 w-3.5 text-[#FF5722]" />{' '}
+                        Ajustes
                     </Link>
                     <button
                         type="button"
@@ -166,11 +234,14 @@ export default function DeliveryDashboard({
                                                 Pedido #{order.code || order.id}
                                             </span>
                                             <span
-                                                className={`rounded-full px-2.5 py-1 text-xs font-bold ${order.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}
+                                                className={`rounded-full px-2.5 py-1 text-xs font-bold ${order.status === 'delivered' ? 'bg-amber-100 text-amber-800' : order.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}
                                             >
-                                                {order.status === 'completed'
-                                                    ? 'Entregado'
-                                                    : 'En Ruta / Preparando'}
+                                                {order.status === 'delivered'
+                                                    ? 'Esperando confirmación'
+                                                    : order.status ===
+                                                        'completed'
+                                                      ? 'Entrega confirmada'
+                                                      : 'En ruta'}
                                             </span>
                                         </div>
 
@@ -199,10 +270,33 @@ export default function DeliveryDashboard({
                                                             key={`${order.id}-${i.id ?? i.item?.name ?? 'item'}-${i.quantity}`}
                                                         >
                                                             {i.quantity}x{' '}
-                                                            {i.item?.name || 'Platillo'}
+                                                            {i.item?.name ||
+                                                                'Platillo'}
                                                         </li>
                                                     ))}
                                                 </ul>
+                                            </div>
+                                            <div className="grid grid-cols-1 gap-2 pt-1 sm:grid-cols-2">
+                                                <a
+                                                    href={restaurantMapsUrl(
+                                                        order,
+                                                    )}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 font-bold text-amber-800 transition hover:bg-amber-100"
+                                                >
+                                                    <MapPin className="h-4 w-4" />
+                                                    Ver local en Maps
+                                                </a>
+                                                <a
+                                                    href={clientMapsUrl(order)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 font-bold text-purple-800 transition hover:bg-purple-100"
+                                                >
+                                                    <Navigation className="h-4 w-4" />
+                                                    Ir con el cliente
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -211,13 +305,13 @@ export default function DeliveryDashboard({
                                         <span className="font-black text-slate-900">
                                             ${Number(order.total).toFixed(2)}
                                         </span>
-                                        {order.status !== 'completed' && (
+                                        {order.status === 'delivering' && (
                                             <button
                                                 type="button"
                                                 onClick={() =>
                                                     updateStatus(
                                                         order.id,
-                                                        'completed',
+                                                        'delivered',
                                                     )
                                                 }
                                                 disabled={
@@ -229,7 +323,7 @@ export default function DeliveryDashboard({
                                                     order.id && (
                                                     <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                                                 )}
-                                                Marcar Entregado
+                                                Reportar entrega
                                             </button>
                                         )}
                                     </div>
@@ -293,7 +387,8 @@ export default function DeliveryDashboard({
                                                             key={`${order.id}-${i.id ?? i.item?.name ?? 'item'}-${i.quantity}`}
                                                         >
                                                             {i.quantity}x{' '}
-                                                            {i.item?.name || 'Platillo'}
+                                                            {i.item?.name ||
+                                                                'Platillo'}
                                                         </li>
                                                     ))}
                                                 </ul>
