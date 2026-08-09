@@ -24,11 +24,6 @@ const settingsNavItems = [
         href: showTwoFactor(),
         icon: Shield,
     },
-    {
-        title: 'Apariencia',
-        href: editAppearance(),
-        icon: Monitor,
-    },
 ];
 
 export default function EatlySettingsLayout({ children }: Readonly<PropsWithChildren>) {
