@@ -32,7 +32,6 @@ const settingsNavItems = [
 ];
 
 export default function EatlySettingsLayout({ children }: Readonly<PropsWithChildren>) {
-    const [menuOpen, setMenuOpen] = useState(false);
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
     const currentItem = settingsNavItems.find((item) => String(item.href) === currentPath) || settingsNavItems[0];
