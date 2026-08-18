@@ -2,7 +2,7 @@
 
 @import 'tw-animate-css';
 
-/* CORREGIDO: Le decimos a Tailwind v4 que escanee todos tus componentes de React */
+/* Mantenemos el escaneo de archivos para Tailwind v4 */
 @source '../js/**/*.tsx';
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -63,75 +63,98 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Modo Claro: Fondo neutro suave, color primario esmeralda vibrante */
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --background: oklch(0.985 0.005 160);
+    --foreground: oklch(0.145 0.02 160);
+    
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card-foreground: oklch(0.145 0.02 160);
+    
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.145 0.02 160);
+    
+    --primary: oklch(0.65 0.18 160);
+    --primary-foreground: oklch(0.99 0 0);
+    
+    --secondary: oklch(0.95 0.015 160);
+    --secondary-foreground: oklch(0.25 0.04 160);
+    
+    --muted: oklch(0.96 0.008 160);
+    --muted-foreground: oklch(0.50 0.02 160);
+    
+    --accent: oklch(0.94 0.025 160);
+    --accent-foreground: oklch(0.20 0.05 160);
+    
     --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
+    --destructive-foreground: oklch(0.985 0 0);
+    
+    --border: oklch(0.91 0.01 160);
+    --input: oklch(0.91 0.01 160);
+    --ring: oklch(0.65 0.18 160);
+    
+    --chart-1: oklch(0.65 0.18 160);
+    --chart-2: oklch(0.70 0.15 50);
+    --chart-3: oklch(0.60 0.14 230);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    
+    --radius: 0.75rem;
+    
+    --sidebar: oklch(0.99 0.003 160);
+    --sidebar-foreground: oklch(0.145 0.02 150);
+    --sidebar-primary: oklch(0.65 0.18 160);
+    --sidebar-primary-foreground: oklch(0.99 0 0);
+    --sidebar-accent: oklch(0.95 0.015 160);
+    --sidebar-accent-foreground: oklch(0.20 0.05 160);
+    --sidebar-border: oklch(0.92 0.01 160);
+    --sidebar-ring: oklch(0.65 0.18 160);
 }
 
+/* Modo Oscuro: Fondos con leve matiz verde pino profundo (evita el negro puro) */
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
+    --background: oklch(0.13 0.015 160);
+    --foreground: oklch(0.98 0.005 160);
+    
+    --card: oklch(0.17 0.015 160);
+    --card-foreground: oklch(0.98 0.005 160);
+    
+    --popover: oklch(0.17 0.015 160);
+    --popover-foreground: oklch(0.98 0.005 160);
+    
+    --primary: oklch(0.68 0.18 160);
+    --primary-foreground: oklch(0.12 0.02 160);
+    
+    --secondary: oklch(0.22 0.02 160);
+    --secondary-foreground: oklch(0.98 0.005 160);
+    
+    --muted: oklch(0.22 0.015 160);
+    --muted-foreground: oklch(0.68 0.02 160);
+    
+    --accent: oklch(0.25 0.025 160);
+    --accent-foreground: oklch(0.98 0.005 160);
+    
+    --destructive: oklch(0.45 0.18 25);
+    --destructive-foreground: oklch(0.98 0 0);
+    
+    --border: oklch(0.24 0.015 160);
+    --input: oklch(0.24 0.015 160);
+    --ring: oklch(0.68 0.18 160);
+    
+    --chart-1: oklch(0.68 0.18 160);
+    --chart-2: oklch(0.70 0.15 50);
+    --chart-3: oklch(0.60 0.14 230);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    
+    --sidebar: oklch(0.15 0.015 160);
+    --sidebar-foreground: oklch(0.98 0.005 160);
+    --sidebar-primary: oklch(0.68 0.18 160);
+    --sidebar-primary-foreground: oklch(0.12 0.02 160);
+    --sidebar-accent: oklch(0.22 0.02 160);
+    --sidebar-accent-foreground: oklch(0.98 0.005 160);
+    --sidebar-border: oklch(0.24 0.015 160);
+    --sidebar-ring: oklch(0.68 0.18 160);
 }
 
 @layer base {
@@ -140,6 +163,24 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground antialiased;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* Clases de utilidad para tarjetas modernas y elementos táctiles */
+@layer utilities {
+    .modern-card {
+        @apply bg-card text-card-foreground rounded-xl border border-border/60 shadow-sm transition-all duration-200 hover:shadow-md hover:border-border;
+    }
+
+    .glass-panel {
+        @apply bg-background/80 backdrop-blur-md border border-border/50;
+    }
+
+    .touch-scroller {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
     }
 }

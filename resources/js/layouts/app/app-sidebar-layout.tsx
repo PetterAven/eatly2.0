@@ -10,11 +10,13 @@ export default function AppSidebarLayout({
     breadcrumbs = [],
 }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     return (
-        <AppShell variant="sidebar">
+        <AppShell variant="sidebar" className="min-h-screen bg-background antialiased">
             <AppSidebar />
-            <AppContent variant="sidebar" className="overflow-x-hidden">
+            <AppContent variant="sidebar" className="overflow-x-hidden flex flex-col flex-1 min-w-0 transition-all duration-200">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                {children}
+                <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl mx-auto touch-scroller">
+                    {children}
+                </main>
             </AppContent>
         </AppShell>
     );
