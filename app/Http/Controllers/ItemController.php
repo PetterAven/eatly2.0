@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ItemController extends Controller
 {
@@ -12,7 +13,11 @@ class ItemController extends Controller
      */
     public function index()
     {
-        //
+        $items = Item::latest()->get();
+
+        return Inertia::render('Restaurant/Dishes', [
+            'items' => $items
+        ]);
     }
 
     /**
@@ -28,7 +33,23 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price'       => 'required|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'branch_id'   => 'nullable|exists:branches,id',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('platillos', 'public');
+            $validated['image'] = '/storage/' . $path;
+        }
+
+        Item::create($validated);
+
+        return redirect()->back()->with('success', 'Platillo creado correctamente.');
     }
 
     /**
@@ -40,7 +61,7 @@ class ItemController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for creating or editing the specified resource.
      */
     public function edit(Item $item)
     {
@@ -52,7 +73,23 @@ class ItemController extends Controller
      */
     public function update(Request $request, Item $item)
     {
-        //
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price'       => 'required|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'branch_id'   => 'nullable|exists:branches,id',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('platillos', 'public');
+            $validated['image'] = '/storage/' . $path;
+        }
+
+        $item->update($validated);
+
+        return redirect()->back()->with('success', 'Platillo actualizado correctamente.');
     }
 
     /**
@@ -60,6 +97,8 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
-        //
+        $item->delete();
+
+        return redirect()->back()->with('success', 'Platillo eliminado correctamente.');
     }
 }
