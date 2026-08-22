@@ -1,4 +1,5 @@
 import { Link, router } from '@inertiajs/react';
+import { Settings } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface SidebarProps {
@@ -38,7 +39,7 @@ export default function Sidebar({
         if (onSelectCategory) {
             onSelectCategory(category);
         } else {
-            router.visit('/login');
+            router.visit('/dashboard');
         }
         onClose();
     };
@@ -103,7 +104,7 @@ export default function Sidebar({
                             className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-white text-lg shadow-sm transition hover:bg-gray-50 hover:text-[#FF5722]"
                             title="Ajustes"
                         >
-                            
+                            <Settings className="h-5 w-5" />
                         </Link>
                     </div>
 

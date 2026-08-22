@@ -130,7 +130,7 @@ export default function Dashboard({
     }, []);
 
     useEffect(() => {
-        if (!activeOrder || activeOrder.status !== 'delivered') {
+        if (activeOrder?.status !== 'delivered') {
             return;
         }
 
@@ -442,10 +442,14 @@ export default function Dashboard({
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-[10px] font-black tracking-wider text-gray-500 uppercase">
+                                <label
+                                    htmlFor="building-input"
+                                    className="mb-1 block text-[10px] font-black tracking-wider text-gray-500 uppercase"
+                                >
                                     Edificio o zona
                                 </label>
                                 <input
+                                    id="building-input"
                                     type="text"
                                     value={deliveryLocation.building}
                                     onChange={(e) =>
@@ -458,10 +462,14 @@ export default function Dashboard({
                                 />
                             </div>
                             <div className="mt-3">
-                                <label className="mb-1 block text-[10px] font-black tracking-wider text-gray-500 uppercase">
+                                <label
+                                    htmlFor="classroom-input"
+                                    className="mb-1 block text-[10px] font-black tracking-wider text-gray-500 uppercase"
+                                >
                                     Salón o referencia
                                 </label>
                                 <input
+                                    id="classroom-input"
                                     type="text"
                                     value={deliveryLocation.classroom}
                                     onChange={(e) =>
