@@ -162,6 +162,7 @@ class EatlyCampusSeeder extends Seeder
         }
 
         // 7. Crear platillos
+        // 7. Crear platillos
         $platillos = [
             ['id' => 1, 'name' => 'Chilaquiles Tecolote con Pollo', 'price' => 65.00, 'branch_id' => 1, 'category_id' => 1, 'description' => 'Totopos crujientes, salsa verde viva, crema, queso de aro y pollo deshebrado.'],
             ['id' => 2, 'name' => 'Hamburguesa Monumental Potro', 'price' => 85.00, 'branch_id' => 2, 'category_id' => 1, 'description' => '150g de res, queso cheddar, tocino ahumado y papas a la francesa.'],
@@ -170,6 +171,8 @@ class EatlyCampusSeeder extends Seeder
             ['id' => 5, 'name' => 'Papas Locas con Queso y Tocino', 'price' => 40.00, 'branch_id' => 2, 'category_id' => 2, 'description' => 'Papas corte francés bañadas en queso cheddar líquido y tocino picado.'],
             ['id' => 6, 'name' => 'Frappé Oreo Supremo', 'price' => 45.00, 'branch_id' => 5, 'category_id' => 3, 'description' => 'Base cremosa de leche, galleta Oreo triturada, crema batida y chocolate.'],
             ['id' => 7, 'name' => 'Gomiboing Escarchado Fresa', 'price' => 35.00, 'branch_id' => 4, 'category_id' => 3, 'description' => 'Jugo Boing frío con hielos, escarchado con miguelito, chamoy y gomitas.'],
+            ['id' => 8, 'name' => 'Molletes Tradicionales (2 pzas)', 'price' => 35.00, 'branch_id' => 1, 'category_id' => 1, 'description' => 'Molletes con frijoles refritos, queso manchego fundido y pico de gallo.'],
+            ['id' => 9, 'name' => 'Agua del Día (1 Litro)', 'price' => 20.00, 'branch_id' => 5, 'category_id' => 3, 'description' => 'Agua fresca natural de fruta de temporada.'],
         ];
 
         foreach ($platillos as $platillo) {
