@@ -212,7 +212,7 @@ class EatlyCampusSeeder extends Seeder
                 'category_id' => 3,
                 'description' => 'Base cremosa de leche, galleta Oreo triturada, crema batida y chocolate.',
             ],
-            [
+            [ 
                 'id' => 7,
                 'name' => 'Gomiboing Escarchado Fresa',
                 'price' => 35.00,
