@@ -1,0 +1,180 @@
+import { type SharedData } from '@/types';
+import { Transition } from '@headlessui/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+
+import DeleteUser from '@/components/delete-user';
+import HeadingSmall from '@/components/heading-small';
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import EatlySettingsLayout from '@/layouts/settings/eatly-settings-layout';
+
+interface ProfileProps {
+    readonly mustVerifyEmail: boolean;
+    readonly status?: string;
+}
+
+export default function Profile({
+    mustVerifyEmail,
+    status,
+}: Readonly<ProfileProps>) {
+    const { auth } = usePage<SharedData>().props;
+    const isGoogleUser = Boolean((auth.user as Record<string, unknown>)?.google_id);
+
+    const userRole = (auth?.user as Record<string, unknown>)?.role as string || 'client';
+
+    const getProfileTypeLabel = () => {
+        if (userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante') {
+            return 'Perfil de restaurante / local';
+        }
+        if (userRole === 'driver') {
+            return 'Perfil de repartidor';
+        }
+        return 'Perfil de estudiante / comensal';
+    };
+
+    const getBadgeColor = () => {
+        if (userRole === 'merchant' || userRole === 'vendor' || userRole === 'restaurante') {
+            return 'bg-orange-100 text-orange-800 border-orange-200';
+        }
+        if (userRole === 'driver') {
+            return 'bg-amber-100 text-amber-800 border-amber-200';
+        }
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+    };
+
+    const profileTypeLabel = getProfileTypeLabel();
+    const badgeColor = getBadgeColor();
+
+    const { data, setData, patch, processing, errors, recentlySuccessful } =
+        useForm({
+            name: auth.user.name,
+            email: isGoogleUser ? '' : auth.user.email,
+        });
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        patch('/settings/profile', {
+            preserveScroll: true,
+        });
+    };
+
+    return (
+        <EatlySettingsLayout>
+            <Head title="Ajustes del perfil - Eatly UPP" />
+
+            <div className="space-y-6">
+                <div className={`inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-xs font-black tracking-wider uppercase shadow-sm ${badgeColor}`}>
+                    {profileTypeLabel}
+                </div>
+
+                <HeadingSmall
+                    title="Información del perfil"
+                    description="Actualiza tu nombre y dirección de correo electrónico"
+                />
+
+                <form onSubmit={submit} className="space-y-6">
+                    <div className="grid gap-2">
+                        <Label htmlFor="name" className="text-xs font-bold text-gray-700 uppercase">Nombre</Label>
+
+                        <Input
+                            id="name"
+                            className="mt-1 block w-full rounded-xl border-gray-200 text-xs"
+                            value={data.name}
+                            onChange={(e) =>
+                                setData('name', e.target.value)
+                            }
+                            required
+                            autoComplete="name"
+                            placeholder="Nombre completo"
+                        />
+
+                        <InputError
+                            className="mt-2 text-xs"
+                            message={errors.name}
+                        />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="email" className="text-xs font-bold text-gray-700 uppercase">Correo electrónico</Label>
+
+                        <Input
+                            id="email"
+                            type="email"
+                            className={`mt-1 block w-full rounded-xl border-gray-200 text-xs ${isGoogleUser ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
+                            value={isGoogleUser ? auth.user.email : data.email}
+                            onChange={(e) =>
+                                setData('email', e.target.value)
+                            }
+                            required={!isGoogleUser}
+                            disabled={isGoogleUser}
+                            autoComplete="username"
+                            placeholder="Correo electrónico"
+                        />
+                        {isGoogleUser && (
+                            <p className="text-[11px] font-medium text-orange-600">
+                                Vinculado a cuenta de Google (correo de solo lectura).
+                            </p>
+                        )}
+
+                        <InputError
+                            className="mt-2 text-xs"
+                            message={errors.email}
+                        />
+                    </div>
+
+                    {mustVerifyEmail &&
+                        auth.user.email_verified_at === null && (
+                            <div>
+                                <p className="-mt-4 text-xs text-muted-foreground">
+                                    Tu dirección de correo no está verificada.{' '}
+                                    <Link
+                                        href="/email/verification-notification"
+                                        method="post"
+                                        as="button"
+                                        className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
+                                    >
+                                        Haz clic aquí para reenviar el correo de verificación.
+                                    </Link>
+                                </p>
+
+                                {status === 'verification-link-sent' && (
+                                    <div className="mt-2 text-xs font-bold text-green-600">
+                                        Se ha enviado un nuevo enlace de verificación a tu correo.
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                    <div className="flex items-center gap-4">
+                        <Button
+                            type="submit"
+                            disabled={processing}
+                            className="rounded-xl bg-[#FF5722] hover:bg-[#F4511E] text-white text-xs font-black tracking-wider px-6 py-2.5 shadow-md transition"
+                            data-test="update-profile-button"
+                        >
+                            Guardar Cambios
+                        </Button>
+
+                        <Transition
+                            show={recentlySuccessful}
+                            enter="transition ease-in-out"
+                            enterFrom="opacity-0"
+                            leave="transition ease-in-out"
+                            leaveTo="opacity-0"
+                        >
+                            <p className="text-xs font-bold text-emerald-600">
+                                ✓ Guardado con éxito
+                            </p>
+                        </Transition>
+                    </div>
+                </form>
+
+                <div className="border-t border-gray-100 pt-6">
+                    <DeleteUser />
+                </div>
+            </div>
+        </EatlySettingsLayout>
+    );
+}

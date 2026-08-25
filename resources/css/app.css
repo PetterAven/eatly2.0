@@ -1,0 +1,186 @@
+@import 'tailwindcss';
+
+@import 'tw-animate-css';
+
+/* Mantenemos el escaneo de archivos para Tailwind v4 */
+@source '../js/**/*.tsx';
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Modo Claro: Fondo neutro suave, color primario esmeralda vibrante */
+:root {
+    --background: oklch(0.985 0.005 160);
+    --foreground: oklch(0.145 0.02 160);
+    
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0.02 160);
+    
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0.02 160);
+    
+    --primary: oklch(0.65 0.18 160);
+    --primary-foreground: oklch(0.99 0 0);
+    
+    --secondary: oklch(0.95 0.015 160);
+    --secondary-foreground: oklch(0.25 0.04 160);
+    
+    --muted: oklch(0.96 0.008 160);
+    --muted-foreground: oklch(0.50 0.02 160);
+    
+    --accent: oklch(0.94 0.025 160);
+    --accent-foreground: oklch(0.20 0.05 160);
+    
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.985 0 0);
+    
+    --border: oklch(0.91 0.01 160);
+    --input: oklch(0.91 0.01 160);
+    --ring: oklch(0.65 0.18 160);
+    
+    --chart-1: oklch(0.65 0.18 160);
+    --chart-2: oklch(0.70 0.15 50);
+    --chart-3: oklch(0.60 0.14 230);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    
+    --radius: 0.75rem;
+    
+    --sidebar: oklch(0.99 0.003 160);
+    --sidebar-foreground: oklch(0.145 0.02 150);
+    --sidebar-primary: oklch(0.65 0.18 160);
+    --sidebar-primary-foreground: oklch(0.99 0 0);
+    --sidebar-accent: oklch(0.95 0.015 160);
+    --sidebar-accent-foreground: oklch(0.20 0.05 160);
+    --sidebar-border: oklch(0.92 0.01 160);
+    --sidebar-ring: oklch(0.65 0.18 160);
+}
+
+/* Modo Oscuro: Fondos con leve matiz verde pino profundo (evita el negro puro) */
+.dark {
+    --background: oklch(0.13 0.015 160);
+    --foreground: oklch(0.98 0.005 160);
+    
+    --card: oklch(0.17 0.015 160);
+    --card-foreground: oklch(0.98 0.005 160);
+    
+    --popover: oklch(0.17 0.015 160);
+    --popover-foreground: oklch(0.98 0.005 160);
+    
+    --primary: oklch(0.68 0.18 160);
+    --primary-foreground: oklch(0.12 0.02 160);
+    
+    --secondary: oklch(0.22 0.02 160);
+    --secondary-foreground: oklch(0.98 0.005 160);
+    
+    --muted: oklch(0.22 0.015 160);
+    --muted-foreground: oklch(0.68 0.02 160);
+    
+    --accent: oklch(0.25 0.025 160);
+    --accent-foreground: oklch(0.98 0.005 160);
+    
+    --destructive: oklch(0.45 0.18 25);
+    --destructive-foreground: oklch(0.98 0 0);
+    
+    --border: oklch(0.24 0.015 160);
+    --input: oklch(0.24 0.015 160);
+    --ring: oklch(0.68 0.18 160);
+    
+    --chart-1: oklch(0.68 0.18 160);
+    --chart-2: oklch(0.70 0.15 50);
+    --chart-3: oklch(0.60 0.14 230);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    
+    --sidebar: oklch(0.15 0.015 160);
+    --sidebar-foreground: oklch(0.98 0.005 160);
+    --sidebar-primary: oklch(0.68 0.18 160);
+    --sidebar-primary-foreground: oklch(0.12 0.02 160);
+    --sidebar-accent: oklch(0.22 0.02 160);
+    --sidebar-accent-foreground: oklch(0.98 0.005 160);
+    --sidebar-border: oklch(0.24 0.015 160);
+    --sidebar-ring: oklch(0.68 0.18 160);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground antialiased;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* Clases de utilidad para tarjetas modernas y elementos táctiles */
+@layer utilities {
+    .modern-card {
+        @apply bg-card text-card-foreground rounded-xl border border-border/60 shadow-sm transition-all duration-200 hover:shadow-md hover:border-border;
+    }
+
+    .glass-panel {
+        @apply bg-background/80 backdrop-blur-md border border-border/50;
+    }
+
+    .touch-scroller {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+}

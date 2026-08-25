@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: eatly-upp
+    env: docker
+    plan: free
+    region: ohio
+    envVars:
+      - key: APP_NAME
+        value: Eatly
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
